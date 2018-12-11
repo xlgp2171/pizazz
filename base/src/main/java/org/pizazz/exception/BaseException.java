@@ -1,6 +1,6 @@
 package org.pizazz.exception;
 
-import org.pizazz.message.IMessageCode;
+import org.pizazz.message.ref.IMessageCode;
 
 /**
  * 基础异常

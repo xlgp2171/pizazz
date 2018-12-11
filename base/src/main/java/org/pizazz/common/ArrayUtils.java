@@ -35,6 +35,7 @@ public class ArrayUtils {
 
 	/**
 	 * 验证数组大小
+	 * 
 	 * @param target
 	 * @param min 为null则不验证
 	 * @param max 为null则不验证
@@ -59,6 +60,7 @@ public class ArrayUtils {
 
 	/**
 	 * 验证数组大小
+	 * 
 	 * @param target
 	 * @param min 为null则不验证
 	 * @param max 为null则不验证
@@ -82,6 +84,9 @@ public class ArrayUtils {
 	}
 
 	public static Object[] insert(Object[] target, int index, Object element) {
+		if (target == null) {
+			return EMPTY_OBJECT;
+		}
 		Object[] _tmp = new Object[target.length + 1];
 		int _length = target.length;
 
@@ -121,6 +126,13 @@ public class ArrayUtils {
 	}
 
 	public static String[] merge(String[] left, String[] right) {
+		if (right != null && isEmpty(left)) {
+			return right;
+		} else if (left != null && isEmpty(right)) {
+			return left;
+		} else if (left.length == 0 && right.length == 0) {
+			return EMPTY_STRING;
+		}
 		String[] _tmp = new String[left.length + right.length];
 		System.arraycopy(left, 0, _tmp, 0, left.length);
 		System.arraycopy(right, 0, _tmp, left.length, right.length);

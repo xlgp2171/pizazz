@@ -1,7 +1,7 @@
 package org.pizazz.exception;
 
 import org.pizazz.common.StringUtils;
-import org.pizazz.message.IMessageCode;
+import org.pizazz.message.ref.IMessageCode;
 
 /**
  * 内核运行异常<br>

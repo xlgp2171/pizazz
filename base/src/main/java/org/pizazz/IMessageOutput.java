@@ -9,7 +9,7 @@ import org.pizazz.exception.BaseException;
  * @param <T> 根据输出内容注册泛型
  * 
  * @author xlgp2171
- * @version 1.0.180601
+ * @version 1.0.181210
  */
 public interface IMessageOutput<T> extends ICloseable {
 

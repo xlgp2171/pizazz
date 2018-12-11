@@ -1,5 +1,7 @@
 package org.pizazz.message;
 
+import org.pizazz.message.ref.IMessageCode;
+
 /**
  * 内核错误识别码
  * 
@@ -11,7 +13,7 @@ public enum ErrorCodeEnum implements IMessageCode {
 	ERR_0000("ERR0000#"),
 	/** 未知操作系统 */
 	ERR_0001("ERR0001#"),
-	/** 类型转换错误 */
+	/** 异常包装 */
 	ERR_0002("ERR0002#");
 
 	private String code;

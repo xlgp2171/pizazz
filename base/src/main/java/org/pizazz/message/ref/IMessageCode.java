@@ -1,4 +1,4 @@
-package org.pizazz.message;
+package org.pizazz.message.ref;
 
 /**
  * 消息识别码接口
