@@ -1,4 +1,4 @@
-package org.pizazz.common.ref;
+package org.pizazz.message;
 
 /**
  * 表达式常量

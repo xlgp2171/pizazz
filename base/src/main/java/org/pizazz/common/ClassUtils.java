@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.pizazz.Constant;
-import org.pizazz.common.ref.ExpressionConstant;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
+import org.pizazz.message.ExpressionConstant;
 import org.pizazz.message.LocaleHelper;
 import org.pizazz.message.ref.TypeEnum;
 
