@@ -23,6 +23,6 @@ public interface IMessageOutput<T> extends ICloseable {
 	};
 
 	@Override
-	public default void close(int timeout) throws BaseException {
+	public default void destroy(int timeout) throws BaseException {
 	}
 }

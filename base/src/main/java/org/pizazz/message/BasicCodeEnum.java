@@ -32,7 +32,9 @@ public enum BasicCodeEnum implements IMessageCode {
 	/** ReflectException */
 	MSG_0010("MSG0010#"),
 	/** RegistryException */
-	MSG_0011("MSG0011#");
+	MSG_0011("MSG0011#"),
+	/** InterruptedException */
+	MSG_0012("MSG0012#");
 
 	private String code;
 	private StringBuffer message;

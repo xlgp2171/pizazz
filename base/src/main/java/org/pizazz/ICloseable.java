@@ -14,8 +14,8 @@ import org.pizazz.exception.BaseException;
 public interface ICloseable extends AutoCloseable {
 	@Override
 	public default void close() throws BaseException {
-		close(0);
+		destroy(0);
 	}
 
-	public void close(int timeout) throws BaseException;
+	public void destroy(int timeout) throws BaseException;
 }

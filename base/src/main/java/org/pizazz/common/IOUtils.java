@@ -58,8 +58,7 @@ public class IOUtils {
 		}
 		charset = charset == null ? StandardCharsets.UTF_8 : charset;
 
-		try (BufferedReader _buffer = new BufferedReader(
-				new InputStreamReader(in, charset))) {
+		try (BufferedReader _buffer = new BufferedReader(new InputStreamReader(in, charset))) {
 			String _line = _buffer.readLine();
 
 			while (_line != null) {
@@ -98,7 +97,7 @@ public class IOUtils {
 		}
 		if (_stream == null) {
 			try {
-				_stream= Files.newInputStream(Paths.get(resource));
+				_stream = Files.newInputStream(Paths.get(resource));
 			} catch (IOException e) {
 				String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO.PATH", resource, e.getMessage());
 				throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
@@ -191,9 +190,16 @@ public class IOUtils {
 
 	public static void close(ICloseable target, int timeout) {
 		if (target != null) {
-			try {
-				target.close(timeout);
-			} catch (BaseException e) {
+			if (timeout > 0) {
+				try {
+					target.destroy(timeout);
+				} catch (BaseException e) {
+				}
+			} else {
+				try {
+					target.close();
+				} catch (BaseException e) {
+				}
 			}
 		}
 	}
