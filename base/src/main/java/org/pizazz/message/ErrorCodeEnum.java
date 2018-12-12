@@ -14,7 +14,11 @@ public enum ErrorCodeEnum implements IMessageCode {
 	/** 未知操作系统 */
 	ERR_0001("ERR0001#"),
 	/** 异常包装 */
-	ERR_0002("ERR0002#");
+	ERR_0002("ERR0002#"),
+	/** 必要对外连接开启错误 */
+	ERR_0003("ERR0003#"),
+	/** 必要对外连接接收数据错误 */
+	ERR_0004("ERR0004#");
 
 	private String code;
 	private StringBuffer message;

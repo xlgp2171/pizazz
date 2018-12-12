@@ -26,14 +26,14 @@ public class CharUtils {
 	}
 
 	public static String fromUnicode(String first, String... more) throws BaseException {
-		AssertUtils.assertLimit("fromUnicode", 1, first, 4);
+		AssertUtils.assertLength("fromUnicode", 1, first, 4);
 		StringBuilder _tmp = new StringBuilder().append(toChar(first, 16));
 
 		if (more == null) {
 			return _tmp.toString();
 		}
 		for (int _i = 0; _i < more.length; _i ++) {
-			AssertUtils.assertLimit("fromUnicode", _i + 1, more[_i], 4);
+			AssertUtils.assertLength("fromUnicode", _i + 1, more[_i], 4);
 			_tmp.append(toChar(more[_i], 16));
 		}
 		return _tmp.toString();
