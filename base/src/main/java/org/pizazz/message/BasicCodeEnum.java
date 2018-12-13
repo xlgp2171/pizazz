@@ -46,7 +46,9 @@ public enum BasicCodeEnum implements IMessageCode {
 	/** DateException */
 	MSG_0017("MSG0017#"),
 	/** XMLException */
-	MSG_0018("MSG0018#");
+	MSG_0018("MSG0018#"),
+	/** LOGException */
+	MSG_0019("MSG0019#");
 
 	private String code;
 	private StringBuffer message;

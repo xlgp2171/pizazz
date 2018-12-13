@@ -10,5 +10,6 @@ import org.pizazz.exception.BaseException;
  */
 public interface IRunnable extends IObject, ICloseable, Runnable {
 
-	public void enable() throws BaseException;
+	public default void enable() throws BaseException {
+	}
 }

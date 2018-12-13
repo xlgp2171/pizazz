@@ -23,6 +23,10 @@ public class BaseException extends Exception {
 		super(cause);
 	}
 
+	public BaseException(IMessageCode code, Throwable cause) {
+		this(code.getValue(), cause);
+	}
+
 	public BaseException(String message, Throwable cause) {
 		super(message, cause);
 	}
