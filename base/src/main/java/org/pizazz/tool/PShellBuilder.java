@@ -4,11 +4,11 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 import org.pizazz.ICloseable;
 import org.pizazz.IMessageOutput;
+import org.pizazz.IObject;
 import org.pizazz.common.ArrayUtils;
 import org.pizazz.common.AssertUtils;
 import org.pizazz.common.SystemUtils;
@@ -19,15 +19,16 @@ import org.pizazz.tool.ref.IShellFactory;
  * SHELL运行组件
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.1.181216
  */
-public class PShellBuilder implements ICloseable {
+public class PShellBuilder implements ICloseable, IObject {
 
 	private IShellFactory factory;
 	private final ProcessBuilder builder;
 	private Charset charset = StandardCharsets.UTF_8;
 	private int timeout = 0;
 	private Process tmpProcess;
+	private String id = "";
 
 	public PShellBuilder(IShellFactory factory, String[] command) throws BaseException {
 		AssertUtils.assertNotNull("PShellBuilder", factory);
@@ -43,6 +44,10 @@ public class PShellBuilder implements ICloseable {
 		return this;
 	}
 
+	public String getId() {
+		return id;
+	}
+
 	public PShellBuilder charset(Charset charset) {
 		if (charset != null) {
 			this.charset = charset;
@@ -53,6 +58,7 @@ public class PShellBuilder implements ICloseable {
 	/**
 	 * 设置等待超时时间<br>
 	 * 其中大于0为超时设置，等于0为永不超时，小于0为不等待
+	 * 
 	 * @param timeout
 	 * @return
 	 */
@@ -65,7 +71,10 @@ public class PShellBuilder implements ICloseable {
 		return builder.environment();
 	}
 
-	private synchronized void turn(Process process, boolean force) {
+	private synchronized void turn(String id, Process process, boolean force) {
+		if (!this.id.equals(id)) {
+			return;
+		}
 		if (tmpProcess != null && process.isAlive()) {
 			if (force) {
 				tmpProcess.destroyForcibly();
@@ -73,59 +82,54 @@ public class PShellBuilder implements ICloseable {
 				tmpProcess.destroy();
 			}
 		}
+		this.id = SystemUtils.newUUIDSimple();
 		tmpProcess = process;
 	}
 
 	public FutureResult<List<String>> execute(IMessageOutput<String> outputS, IMessageOutput<String> outputE)
 			throws BaseException {
-		turn(factory.newProcess(builder, timeout), true);
-		final CountDownLatch _latch = new CountDownLatch(2);
-		ICloseable _shutdown = new ICloseable() {
-			@Override
-			public void destroy(int timeout) throws BaseException {
-				_latch.countDown();
-
-				if (_latch.getCount() <= 0) {
-					turn(null, false);
-				}
-			}
-		};
-		return new FutureResult<List<String>>(factory.submit(tmpProcess.getInputStream(), charset, _shutdown, outputS),
-				factory.submit(tmpProcess.getErrorStream(), charset, _shutdown, outputE));
+		builder.redirectErrorStream(false);
+		turn(this.id, factory.newProcess(builder, timeout), true);
+		FutureResult<List<String>> _result = new FutureResult<List<String>>(
+				factory.apply(tmpProcess.getInputStream(), charset, outputS),
+				factory.apply(tmpProcess.getErrorStream(), charset, outputE));
+		final String _currentId = this.id;
+		CompletableFuture.allOf(_result.getInputFuture(), _result.getErrorFuture())
+				.whenCompleteAsync((v, e) -> turn(_currentId, null, false), factory.getExecutorService());
+		return _result;
 	}
 
-	public Future<List<String>> execute(IMessageOutput<String> output) throws BaseException {
+	public CompletableFuture<List<String>> execute(IMessageOutput<String> output) throws BaseException {
 		builder.redirectErrorStream(true);
-		turn(factory.newProcess(builder, timeout), true);
-		return factory.submit(tmpProcess.getInputStream(), charset, new ICloseable() {
-
-			@Override
-			public void destroy(int timeout) throws BaseException {
-				turn(null, false);
-			}
-		}, output);
+		turn(this.id, factory.newProcess(builder, timeout), true);
+		final String _currentId = this.id;
+		return factory.apply(tmpProcess.getInputStream(), charset, output).thenApply(v -> {
+			turn(_currentId, null, false);
+			return v;
+		});
 	}
 
 	@Override
 	public void destroy(int timeout) throws BaseException {
-		turn(null, true);
+		turn(id, null, true);
+		id = "";
 	}
 
 	public static class FutureResult<T> {
-		private final Future<T> inputStream;
-		private final Future<T> errorStream;
+		private final CompletableFuture<T> input;
+		private final CompletableFuture<T> error;
 
-		public FutureResult(Future<T> inputStream, Future<T> errorStream) {
-			this.inputStream = inputStream;
-			this.errorStream = errorStream;
+		public FutureResult(CompletableFuture<T> input, CompletableFuture<T> error) {
+			this.input = input;
+			this.error = error;
 		}
 
-		public Future<T> getInputStream() {
-			return inputStream;
+		public CompletableFuture<T> getInputFuture() {
+			return input;
 		}
 
-		public Future<T> getErrorStream() {
-			return errorStream;
+		public CompletableFuture<T> getErrorFuture() {
+			return error;
 		}
 	}
 }

@@ -5,11 +5,12 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import org.pizazz.Constant;
 import org.pizazz.ICloseable;
@@ -19,6 +20,7 @@ import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.message.ConfigureHelper;
 import org.pizazz.message.LocaleHelper;
+import org.pizazz.message.MessageOutputHelper;
 import org.pizazz.message.ref.TypeEnum;
 import org.pizazz.tool.ref.IShellFactory;
 
@@ -26,11 +28,11 @@ import org.pizazz.tool.ref.IShellFactory;
  * SHELL工厂组件
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.1.181216
  */
 public final class PShellFactory implements IShellFactory, ICloseable {
 
-	private final ThreadPoolExecutor threadPool;
+	private final ExecutorService threadPool;
 
 	public PShellFactory() {
 		int _maximumPoolSize = ConfigureHelper.getInt(TypeEnum.BASIC, "DEF_SHELL_POOL_MAX", 16);
@@ -52,38 +54,29 @@ public final class PShellFactory implements IShellFactory, ICloseable {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PROCESS.START", e.getMessage());
 			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
 		}
-		if (timeout == 0) {
-			try {
+		try {
+			if (timeout == 0) {
 				_process.waitFor();
-			} catch (InterruptedException e) {
-				String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PROCESS.WAIT", e.getMessage());
-				throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
-			}
-		} else if (timeout > 0) {
-			try {
+			} else if (timeout > 0) {
 				_process.waitFor(timeout, TimeUnit.MILLISECONDS);
-			} catch (InterruptedException e) {
-				String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PROCESS.WAIT", e.getMessage());
-				throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
 			}
+		} catch (InterruptedException e) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PROCESS.WAIT", e.getMessage());
+			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
 		}
 		return _process;
 	}
 
 	@Override
-	public Future<List<String>> submit(InputStream in, Charset charset, ICloseable shutdown,
-			IMessageOutput<String> output) {
-		return threadPool
-				.submit(new StreamCallable(in, charset, shutdown, output == null ? new IMessageOutput<String>() {
-					@Override
-					public boolean isEnable() {
-						return true;
-					}
+	public CompletableFuture<List<String>> apply(InputStream in, Charset charset, IMessageOutput<String> output) {
+		return CompletableFuture.supplyAsync(
+				new StreamSupplier(in, charset, output == null ? MessageOutputHelper.EMPTY_STRING_ENABLE : output),
+				threadPool);
+	}
 
-					@Override
-					public void write(String message) {
-					}
-				} : output));
+	@Override
+	public ExecutorService getExecutorService() {
+		return threadPool;
 	}
 
 	@Override
@@ -91,21 +84,19 @@ public final class PShellFactory implements IShellFactory, ICloseable {
 		threadPool.shutdownNow();
 	}
 
-	private class StreamCallable implements Callable<List<String>> {
+	private class StreamSupplier implements Supplier<List<String>> {
 		private final InputStream in;
-		private final ICloseable shutdown;
 		private final Charset charset;
 		private final IMessageOutput<String> call;
 
-		public StreamCallable(InputStream in, Charset charset, ICloseable shutdown, IMessageOutput<String> call) {
+		public StreamSupplier(InputStream in, Charset charset, IMessageOutput<String> call) {
 			this.in = in;
 			this.charset = charset;
-			this.shutdown = shutdown;
 			this.call = call;
 		}
 
 		@Override
-		public List<String> call() throws Exception {
+		public List<String> get() {
 			final List<String> _tmp = new LinkedList<String>();
 			IOUtils.readLine(in, charset, new IMessageOutput<String>() {
 				@Override
@@ -121,7 +112,6 @@ public final class PShellFactory implements IShellFactory, ICloseable {
 					call.throwException(e);
 				};
 			});
-			shutdown.destroy(0);
 			return _tmp;
 		}
 	}
