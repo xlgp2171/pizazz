@@ -4,6 +4,7 @@ import java.util.Properties;
 
 import org.pizazz.context.ConfigureContext;
 import org.pizazz.message.ref.IType;
+import org.pizazz.message.ref.TypeEnum;
 
 /**
  * 内部配置工具
@@ -14,6 +15,9 @@ import org.pizazz.message.ref.IType;
 public class ConfigureHelper {
 
 	public static Properties validate(IType type) {
+		if (type == null) {
+			type = TypeEnum.BASIC;
+		}
 		ConfigureContext.getInstance().register(type);
 		return ConfigureContext.getInstance().getProperties(type);
 	}
