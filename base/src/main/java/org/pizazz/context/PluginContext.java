@@ -1,21 +1,22 @@
 package org.pizazz.context;
 
 import java.lang.ref.WeakReference;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
+import org.pizazz.ICloseable;
 import org.pizazz.IPlugin;
 
 /**
  * 插件环境组件
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.0.181216
  */
-public final class PluginContext {
+public final class PluginContext implements ICloseable {
 	private final ConcurrentMap<Class<?>, Set<WeakReference<IPlugin>>> tree;
 	private final Object lock = new Object();
 
@@ -27,39 +28,45 @@ public final class PluginContext {
 		return Singleton.INSTANCE.get();
 	}
 
-	public void create(Class<?>... type) {
+	public void create(Class<?>... types) {
 		synchronized (lock) {
-			for (Class<?> _item : type) {
-				if (!tree.containsKey(type)) {
-					Set<WeakReference<IPlugin>> _tmp = Collections
-					        .synchronizedSet(
-					                new HashSet<WeakReference<IPlugin>>());
-					tree.put(_item, _tmp);
+			for (Class<?> _item : types) {
+				if (!tree.containsKey(_item)) {
+					tree.put(_item, new ConcurrentSkipListSet<WeakReference<IPlugin>>());
 				}
 			}
 		}
 	}
 
 	public void register(Class<?> type, IPlugin plugin) {
-		getByType(type).add(new WeakReference<IPlugin>(plugin));
+		if (type != null && plugin != null) {
+			getByType(type).add(new WeakReference<IPlugin>(plugin));
+		}
 	}
 
 	public void unregister(Class<?> type, IPlugin plugin) {
-		getByType(type).remove(new WeakReference<IPlugin>(plugin));
+		if (type != null && plugin != null) {
+			getByType(type).remove(new WeakReference<IPlugin>(plugin));
+		}
 	}
 
 	public Set<WeakReference<IPlugin>> getByType(Class<?> type) {
+		if (type == null) {
+			return null;
+		}
 		if (!tree.containsKey(type)) {
 			create(type);
 		}
 		return tree.get(type);
 	}
 
-	public void clear() {
+	public Map<Class<?>, Set<WeakReference<IPlugin>>> getPluginTree() {
+		return tree;
+	}
+
+	public void destroy(int timeout) {
 		synchronized (lock) {
-			for (Set<WeakReference<IPlugin>> _item : tree.values()) {
-				_item.clear();
-			}
+			tree.values().stream().forEach(_item -> _item.clear());
 			tree.clear();
 		}
 	}

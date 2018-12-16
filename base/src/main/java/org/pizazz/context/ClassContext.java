@@ -8,15 +8,16 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.pizazz.ICloseable;
 import org.pizazz.tool.PClassLoader;
 
 /**
  * 类环境组件
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.0.181216
  */
-public final class ClassContext {
+public final class ClassContext implements ICloseable {
 	private final ConcurrentMap<String, WeakReference<PClassLoader>> loaders;
 	private final ConcurrentMap<URL, Set<String>> tree;
 	private final Object lock = new Object();
@@ -52,14 +53,17 @@ public final class ClassContext {
 	}
 
 	private void removeID(String id) {
-		for (Set<String> _item : tree.values()) {
+		tree.values().stream().forEach(_item -> {
 			if (_item.contains(id)) {
 				_item.remove(id);
 			}
-		}
+		});
 	}
 
 	public PClassLoader register(PClassLoader loader) {
+		if (loader == null) {
+			return null;
+		}
 		synchronized (lock) {
 			String _id = loader.getId();
 
@@ -117,7 +121,7 @@ public final class ClassContext {
 		return tree;
 	}
 
-	public void clear() {
+	public void destroy(int timeout) {
 		synchronized (lock) {
 			String[] _tmp = new String[loaders.size()];
 			_tmp = loaders.keySet().toArray(_tmp);

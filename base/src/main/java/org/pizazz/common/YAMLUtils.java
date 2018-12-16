@@ -51,7 +51,7 @@ public class YAMLUtils {
 		try (InputStream _tmp = IOUtils.getResourceAsStream(resource, Constant.class, null)) {
 			return fromYAML(_tmp, TupleObject.class, null);
 		} catch (IOException e) {
-			return TupleObjectUtils.emptyObject();
+			return TupleObjectHelper.emptyObject();
 		}
 	}
 }

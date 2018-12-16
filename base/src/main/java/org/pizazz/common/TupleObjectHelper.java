@@ -13,7 +13,7 @@ import org.pizazz.exception.BaseException;
  * @author xlgp2171
  * @version 1.0.181210
  */
-public class TupleObjectUtils {
+public class TupleObjectHelper {
 
 	public static TupleObject emptyObject() {
 		return newObject(1);

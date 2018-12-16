@@ -11,7 +11,7 @@ import org.pizazz.IPlugin;
 import org.pizazz.common.AssertUtils;
 import org.pizazz.common.IOUtils;
 import org.pizazz.common.SystemUtils;
-import org.pizazz.common.TupleObjectUtils;
+import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.data.TupleObject;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.ConfigureHelper;
@@ -50,7 +50,7 @@ public abstract class AbstractContainer<T> implements IPlugin {
 
 	public AbstractContainer(IPlugin plugin, IMessageOutput<T> output) throws BaseException {
 		AssertUtils.assertNotNull("AbstractContainer", plugin, output);
-		properties = TupleObjectUtils.newObject(4);
+		properties = TupleObjectHelper.newObject(4);
 		this.plugin = plugin;
 		this.output = output;
 	}

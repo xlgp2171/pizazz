@@ -10,7 +10,7 @@ import org.pizazz.IMessageOutput;
 import org.pizazz.IPlugin;
 import org.pizazz.common.StringUtils;
 import org.pizazz.common.SystemUtils;
-import org.pizazz.common.TupleObjectUtils;
+import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.data.TupleObject;
 import org.pizazz.exception.BaseError;
 import org.pizazz.exception.BaseException;
@@ -43,8 +43,8 @@ public class KeepContainer extends AbstractContainer<String> {
 
 	@Override
 	public void waitForShutdown() {
-		int _port = TupleObjectUtils.getInt(properties, KEY_CONTAINER_PORT, 10420);
-		String _key = TupleObjectUtils.getString(properties, KEY_CONTAINER_KEY, Constant.NAMING);
+		int _port = TupleObjectHelper.getInt(properties, KEY_CONTAINER_PORT, 10420);
+		String _key = TupleObjectHelper.getString(properties, KEY_CONTAINER_KEY, Constant.NAMING);
 		DatagramSocket _socket;
 		try {
 			_socket = new DatagramSocket(_port);
@@ -87,7 +87,7 @@ public class KeepContainer extends AbstractContainer<String> {
 			_packet.setData(new byte[36]);
 		}
 		int _maxTimeout = ConfigureHelper.getInt(TypeEnum.BASIC, "DEF_CONTAINER_TIMEOUT_MAX", 60000);
-		int _exitTime = TupleObjectUtils.getInt(properties, KEY_CONTAINER_TIMEOUT, 20000);
+		int _exitTime = TupleObjectHelper.getInt(properties, KEY_CONTAINER_TIMEOUT, 20000);
 		_exitTime = (_exitTime > 0 && _exitTime <= _maxTimeout) ? _exitTime : _maxTimeout;
 		destroy(_exitTime);
 	}

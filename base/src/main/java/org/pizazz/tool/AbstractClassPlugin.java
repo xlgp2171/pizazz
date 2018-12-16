@@ -4,7 +4,7 @@ import org.pizazz.IPlugin;
 import org.pizazz.common.AssertUtils;
 import org.pizazz.common.ClassUtils;
 import org.pizazz.common.IOUtils;
-import org.pizazz.common.TupleObjectUtils;
+import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.common.StringUtils;
 import org.pizazz.context.PluginContext;
 import org.pizazz.data.TupleObject;
@@ -20,7 +20,7 @@ import org.pizazz.message.ref.TypeEnum;
  * @version 1.0.181210
  */
 public abstract class AbstractClassPlugin implements IPlugin {
-	private final TupleObject configure = TupleObjectUtils.newObject();
+	private final TupleObject configure = TupleObjectHelper.newObject();
 
 	protected abstract void log(String msg, BaseException e);
 
@@ -68,7 +68,7 @@ public abstract class AbstractClassPlugin implements IPlugin {
 	 */
 	public IPlugin loadPlugin(String key, IPlugin defPlugin, ClassLoader loader, boolean initialize)
 			throws BaseException {
-		String _classpath = TupleObjectUtils.getString(configure, key, "");
+		String _classpath = TupleObjectHelper.getString(configure, key, "");
 		try {
 			return load(_classpath, key, defPlugin, loader, initialize, null);
 		} catch (BaseException e) {
