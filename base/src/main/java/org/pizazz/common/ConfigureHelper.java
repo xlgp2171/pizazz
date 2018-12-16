@@ -15,7 +15,7 @@ public class ConfigureHelper {
 
 	public static Properties validate(IType type) {
 		ConfigureContext.getInstance().register(type);
-		return ConfigureContext.getInstance().getConfigureTree().get(type);
+		return ConfigureContext.getInstance().getProperties(type);
 	}
 
 	public static String getString(IType type, String key, String defValue) {

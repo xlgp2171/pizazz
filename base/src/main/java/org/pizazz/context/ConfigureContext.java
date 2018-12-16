@@ -56,6 +56,10 @@ public final class ConfigureContext implements ICloseable {
 		return tree;
 	}
 
+	public Properties getProperties(IType type) {
+		return tree.get(type);
+	}
+
 	private void load(IType type) {
 		String _postfix = SystemUtils.getSystemProperty(Constant.NAMING_SHORT + ".configure.postfix", "_Configure");
 		try {
