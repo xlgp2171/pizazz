@@ -23,22 +23,37 @@ public class ConfigureHelper {
 	}
 
 	public static String getString(IType type, String key, String defValue) {
+		if (type == null) {
+			type = TypeEnum.BASIC;
+		}
 		return ResourceUtils.getString(validate(type), type.toConfigureKey(key), defValue);
 	}
 
 	public static int getInt(IType type, String key, int defValue) {
+		if (type == null) {
+			type = TypeEnum.BASIC;
+		}
 		return ResourceUtils.getInt(validate(type), type.toConfigureKey(key), defValue);
 	}
 
 	public static long getLong(IType type, String key, long defValue) {
+		if (type == null) {
+			type = TypeEnum.BASIC;
+		}
 		return ResourceUtils.getLong(validate(type), type.toConfigureKey(key), defValue);
 	}
 
 	public static double getDouble(IType type, String key, double defValue) {
+		if (type == null) {
+			type = TypeEnum.BASIC;
+		}
 		return ResourceUtils.getDouble(validate(type), type.toConfigureKey(key), defValue);
 	}
 
 	public static boolean getBoolean(IType type, String key, boolean defValue) {
+		if (type == null) {
+			type = TypeEnum.BASIC;
+		}
 		return ResourceUtils.getBoolean(validate(type), type.toConfigureKey(key), defValue);
 	}
 
