@@ -44,7 +44,9 @@ public final class ConfigureContext implements ICloseable {
 		if (type != null) {
 			if (tree.containsKey(type)) {
 				synchronized (tree) {
-					tree.remove(type).clear();
+					if (tree.containsKey(type)) {
+						tree.remove(type).clear();
+					}
 				}
 			}
 		}
