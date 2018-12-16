@@ -9,7 +9,7 @@ import org.pizazz.Constant;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.message.ExpressionConstant;
-import org.pizazz.message.ref.TypeEnum;
+import org.pizazz.message.TypeEnum;
 
 /**
  * 类处理工具

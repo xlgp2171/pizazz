@@ -8,7 +8,7 @@ import org.pizazz.common.ref.IJacksonConfig;
 import org.pizazz.data.TupleObject;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
-import org.pizazz.message.ref.TypeEnum;
+import org.pizazz.message.TypeEnum;
 
 /**
  * 对象YAML处理<br>

@@ -29,7 +29,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.pizazz.common.ref.KeySpecEnum;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
-import org.pizazz.message.ref.TypeEnum;
+import org.pizazz.message.TypeEnum;
 
 /**
  * 加密解密工具

@@ -4,8 +4,8 @@ import java.util.Locale;
 import java.util.Properties;
 
 import org.pizazz.context.LocaleContext;
+import org.pizazz.message.TypeEnum;
 import org.pizazz.message.ref.IType;
-import org.pizazz.message.ref.TypeEnum;
 
 /**
  * 国际化消息组件

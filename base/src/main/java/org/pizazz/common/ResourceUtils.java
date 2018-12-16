@@ -7,7 +7,7 @@ import java.util.Properties;
 import org.pizazz.Constant;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
-import org.pizazz.message.ref.TypeEnum;
+import org.pizazz.message.TypeEnum;
 
 /**
  * 资源工具

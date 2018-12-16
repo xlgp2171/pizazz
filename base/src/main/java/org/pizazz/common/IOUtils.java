@@ -22,7 +22,7 @@ import org.pizazz.IMessageOutput;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.message.MessageOutputHelper;
-import org.pizazz.message.ref.TypeEnum;
+import org.pizazz.message.TypeEnum;
 
 /**
  * 输入输出工具

@@ -15,7 +15,7 @@ import org.pizazz.common.IOUtils;
 import org.pizazz.common.LocaleHelper;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
-import org.pizazz.message.ref.TypeEnum;
+import org.pizazz.message.TypeEnum;
 
 /**
  * 文件夹监视组件

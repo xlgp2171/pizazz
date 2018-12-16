@@ -11,8 +11,8 @@ import org.pizazz.Constant;
 import org.pizazz.ICloseable;
 import org.pizazz.common.SystemUtils;
 import org.pizazz.exception.BaseException;
+import org.pizazz.message.TypeEnum;
 import org.pizazz.message.ref.IType;
-import org.pizazz.message.ref.TypeEnum;
 
 /**
  * 国际化消息环境组件

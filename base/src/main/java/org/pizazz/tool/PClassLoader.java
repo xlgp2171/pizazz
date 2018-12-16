@@ -19,7 +19,7 @@ import org.pizazz.common.LocaleHelper;
 import org.pizazz.common.SystemUtils;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
-import org.pizazz.message.ref.TypeEnum;
+import org.pizazz.message.TypeEnum;
 
 /**
  * 类加载组件

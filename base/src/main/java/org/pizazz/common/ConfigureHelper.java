@@ -3,8 +3,8 @@ package org.pizazz.common;
 import java.util.Properties;
 
 import org.pizazz.context.ConfigureContext;
+import org.pizazz.message.TypeEnum;
 import org.pizazz.message.ref.IType;
-import org.pizazz.message.ref.TypeEnum;
 
 /**
  * 内部配置工具

@@ -1,4 +1,6 @@
-package org.pizazz.message.ref;
+package org.pizazz.message;
+
+import org.pizazz.message.ref.IType;
 
 /**
  * 基础消息枚举

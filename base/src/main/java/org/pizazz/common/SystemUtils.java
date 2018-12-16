@@ -27,7 +27,7 @@ import org.pizazz.exception.BaseError;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.message.ErrorCodeEnum;
-import org.pizazz.message.ref.TypeEnum;
+import org.pizazz.message.TypeEnum;
 
 /**
  * 系统工具

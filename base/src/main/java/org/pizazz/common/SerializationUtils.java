@@ -6,7 +6,7 @@ import org.pizazz.common.ref.IJacksonConfig;
 import org.pizazz.common.ref.IKryoConfig;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
-import org.pizazz.message.ref.TypeEnum;
+import org.pizazz.message.TypeEnum;
 
 /**
  * 对象序列化工具

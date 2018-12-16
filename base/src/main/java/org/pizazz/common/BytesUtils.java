@@ -5,7 +5,7 @@ import java.nio.ByteBuffer;
 import org.pizazz.common.ArrayUtils;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
-import org.pizazz.message.ref.TypeEnum;
+import org.pizazz.message.TypeEnum;
 
 /**
  * 字节工具

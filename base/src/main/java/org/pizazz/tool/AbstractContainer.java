@@ -16,7 +16,7 @@ import org.pizazz.common.SystemUtils;
 import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.data.TupleObject;
 import org.pizazz.exception.BaseException;
-import org.pizazz.message.ref.TypeEnum;
+import org.pizazz.message.TypeEnum;
 
 /**
  * 容器组件超类

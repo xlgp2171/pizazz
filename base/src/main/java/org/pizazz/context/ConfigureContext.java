@@ -10,8 +10,8 @@ import org.pizazz.ICloseable;
 import org.pizazz.common.ResourceUtils;
 import org.pizazz.common.SystemUtils;
 import org.pizazz.exception.BaseException;
+import org.pizazz.message.TypeEnum;
 import org.pizazz.message.ref.IType;
-import org.pizazz.message.ref.TypeEnum;
 
 /**
  * 内部配置环境组件

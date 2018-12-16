@@ -15,7 +15,7 @@ import java.util.Set;
 import org.pizazz.common.ref.NetworkEnum;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
-import org.pizazz.message.ref.TypeEnum;
+import org.pizazz.message.TypeEnum;
 
 /**
  * 网络工具
