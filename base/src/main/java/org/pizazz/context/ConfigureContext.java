@@ -30,10 +30,7 @@ public final class ConfigureContext implements ICloseable {
 		register(TypeEnum.BASIC);
 	}
 
-	public IType register(IType type) {
-		if (type == null) {
-			return TypeEnum.BASIC;
-		}
+	public void register(IType type) {
 		if (!tree.containsKey(type)) {
 			synchronized (tree) {
 				if (!tree.containsKey(type)) {
@@ -41,7 +38,6 @@ public final class ConfigureContext implements ICloseable {
 				}
 			}
 		}
-		return type;
 	}
 
 	public void unregister(IType type) {
