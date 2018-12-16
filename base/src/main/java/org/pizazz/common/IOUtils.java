@@ -21,7 +21,6 @@ import org.pizazz.ICloseable;
 import org.pizazz.IMessageOutput;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
-import org.pizazz.message.LocaleHelper;
 import org.pizazz.message.MessageOutputHelper;
 import org.pizazz.message.ref.TypeEnum;
 

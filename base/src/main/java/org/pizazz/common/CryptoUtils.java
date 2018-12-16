@@ -29,7 +29,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.pizazz.common.ref.KeySpecEnum;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
-import org.pizazz.message.LocaleHelper;
 import org.pizazz.message.ref.TypeEnum;
 
 /**

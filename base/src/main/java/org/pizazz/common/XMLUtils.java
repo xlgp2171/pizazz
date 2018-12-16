@@ -11,7 +11,6 @@ import javax.xml.xpath.XPathFactory;
 
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
-import org.pizazz.message.LocaleHelper;
 import org.pizazz.message.ref.TypeEnum;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

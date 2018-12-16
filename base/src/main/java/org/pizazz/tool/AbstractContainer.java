@@ -11,11 +11,11 @@ import org.pizazz.IPlugin;
 import org.pizazz.common.AssertUtils;
 import org.pizazz.common.ConfigureHelper;
 import org.pizazz.common.IOUtils;
+import org.pizazz.common.LocaleHelper;
 import org.pizazz.common.SystemUtils;
 import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.data.TupleObject;
 import org.pizazz.exception.BaseException;
-import org.pizazz.message.LocaleHelper;
 import org.pizazz.message.ref.TypeEnum;
 
 /**
