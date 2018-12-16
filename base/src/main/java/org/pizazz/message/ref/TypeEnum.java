@@ -4,7 +4,7 @@ package org.pizazz.message.ref;
  * 基础消息枚举
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.0.181216
  */
 public enum TypeEnum implements IType {
 	BASIC {
@@ -15,7 +15,7 @@ public enum TypeEnum implements IType {
 		
 		@Override
 		public String toConfigureKey(String key) {
-			return new StringBuilder(key).insert(4, value() + "_").toString();
+			return value() + "_" + key;
 		}
 
 		@Override
