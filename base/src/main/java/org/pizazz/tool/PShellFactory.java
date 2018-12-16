@@ -18,9 +18,9 @@ import org.pizazz.IMessageOutput;
 import org.pizazz.common.ConfigureHelper;
 import org.pizazz.common.IOUtils;
 import org.pizazz.common.LocaleHelper;
+import org.pizazz.common.MessageOutputHelper;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
-import org.pizazz.message.MessageOutputHelper;
 import org.pizazz.message.TypeEnum;
 import org.pizazz.tool.ref.IShellFactory;
 

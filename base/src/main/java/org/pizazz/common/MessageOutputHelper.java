@@ -1,4 +1,4 @@
-package org.pizazz.message;
+package org.pizazz.common;
 
 import org.pizazz.IMessageOutput;
 
