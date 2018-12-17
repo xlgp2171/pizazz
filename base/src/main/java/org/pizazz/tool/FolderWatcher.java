@@ -36,7 +36,7 @@ public class FolderWatcher implements IRunnable {
 			dir.register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE,
 					StandardWatchEventKinds.ENTRY_MODIFY);
 		} catch (IOException e) {
-			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.WATCHER", dir.toAbsolutePath(),
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.DIR.WATCHER", dir.toAbsolutePath(),
 					e.getMessage());
 			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
 		}
