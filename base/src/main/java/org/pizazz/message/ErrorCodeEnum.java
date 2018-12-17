@@ -6,7 +6,7 @@ import org.pizazz.message.ref.IMessageCode;
  * 内核错误识别码
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.0.181217
  */
 public enum ErrorCodeEnum implements IMessageCode {
 	/** 未知的异常 */
@@ -22,6 +22,7 @@ public enum ErrorCodeEnum implements IMessageCode {
 
 	private String code;
 	private StringBuffer message;
+	private final Object lock = new Object();
 
 	private ErrorCodeEnum(String code) {
 		this.code = code;
@@ -40,7 +41,7 @@ public enum ErrorCodeEnum implements IMessageCode {
 	@Override
 	public IMessageCode append(Object target) {
 		if (message == null) {
-			synchronized (message) {
+			synchronized (lock) {
 				if (message == null) {
 					message = new StringBuffer();
 				}
