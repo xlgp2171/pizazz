@@ -1,41 +1,58 @@
 package org.pizazz.tool;
 
+import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Hashtable;
-import java.util.Map;
+import java.nio.file.Paths;
+import java.util.Enumeration;
+import java.util.WeakHashMap;
+import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.pizazz.Constant;
 import org.pizazz.IObject;
+import org.pizazz.common.ArrayUtils;
 import org.pizazz.common.AssertUtils;
 import org.pizazz.common.ClassUtils;
 import org.pizazz.common.IOUtils;
 import org.pizazz.common.LocaleHelper;
+import org.pizazz.common.PathUtils;
 import org.pizazz.common.SystemUtils;
+import org.pizazz.exception.BaseError;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
+import org.pizazz.message.ErrorCodeEnum;
 import org.pizazz.message.TypeEnum;
 
 /**
  * 类加载组件
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.1.181217
  */
 public class PClassLoader extends URLClassLoader implements IObject {
-	private final Map<URL, JarFile> paths;
+	/**
+	 * 未关闭的JAR文件
+	 */
+	protected final WeakHashMap<Closeable, Void> closeables;
 	private final String id;
-	private Path dir = SystemUtils.LOCAL_DIR;
+	private Path dir;
+	/**
+	 * 文件夹一旦使用则不允许修改
+	 */
+	private boolean isDirUpdate = true;
+	private final Object lock = new Object();
 
 	public PClassLoader(String id, ClassLoader parent) {
 		super(new URL[0], parent);
 		this.id = id;
-		paths = new Hashtable<URL, JarFile>();
+		closeables = new WeakHashMap<Closeable, Void>();
 	}
 
 	@Override
@@ -45,17 +62,16 @@ public class PClassLoader extends URLClassLoader implements IObject {
 
 	@Override
 	protected Class<?> findClass(String name) throws ClassNotFoundException {
-		Class<?> _tmp = super.findClass(name);
-
-		if (_tmp == null) {
-			_tmp = toClass(name);
+		try {
+			return super.findClass(name);
+		} catch (ClassNotFoundException e) {
+			return toClass(name);
 		}
-		return _tmp;
 	}
 
 	private Class<?> toClass(String name) throws ClassNotFoundException {
 		String _path = name.replace('.', '/').concat(".class");
-		Path _classFile = dir.resolve(_path);
+		Path _classFile = getDirectory().resolve(_path);
 
 		if (!Files.isReadable(_classFile) || !Files.isRegularFile(_classFile)) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.REGULAR", _classFile.toAbsolutePath());
@@ -77,14 +93,71 @@ public class PClassLoader extends URLClassLoader implements IObject {
 		return _tmp;
 	}
 
+	@Override
+	public InputStream getResourceAsStream(String name) {
+		InputStream _in = super.getResourceAsStream(name);
+
+		if (_in == null) {
+			try {
+				_in = PathUtils.getInputStream(getDirectory().resolve(name));
+			} catch (BaseException e) {
+				throw new BaseError(ErrorCodeEnum.ERR_0002, e);
+			}
+		}
+		return _in;
+	}
+
+	public synchronized PClassLoader addJAR(Path path) throws BaseException {
+		AssertUtils.assertNotNull("addJAR", path);
+
+		try (JarFile _item = new JarFile(path.toFile())) {
+			Enumeration<JarEntry> _entries = _item.entries();
+
+			while (_entries.hasMoreElements()) {
+				JarEntry _entry = _entries.nextElement();
+				String _name = _entry.getName();
+				// 兼容能获取文件夹的情况
+				if (_entry.isDirectory()) {
+					PathUtils.createDirectories(getDirectory().resolve(_name));
+				} else {
+					Path _dir = getDirectory().resolve(Paths.get(_name).getParent());
+
+					if (!Files.exists(_dir)) {
+						PathUtils.createDirectories(_dir);
+					}
+					try (InputStream _in = _item.getInputStream(_entry)) {
+						PathUtils.copyToPath(getDirectory().resolve(_name), _in);
+					}
+				}
+			}
+			isDirUpdate = false;
+		} catch (IOException e) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.REGULAR", path.toAbsolutePath());
+			throw new BaseException(BasicCodeEnum.MSG_0005, _msg, e);
+		}
+		URL _url;
+		try {
+			_url = getDirectory().toUri().toURL();
+		} catch (MalformedURLException e) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.REGULAR",
+					getDirectory().toAbsolutePath());
+			throw new BaseException(BasicCodeEnum.MSG_0005, _msg, e);
+		}
+		if (!ArrayUtils.contains(super.getURLs(), _url)) {
+			super.addURL(_url);
+		}
+		return this;
+	}
+
 	/**
-	 * new File("C:/lib/tools.jar");
+	 * 链接JAR文件<br>
+	 * Paths.get("C:/lib/tools.jar");
 	 * 
 	 * @param path
 	 * @throws BaseException
 	 */
-	public PClassLoader addJar(Path path) throws BaseException {
-		AssertUtils.assertNotNull("addJar", path);
+	public synchronized PClassLoader linkJAR(Path path) throws BaseException {
+		AssertUtils.assertNotNull("linkJAR", path);
 
 		if (!Files.isReadable(path) || !Files.isRegularFile(path)) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.REGULAR", path.toAbsolutePath());
@@ -98,54 +171,71 @@ public class PClassLoader extends URLClassLoader implements IObject {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.JAR.NAME", _name, e.getMessage());
 			throw new BaseException(BasicCodeEnum.MSG_0005, _msg, e);
 		}
-		return addJar(_url);
+		return linkJAR(_url);
 	}
 
 	/**
+	 * 链接JAR文件<br>
 	 * new URL("jar:file:/C:/lib/tools.jar!/");
 	 * 
 	 * @param url
 	 * @throws BaseException
 	 */
-	public PClassLoader addJar(URL url) throws BaseException {
-		AssertUtils.assertNotNull("addJar", url);
+	public synchronized PClassLoader linkJAR(URL url) throws BaseException {
+		AssertUtils.assertNotNull("linkJAR", url);
 
-		synchronized (paths) {
-			if (paths.containsKey(url)) {
-				String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.JAR.EXIST", url);
-				throw new BaseException(_msg);
-			}
-			JarFile _file;
-			// FIXME xlgp2171:是否会造成打开文件过多?
-			try {
-				JarURLConnection _connection = ClassUtils.cast(url.openConnection(), JarURLConnection.class);
-				_connection.setUseCaches(true);
-				// _connection.connect();
-				_file = _connection.getJarFile();
-			} catch (IOException e) {
-				String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.JAR.IN", url, e.getMessage());
-				throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
-			}
+		if (ArrayUtils.contains(super.getURLs(), url)) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.JAR.EXIST", url);
+			throw new BaseException(_msg);
+		}
+		JarFile _file;
+		// FIXME xlgp2171:是否会造成打开文件过多?
+		try {
+			JarURLConnection _connection = ClassUtils.cast(url.openConnection(), JarURLConnection.class);
+			_connection.setUseCaches(true);
+			// _connection.connect();
+			_file = _connection.getJarFile();
+		} catch (IOException e) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.JAR.IN", url, e.getMessage());
+			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
+		}
+		synchronized (closeables) {
 			super.addURL(url);
-			paths.put(url, _file);
+			closeables.put(_file, null);
 		}
 		return this;
 	}
 
-	public void setClassDirectory(Path dir) {
-		if (dir != null && Files.isDirectory(dir)) {
+	public void setDirectory(Path dir) {
+		if (isDirUpdate && dir != null && Files.isDirectory(dir)) {
 			this.dir = dir;
 		}
 	}
 
+	protected Path getDirectory() {
+		if (dir == null) {
+			synchronized (lock) {
+				if (dir == null) {
+					try {
+						dir = PathUtils.createTempDirectory(Constant.NAMING_SHORT + "_CLASS_");
+					} catch (BaseException e) {
+						dir = SystemUtils.LOCAL_DIR;
+					}
+				}
+			}
+		}
+		return dir;
+	}
+
 	@Override
 	public void close() {
+		isDirUpdate = false;
 		try {
 			super.close();
 		} catch (IOException e) {
 		}
-		paths.values().forEach(_item -> IOUtils.close(_item));
-		paths.clear();
+		closeables.keySet().forEach(_item -> IOUtils.close(_item));
+		closeables.clear();
 	}
 
 	@Override
