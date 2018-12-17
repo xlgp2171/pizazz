@@ -60,6 +60,7 @@ public class ClassUtils {
 
 	/**
 	 * 根据代码获取包名称
+	 * 
 	 * @param code 代码
 	 * @return
 	 * @throws BaseException
@@ -137,6 +138,15 @@ public class ClassUtils {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CLASS.FOUND", classpath);
 			throw new BaseException(BasicCodeEnum.MSG_0009, _msg, e);
 		}
+	}
+
+	/**
+	 * 获取类加载器
+	 * 
+	 * @return
+	 */
+	public static ClassLoader getClassLoader() {
+		return getClassLoader(null, Thread.currentThread());
 	}
 
 	/**
@@ -271,7 +281,10 @@ public class ClassUtils {
 	}
 
 	public static <T> T cast(Object target, Class<T> type) throws BaseException {
-		AssertUtils.assertNotNull("cast", target, type);
+		if (type == null) {
+			return null;
+		}
+		AssertUtils.assertNotNull("cast", target);
 		try {
 			return type.cast(target);
 		} catch (ClassCastException e) {

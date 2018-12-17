@@ -1,12 +1,15 @@
 package org.pizazz.common;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.channels.FileChannel;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
@@ -16,13 +19,25 @@ import org.pizazz.message.TypeEnum;
  * 文件工具
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.1.181217
  */
 public class PathUtils {
 
 	public static byte[] toByteArray(Path path) throws BaseException {
+		AssertUtils.assertNotNull("toByteArray", path);
 		try {
 			return Files.readAllBytes(path);
+		} catch (IOException e) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO.PATH", path.toAbsolutePath(),
+					e.getMessage());
+			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
+		}
+	}
+
+	public static InputStream getInputStream(Path path) throws BaseException {
+		AssertUtils.assertNotNull("getInputStream", path);
+		try {
+			return Files.newInputStream(path);
 		} catch (IOException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO.PATH", path.toAbsolutePath(),
 					e.getMessage());
@@ -72,5 +87,57 @@ public class PathUtils {
 			IOUtils.close(in);
 			IOUtils.close(out);
 		}
+	}
+
+	public static long copyToPath(Path path, InputStream in) throws BaseException {
+		AssertUtils.assertNotNull("copyToPath", path, in);
+		try {
+			return Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH", path.toAbsolutePath(), e.getMessage());
+			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
+		}
+	}
+
+	public static Path createDirectories(Path dir) throws BaseException {
+		AssertUtils.assertNotNull("createDirectories", dir);
+		try {
+			return Files.createDirectories(dir);
+		} catch (IOException e) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.DIR", dir.toAbsolutePath(), e.getMessage());
+			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
+		}
+	}
+
+	public static Path createTempDirectory(String prefix) throws BaseException {
+		try {
+			return Files.createTempDirectory(prefix);
+		} catch (IOException e) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.DIR.TEMP", e.getMessage());
+			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
+		}
+	}
+
+	public static Path copyToTemp(Path path, String prefix) throws BaseException {
+		AssertUtils.assertNotNull("copyToTemp", path);
+		return copyToTemp(toByteArray(path), prefix);
+	}
+
+	public static Path copyToTemp(byte[] data, String prefix) throws BaseException {
+		AssertUtils.assertNotNull("copyToTemp", data);
+		Path _tmp;
+		try {
+			_tmp = Files.createTempFile(prefix, ".tmp");
+		} catch (IOException e) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.TEMP", e.getMessage());
+			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
+		}
+		try (ByteArrayInputStream _in = new ByteArrayInputStream(data)) {
+			Files.copy(_in, _tmp, StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.WRITE", _tmp.toAbsolutePath(), e.getMessage());
+			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
+		}
+		return _tmp;
 	}
 }

@@ -6,7 +6,7 @@ import java.util.Arrays;
  * 数组工具
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.0.181217
  */
 public class ArrayUtils {
 
@@ -102,6 +102,20 @@ public class ArrayUtils {
 			_tmp[index] = element;
 		}
 		return _tmp;
+	}
+
+	public static boolean contains(Object[] target, Object o) {
+		if (target == null) {
+			return false;
+		}
+		for (Object _item : target) {
+			if (_item == null) {
+				continue;
+			} else if (_item.equals(o)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static Object[] nullToEmpty(Object[] target) {
