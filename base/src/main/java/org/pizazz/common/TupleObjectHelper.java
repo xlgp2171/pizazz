@@ -12,7 +12,7 @@ import org.pizazz.exception.BaseException;
  * 通用对象工具
  * 
  * @author xlgp2171
- * @version 1.1.181218
+ * @version 1.2.181219
  */
 public class TupleObjectHelper {
 
@@ -89,6 +89,19 @@ public class TupleObjectHelper {
 		return StringUtils.of(target.get(key));
 	}
 
+	public static String getNestString(TupleObject target, String defValue, String... keys) {
+		if (target == null || ArrayUtils.isEmpty(keys)) {
+			return defValue;
+		}
+		if (keys.length == 1) {
+			return getString(target, keys[0], defValue);
+		}
+		String[] _tmp = new String[keys.length];
+		System.arraycopy(keys, 0, _tmp, 0, keys.length - 1);
+		target = getNestTupleObject(target, _tmp);
+		return getString(target, keys[keys.length - 1], defValue);
+	}
+
 	public static String[] getStringArray(TupleObject target, String key, String regex, String[] defValue) {
 		if (target == null || !target.containsKey(key)) {
 			return defValue;
@@ -114,11 +127,37 @@ public class TupleObjectHelper {
 		return NumberUtils.toInt(StringUtils.of(target.get(key)), defValue);
 	}
 
+	public static int getNestInt(TupleObject target, int defValue, String... keys) {
+		if (target == null || ArrayUtils.isEmpty(keys)) {
+			return defValue;
+		}
+		if (keys.length == 1) {
+			return getInt(target, keys[0], defValue);
+		}
+		String[] _tmp = new String[keys.length];
+		System.arraycopy(keys, 0, _tmp, 0, keys.length - 1);
+		target = getNestTupleObject(target, _tmp);
+		return getInt(target, keys[keys.length - 1], defValue);
+	}
+
 	public static long getLong(TupleObject target, String key, long defValue) {
 		if (target == null || !target.containsKey(key)) {
 			return defValue;
 		}
 		return NumberUtils.toLong(StringUtils.of(target.get(key)), defValue);
+	}
+
+	public static long getNestLong(TupleObject target, long defValue, String... keys) {
+		if (target == null || ArrayUtils.isEmpty(keys)) {
+			return defValue;
+		}
+		if (keys.length == 1) {
+			return getLong(target, keys[0], defValue);
+		}
+		String[] _tmp = new String[keys.length];
+		System.arraycopy(keys, 0, _tmp, 0, keys.length - 1);
+		target = getNestTupleObject(target, _tmp);
+		return getLong(target, keys[keys.length - 1], defValue);
 	}
 
 	public static short getShort(TupleObject target, String key, short defValue) {
@@ -128,6 +167,19 @@ public class TupleObjectHelper {
 		return NumberUtils.toShort(StringUtils.of(target.get(key)), defValue);
 	}
 
+	public static short getNestShort(TupleObject target, short defValue, String... keys) {
+		if (target == null || ArrayUtils.isEmpty(keys)) {
+			return defValue;
+		}
+		if (keys.length == 1) {
+			return getShort(target, keys[0], defValue);
+		}
+		String[] _tmp = new String[keys.length];
+		System.arraycopy(keys, 0, _tmp, 0, keys.length - 1);
+		target = getNestTupleObject(target, _tmp);
+		return getShort(target, keys[keys.length - 1], defValue);
+	}
+
 	public static double getDouble(TupleObject target, String key, double defValue) {
 		if (target == null || !target.containsKey(key)) {
 			return defValue;
@@ -135,11 +187,37 @@ public class TupleObjectHelper {
 		return NumberUtils.toDouble(StringUtils.of(target.get(key)), defValue);
 	}
 
+	public static double getNestDouble(TupleObject target, double defValue, String... keys) {
+		if (target == null || ArrayUtils.isEmpty(keys)) {
+			return defValue;
+		}
+		if (keys.length == 1) {
+			return getDouble(target, keys[0], defValue);
+		}
+		String[] _tmp = new String[keys.length];
+		System.arraycopy(keys, 0, _tmp, 0, keys.length - 1);
+		target = getNestTupleObject(target, _tmp);
+		return getDouble(target, keys[keys.length - 1], defValue);
+	}
+
 	public static boolean getBoolean(TupleObject target, String key, boolean defValue) {
 		if (target == null || !target.containsKey(key)) {
 			return defValue;
 		}
 		return Boolean.parseBoolean(StringUtils.of(target.get(key)));
+	}
+
+	public static boolean getNestBoolean(TupleObject target, boolean defValue, String... keys) {
+		if (target == null || ArrayUtils.isEmpty(keys)) {
+			return defValue;
+		}
+		if (keys.length == 1) {
+			return getBoolean(target, keys[0], defValue);
+		}
+		String[] _tmp = new String[keys.length];
+		System.arraycopy(keys, 0, _tmp, 0, keys.length - 1);
+		target = getNestTupleObject(target, _tmp);
+		return getBoolean(target, keys[keys.length - 1], defValue);
 	}
 
 	public static TupleObject getTupleObject(TupleObject target, String key) {
@@ -153,6 +231,18 @@ public class TupleObjectHelper {
 		}
 	}
 
+	public static TupleObject getNestTupleObject(TupleObject target, String... keys) {
+		if (target == null || ArrayUtils.isEmpty(keys)) {
+			return emptyObject();
+		}
+		if (keys.length == 1) {
+			return getTupleObject(target, keys[0]);
+		}
+		for (int _i = 0; _i < keys.length - 1; _i ++) {
+			target = getTupleObject(target, keys[_i]);
+		}
+		return getTupleObject(target, keys[keys.length - 1]);
+	}
 	
 	@SuppressWarnings("unchecked")
 	public static List<Object> getList(TupleObject target, String key) {
@@ -164,5 +254,26 @@ public class TupleObjectHelper {
 		} catch (BaseException e) {
 			return CollectionUtils.emptyList();
 		}
+	}
+
+	/**
+	 * 按照key值顺序获取深层嵌套的List<br>
+	 * 最后一个key采用getList方法取值
+	 * 
+	 * @param target 获取目标
+	 * @param keys key值顺序
+	 * @return List集合
+	 */
+	public static List<Object> getNestList(TupleObject target, String... keys) {
+		if (target == null || ArrayUtils.isEmpty(keys)) {
+			return CollectionUtils.emptyList();
+		}
+		if (keys.length == 1) {
+			return getList(target, keys[0]);
+		}
+		String[] _tmp = new String[keys.length];
+		System.arraycopy(keys, 0, _tmp, 0, keys.length - 1);
+		target = getNestTupleObject(target, _tmp);
+		return getList(target, keys[keys.length - 1]);
 	}
 }
