@@ -57,20 +57,4 @@ public class AssertUtils {
 			throw new BaseException(BasicCodeEnum.MSG_0005, _msg);
 		}
 	}
-
-	public static void fail(String message) throws BaseException {
-		throw new BaseException(message == null ? StringUtils.EMPTY : message);
-	}
-
-	public static void assertTrue(String message, boolean target) throws BaseException {
-		if (!target) {
-			fail(message);
-		}
-	}
-
-	public static void assertFalse(String message, boolean target) throws BaseException {
-		if (target) {
-			fail(message);
-		}
-	}
 }

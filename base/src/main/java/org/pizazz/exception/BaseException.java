@@ -7,31 +7,21 @@ import org.pizazz.message.ref.IMessageCode;
  * 
  * @author xlgp2171
  * @version 1.0.181210
+ * 
+ * @see IMessageCode
  */
-public class BaseException extends Exception {
+public class BaseException extends AbstractException {
 	private static final long serialVersionUID = 6106125903101600702L;
 
-	public BaseException(String message) {
-		super(message);
-	}
-
 	public BaseException(IMessageCode code, String message) {
-		super(code.append(message).getValue());
-	}
-
-	public BaseException(Throwable cause) {
-		super(cause);
+		super(code, message);
 	}
 
 	public BaseException(IMessageCode code, Throwable cause) {
-		this(code.getValue(), cause);
-	}
-
-	public BaseException(String message, Throwable cause) {
-		super(message, cause);
+		super(code, cause);
 	}
 
 	public BaseException(IMessageCode code, String message, Throwable cause) {
-		super(code.append(message).getValue(), cause);
+		super(code, message, cause);
 	}
 }

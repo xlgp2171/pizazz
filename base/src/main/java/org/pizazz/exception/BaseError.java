@@ -12,7 +12,7 @@ import org.pizazz.message.ref.IMessageCode;
  * 
  * @see IMessageCode
  */
-public class BaseError extends RuntimeException {
+public class BaseError extends AbstractError {
 	private static final long serialVersionUID = -3508124189871042223L;
 
 	public BaseError(IMessageCode code) {
@@ -20,14 +20,14 @@ public class BaseError extends RuntimeException {
 	}
 
 	public BaseError(IMessageCode code, String message) {
-		super(code.append(message).getValue());
+		super(code, message);
 	}
 
 	public BaseError(IMessageCode code, Throwable cause) {
-		this(code, StringUtils.EMPTY, cause);
+		super(code, cause);
 	}
 
 	public BaseError(IMessageCode code, String message, Throwable cause) {
-		super(code.append(message).getValue(), cause);
+		super(code, message, cause);
 	}
 }
