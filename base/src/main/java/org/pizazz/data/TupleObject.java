@@ -15,7 +15,7 @@ import org.pizazz.message.ErrorCodeEnum;
  * 通用对象
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.0.181218
  */
 public class TupleObject extends LinkedHashMap<String, Object> implements IObject {
 	private static final long serialVersionUID = 2892973669901268754L;
@@ -42,6 +42,13 @@ public class TupleObject extends LinkedHashMap<String, Object> implements IObjec
 		return this;
 	}
 
+	public TupleObject append(Map<String, Object> value) {
+		if (value != null) {
+			putAll(value);
+		}
+		return this;
+	}
+
 	@Override
 	public String getId() {
 		// 默认的ID为:piz@[UUID]
@@ -53,6 +60,10 @@ public class TupleObject extends LinkedHashMap<String, Object> implements IObjec
 			}
 		}
 		return id;
+	}
+
+	public Map<String, Object> asMap() {
+		return this;
 	}
 
 	@Override
