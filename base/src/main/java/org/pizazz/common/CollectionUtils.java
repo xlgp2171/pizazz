@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,8 +36,7 @@ public class CollectionUtils {
 		return Collections.emptyMap();
 	}
 
-	public static <K, V> Map<K, V> unmodifiableMap(
-			Map<? extends K, ? extends V> target) {
+	public static <K, V> Map<K, V> unmodifiableMap(Map<? extends K, ? extends V> target) {
 		return Collections.unmodifiableMap(target);
 	}
 
@@ -72,7 +72,7 @@ public class CollectionUtils {
 	 * 
 	 * @param target
 	 * @return
-	 * @throws BaseException 
+	 * @throws BaseException
 	 */
 	public static <K, V> Map<V, K> flip(Map<K, V> target) throws BaseException {
 		AssertUtils.assertNotNull("flip", target);
@@ -80,6 +80,23 @@ public class CollectionUtils {
 
 		for (Map.Entry<K, V> _item : target.entrySet()) {
 			_tmp.put(_item.getValue(), _item.getKey());
+		}
+		return _tmp;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<String> convert(List<Object> target) {
+		if (isEmpty(target)) {
+			return emptyList();
+		}
+		List<String> _tmp;
+		try {
+			_tmp =  ClassUtils.newAndCast(target.getClass(), List.class);
+		} catch (BaseException e) {
+			_tmp = new LinkedList<String>();
+		}
+		for (Object _item : target) {
+			_tmp.add(StringUtils.of(_item));
 		}
 		return _tmp;
 	}
