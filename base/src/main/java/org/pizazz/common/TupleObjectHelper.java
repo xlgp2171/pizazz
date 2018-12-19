@@ -1,5 +1,6 @@
 package org.pizazz.common;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -11,7 +12,7 @@ import org.pizazz.exception.BaseException;
  * 通用对象工具
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.1.181218
  */
 public class TupleObjectHelper {
 
@@ -57,6 +58,19 @@ public class TupleObjectHelper {
 			}
 		}
 		return _tmp;
+	}
+
+	public static TupleObject merge(TupleObject left, TupleObject right) {
+		if (left == null && right == null) {
+			return emptyObject();
+		} else if (left == null) {
+			return right;
+		} else if (right == null) {
+			return left;
+		} else {
+			left.putAll(right);
+			return left;
+		}
 	}
 
 	public static Properties toProperties(Properties left, TupleObject right) {
@@ -136,6 +150,19 @@ public class TupleObjectHelper {
 			return ClassUtils.cast(target.get(key), TupleObject.class);
 		} catch (BaseException e) {
 			return emptyObject();
+		}
+	}
+
+	
+	@SuppressWarnings("unchecked")
+	public static List<Object> getList(TupleObject target, String key) {
+		if (target == null || !target.containsKey(key)) {
+			return CollectionUtils.emptyList();
+		}
+		try {
+			return ClassUtils.cast(target.get(key), List.class);
+		} catch (BaseException e) {
+			return CollectionUtils.emptyList();
 		}
 	}
 }
