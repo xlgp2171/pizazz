@@ -34,7 +34,7 @@ import org.pizazz.message.TypeEnum;
  * 类加载组件
  * 
  * @author xlgp2171
- * @version 1.1.181217
+ * @version 1.1.181218
  */
 public class PClassLoader extends URLClassLoader implements IObject {
 	/**
@@ -186,7 +186,7 @@ public class PClassLoader extends URLClassLoader implements IObject {
 
 		if (ArrayUtils.contains(super.getURLs(), url)) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.JAR.EXIST", url);
-			throw new BaseException(_msg);
+			throw new BaseException(BasicCodeEnum.MSG_0005, _msg);
 		}
 		JarFile _file;
 		// FIXME xlgp2171:是否会造成打开文件过多?
