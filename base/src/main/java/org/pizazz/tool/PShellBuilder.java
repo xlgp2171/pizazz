@@ -2,6 +2,7 @@ package org.pizazz.tool;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -19,7 +20,7 @@ import org.pizazz.tool.ref.IShellFactory;
  * SHELL运行组件
  * 
  * @author xlgp2171
- * @version 1.1.181216
+ * @version 1.1.181219
  */
 public class PShellBuilder implements ICloseable, IObject {
 
@@ -110,7 +111,7 @@ public class PShellBuilder implements ICloseable, IObject {
 	}
 
 	@Override
-	public void destroy(int timeout) throws BaseException {
+	public void destroy(Duration timeout) throws BaseException {
 		turn(id, null, true);
 		id = "";
 	}

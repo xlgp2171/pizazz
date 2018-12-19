@@ -13,6 +13,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,7 +28,7 @@ import org.pizazz.message.TypeEnum;
  * 输入输出工具
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.0.181219
  */
 public class IOUtils {
 
@@ -186,18 +187,15 @@ public class IOUtils {
 		}
 	}
 
-	public static void close(ICloseable target, int timeout) {
+	public static void close(ICloseable target, Duration timeout) {
 		if (target != null) {
-			if (timeout > 0) {
+			if (timeout!= null && !timeout.isNegative()) {
 				try {
 					target.destroy(timeout);
 				} catch (BaseException e) {
 				}
 			} else {
-				try {
-					target.close();
-				} catch (BaseException e) {
-				}
+				close(target);
 			}
 		}
 	}

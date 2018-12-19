@@ -1,5 +1,7 @@
 package org.pizazz.tool;
 
+import java.time.Duration;
+
 import org.pizazz.IPlugin;
 import org.pizazz.common.AssertUtils;
 import org.pizazz.common.ClassUtils;
@@ -17,7 +19,7 @@ import org.pizazz.message.TypeEnum;
  * 通用加载器组件
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.0.181219
  */
 public abstract class AbstractClassPlugin implements IPlugin {
 	private final TupleObject configure = TupleObjectHelper.newObject();
@@ -109,7 +111,7 @@ public abstract class AbstractClassPlugin implements IPlugin {
 		return instance;
 	}
 
-	public void unloadPlugin(IPlugin plugin, int timeout) {
+	public void unloadPlugin(IPlugin plugin, Duration timeout) {
 		if (plugin != null) {
 			IOUtils.close(plugin, timeout);
 			PluginContext.getInstance().unregister(getClass(), plugin);

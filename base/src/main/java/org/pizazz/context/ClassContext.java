@@ -2,6 +2,7 @@ package org.pizazz.context;
 
 import java.lang.ref.WeakReference;
 import java.net.URL;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -9,13 +10,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.pizazz.ICloseable;
+import org.pizazz.exception.BaseException;
 import org.pizazz.tool.PClassLoader;
 
 /**
  * 类环境组件
  * 
  * @author xlgp2171
- * @version 1.0.181216
+ * @version 1.0.181219
  */
 public final class ClassContext implements ICloseable {
 	private final ConcurrentMap<String, WeakReference<PClassLoader>> loaders;
@@ -121,7 +123,8 @@ public final class ClassContext implements ICloseable {
 		return tree;
 	}
 
-	public void destroy(int timeout) {
+	@Override
+	public void destroy(Duration timeout) throws BaseException {
 		synchronized (lock) {
 			String[] _tmp = new String[loaders.size()];
 			_tmp = loaders.keySet().toArray(_tmp);

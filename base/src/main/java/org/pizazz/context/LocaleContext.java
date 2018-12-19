@@ -1,5 +1,6 @@
 package org.pizazz.context;
 
+import java.time.Duration;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -18,7 +19,7 @@ import org.pizazz.message.ref.IType;
  * 国际化消息环境组件
  * 
  * @author xlgp2171
- * @version 1.0.181216
+ * @version 1.0.181219
  */
 public final class LocaleContext implements ICloseable {
 	private final ConcurrentMap<IType, Map<Locale, Properties>> tree;
@@ -94,7 +95,7 @@ public final class LocaleContext implements ICloseable {
 	}
 
 	@Override
-	public void destroy(int timeout) throws BaseException {
+	public void destroy(Duration timeout) throws BaseException {
 		tree.values().stream().forEach(_item -> _item.clear());
 		tree.clear();
 	}

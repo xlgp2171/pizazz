@@ -1,5 +1,6 @@
 package org.pizazz.context;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -71,7 +72,7 @@ public final class ConfigureContext implements ICloseable {
 	}
 
 	@Override
-	public void destroy(int timeout) throws BaseException {
+	public void destroy(Duration timeout) throws BaseException {
 		tree.values().stream().forEach(_item -> _item.clear());
 		tree.clear();
 	}

@@ -1,5 +1,7 @@
 package org.pizazz;
 
+import java.time.Duration;
+
 import org.pizazz.exception.BaseException;
 
 /**
@@ -9,7 +11,7 @@ import org.pizazz.exception.BaseException;
  * @param <T> 根据输出内容注册泛型
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.1.181219
  */
 public interface IMessageOutput<T> extends ICloseable {
 
@@ -23,6 +25,6 @@ public interface IMessageOutput<T> extends ICloseable {
 	};
 
 	@Override
-	public default void destroy(int timeout) throws BaseException {
+	public default void destroy(Duration timeout) throws BaseException {
 	}
 }

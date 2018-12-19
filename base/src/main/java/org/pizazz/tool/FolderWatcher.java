@@ -7,6 +7,7 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.time.Duration;
 
 import org.pizazz.IMessageOutput;
 import org.pizazz.IRunnable;
@@ -21,7 +22,7 @@ import org.pizazz.message.TypeEnum;
  * 文件夹监视组件
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.0.181219
  */
 public class FolderWatcher implements IRunnable {
 
@@ -70,7 +71,7 @@ public class FolderWatcher implements IRunnable {
 	}
 
 	@Override
-	public void destroy(int timeout) {
+	public void destroy(Duration timeout) throws BaseException {
 		IOUtils.close(service);
 		IOUtils.close(watcher, timeout);
 	}

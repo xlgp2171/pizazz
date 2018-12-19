@@ -1,5 +1,7 @@
 package org.pizazz;
 
+import java.time.Duration;
+
 import org.pizazz.exception.BaseException;
 
 /**
@@ -7,15 +9,15 @@ import org.pizazz.exception.BaseException;
  * 提供自动关闭方法
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.1.181219
  * 
  * @see AutoCloseable
  */
 public interface ICloseable extends AutoCloseable {
 	@Override
 	public default void close() throws BaseException {
-		destroy(0);
+		destroy(Duration.ZERO);
 	}
 
-	public void destroy(int timeout) throws BaseException;
+	public void destroy(Duration timeout) throws BaseException;
 }

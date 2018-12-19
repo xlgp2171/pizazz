@@ -1,6 +1,7 @@
 package org.pizazz.context;
 
 import java.lang.ref.WeakReference;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,12 +10,13 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.pizazz.ICloseable;
 import org.pizazz.IPlugin;
+import org.pizazz.exception.BaseException;
 
 /**
  * 插件环境组件
  * 
  * @author xlgp2171
- * @version 1.0.181216
+ * @version 1.0.181219
  */
 public final class PluginContext implements ICloseable {
 	private final ConcurrentMap<Class<?>, Set<WeakReference<IPlugin>>> tree;
@@ -64,7 +66,8 @@ public final class PluginContext implements ICloseable {
 		return tree;
 	}
 
-	public void destroy(int timeout) {
+	@Override
+	public void destroy(Duration timeout) throws BaseException {
 		synchronized (lock) {
 			tree.values().stream().forEach(_item -> _item.clear());
 			tree.clear();

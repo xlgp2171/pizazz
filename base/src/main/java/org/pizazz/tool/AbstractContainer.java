@@ -1,5 +1,6 @@
 package org.pizazz.tool;
 
+import java.time.Duration;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -24,7 +25,7 @@ import org.pizazz.message.TypeEnum;
  * @param <T> 输出类型
  *
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.0.181219
  */
 public abstract class AbstractContainer<T> implements IPlugin {
 	static final String KEY_CONTAINER_PORT = "$PORT";
@@ -39,7 +40,7 @@ public abstract class AbstractContainer<T> implements IPlugin {
 		@Override
 		public Integer call() throws Exception {
 			try {
-				plugin.destroy(-1);
+				plugin.destroy(Duration.ZERO);
 			} catch (Exception e) {
 				output.throwException(e);
 				return -1;
@@ -71,10 +72,13 @@ public abstract class AbstractContainer<T> implements IPlugin {
 	}
 
 	@Override
-	public void destroy(int timeout) {
+	public void destroy(Duration timeout) throws BaseException {
 		int _status = 0;
 
-		if (timeout <= 0) {
+		if (timeout == null) {
+			timeout = Duration.ofMillis(-1);
+		}
+		if (timeout.isZero() || timeout.isNegative()) {
 			try {
 				_status = callable.call();
 			} catch (Exception e) {
@@ -82,7 +86,8 @@ public abstract class AbstractContainer<T> implements IPlugin {
 			}
 		} else {
 			try {
-				_status = Executors.newSingleThreadExecutor().submit(callable).get(timeout, TimeUnit.MILLISECONDS);
+				_status = Executors.newSingleThreadExecutor().submit(callable).get(timeout.toMillis(),
+						TimeUnit.MILLISECONDS);
 			} catch (TimeoutException e) {
 				String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CONTAINER.TIMEOUT", timeout);
 				SystemUtils.println(System.err, new StringBuilder(_msg));
@@ -93,7 +98,7 @@ public abstract class AbstractContainer<T> implements IPlugin {
 				Runtime.getRuntime().halt(_status);
 				return;
 			} finally {
-				IOUtils.close(output, 0);
+				IOUtils.close(output, Duration.ZERO);
 			}
 		}
 		Runtime.getRuntime().exit(_status);

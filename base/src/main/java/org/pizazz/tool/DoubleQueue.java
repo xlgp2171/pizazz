@@ -1,6 +1,7 @@
 package org.pizazz.tool;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.AbstractQueue;
 import java.util.Collection;
 import java.util.Iterator;
@@ -19,7 +20,7 @@ import org.pizazz.exception.BaseException;
  * 代码参考DataX
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.0.181219
  */
 public class DoubleQueue<E> extends AbstractQueue<E> implements BlockingQueue<E>, Serializable, ICloseable {
 	private static final long serialVersionUID = 8209223542093795745L;
@@ -224,7 +225,7 @@ public class DoubleQueue<E> extends AbstractQueue<E> implements BlockingQueue<E>
 	}
 
 	@Override
-	public void destroy(int timeout) {
+	public void destroy(Duration timeout) throws BaseException {
 		awake.signalAll();
 		notFull.signalAll();
 

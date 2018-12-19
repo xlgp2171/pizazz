@@ -3,6 +3,7 @@ package org.pizazz.tool;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -28,7 +29,7 @@ import org.pizazz.tool.ref.IShellFactory;
  * SHELL工厂组件
  * 
  * @author xlgp2171
- * @version 1.1.181216
+ * @version 1.1.181219
  */
 public final class PShellFactory implements IShellFactory, ICloseable {
 
@@ -80,8 +81,12 @@ public final class PShellFactory implements IShellFactory, ICloseable {
 	}
 
 	@Override
-	public void destroy(int timeout) throws BaseException {
-		threadPool.shutdownNow();
+	public void destroy(Duration timeout) throws BaseException {
+		if (timeout.isNegative() || timeout.isZero()) {
+			threadPool.shutdownNow();
+		} else {
+			threadPool.shutdown();
+		}
 	}
 
 	private class StreamSupplier implements Supplier<List<String>> {
