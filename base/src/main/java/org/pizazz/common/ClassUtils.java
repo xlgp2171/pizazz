@@ -15,7 +15,7 @@ import org.pizazz.message.TypeEnum;
  * 类处理工具
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.0.181218
  */
 public class ClassUtils {
 	// 包装类型对应包装类
@@ -104,12 +104,7 @@ public class ClassUtils {
 	 */
 	public static <T> T newClass(String classpath, ClassLoader loader, Class<T> type) throws BaseException {
 		Class<?> _clazz = loadClass(classpath, loader, true);
-		try {
-			return cast(_clazz.newInstance(), type);
-		} catch (InstantiationException | IllegalAccessException e) {
-			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CLASS.INIT", _clazz.getName(), e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0001, _msg, e);
-		}
+		return newAndCast(_clazz, type);
 	}
 
 	/**
@@ -291,6 +286,22 @@ public class ClassUtils {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CLASS.CAST", target.getClass().getName(),
 					type.getName());
 			throw new BaseException(BasicCodeEnum.MSG_0004, _msg, e);
+		}
+	}
+
+	public static <T> T newAndCast(Class<?> target, Class<T> type) throws BaseException {
+		if (type == null) {
+			return null;
+		}
+		AssertUtils.assertNotNull("newAndCast", target);
+		try {
+			return type.cast(target.newInstance());
+		} catch (ClassCastException e) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CLASS.CAST", target.getName(), type.getName());
+			throw new BaseException(BasicCodeEnum.MSG_0004, _msg, e);
+		} catch (InstantiationException | IllegalAccessException e) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CLASS.INIT", target.getName(), e.getMessage());
+			throw new BaseException(BasicCodeEnum.MSG_0001, _msg, e);
 		}
 	}
 }
