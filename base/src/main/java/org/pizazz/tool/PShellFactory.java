@@ -29,16 +29,17 @@ import org.pizazz.tool.ref.IShellFactory;
  * SHELL工厂组件
  * 
  * @author xlgp2171
- * @version 1.1.181219
+ * @version 1.1.181220
  */
 public final class PShellFactory implements IShellFactory, ICloseable {
 
 	private final ExecutorService threadPool;
 
 	public PShellFactory() {
-		int _maximumPoolSize = ConfigureHelper.getInt(TypeEnum.BASIC, "DEF_SHELL_POOL_MAX", 16);
-		long _keepAliveTime = ConfigureHelper.getLong(TypeEnum.BASIC, "DEF_SHELL_THREAD_KEEP", 60L);
-		threadPool = new ThreadPoolExecutor(0, _maximumPoolSize, _keepAliveTime, TimeUnit.SECONDS,
+		int _maximumPoolSize = ConfigureHelper.getInt(TypeEnum.BASIC, "DEF_SHELL_POOL_MAX",
+				Runtime.getRuntime().availableProcessors() * 2);
+		long _keepAliveTime = ConfigureHelper.getLong(TypeEnum.BASIC, "DEF_SHELL_THREAD_KEEP", 0L);
+		threadPool = new ThreadPoolExecutor(_maximumPoolSize, _maximumPoolSize, _keepAliveTime, TimeUnit.SECONDS,
 				new LinkedBlockingQueue<Runnable>(), new PThreadFactory(Constant.NAMING_SHORT + "-shell", true));
 	}
 
