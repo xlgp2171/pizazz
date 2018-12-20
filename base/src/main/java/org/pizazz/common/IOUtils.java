@@ -13,12 +13,10 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.pizazz.Constant;
-import org.pizazz.ICloseable;
 import org.pizazz.IMessageOutput;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
@@ -28,7 +26,7 @@ import org.pizazz.message.TypeEnum;
  * 输入输出工具
  * 
  * @author xlgp2171
- * @version 1.0.181219
+ * @version 1.0.181220
  */
 public class IOUtils {
 
@@ -183,19 +181,6 @@ public class IOUtils {
 		} finally {
 			if (close) {
 				close(input);
-			}
-		}
-	}
-
-	public static void close(ICloseable target, Duration timeout) {
-		if (target != null) {
-			if (timeout!= null && !timeout.isNegative()) {
-				try {
-					target.destroy(timeout);
-				} catch (BaseException e) {
-				}
-			} else {
-				close(target);
 			}
 		}
 	}

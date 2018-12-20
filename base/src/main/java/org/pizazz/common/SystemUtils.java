@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -21,6 +22,7 @@ import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 
 import org.pizazz.Constant;
+import org.pizazz.ICloseable;
 import org.pizazz.common.ref.IMXBean;
 import org.pizazz.common.ref.OSTypeEnum;
 import org.pizazz.exception.BaseError;
@@ -33,7 +35,7 @@ import org.pizazz.message.TypeEnum;
  * 系统工具
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.0.181220
  */
 public class SystemUtils {
 	/**
@@ -187,6 +189,19 @@ public class SystemUtils {
 
 	public static String newUUIDSimple() {
 		return newUUID().replaceAll("-", "");
+	}
+
+	public static void destroy(ICloseable target, Duration timeout) {
+		if (target != null) {
+			if (timeout!= null && !timeout.isNegative()) {
+				try {
+					target.destroy(timeout);
+				} catch (BaseException e) {
+				}
+			} else {
+				IOUtils.close(target);
+			}
+		}
 	}
 
 	public static synchronized void clear(Object target) {
