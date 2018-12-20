@@ -1,14 +1,17 @@
 package org.pizazz.log;
 
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.pizazz.Constant;
 import org.pizazz.IPlugin;
-import org.pizazz.common.IOUtils;
+import org.pizazz.common.ConfigureHelper;
+import org.pizazz.common.LocaleHelper;
 import org.pizazz.common.StringUtils;
-import org.pizazz.common.TupleObjectUtils;
+import org.pizazz.common.SystemUtils;
+import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.data.TupleObject;
 import org.pizazz.exception.BaseException;
 import org.pizazz.log.exception.LogError;
@@ -17,15 +20,13 @@ import org.pizazz.log.ref.ILoggerAdapter;
 import org.pizazz.log.ref.LogEnum;
 import org.pizazz.log.ref.TypeEnum;
 import org.pizazz.message.BasicCodeEnum;
-import org.pizazz.message.ConfigureHelper;
-import org.pizazz.message.LocaleHelper;
 import org.pizazz.tool.AbstractClassPlugin;
 
 /**
  * 日志输出器工厂
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.0.181220
  */
 public class LoggerFactory {
 	// 日志适配器
@@ -39,7 +40,7 @@ public class LoggerFactory {
 		// 获取日志记录类
 		String _record = ConfigureHelper.getConfig(TypeEnum.LOG, Constant.NAMING_SHORT + ".logger.record", "DEF_RECORD",
 				"");
-		TupleObject _config = TupleObjectUtils.newObject(2).append("$CLASS", _record);
+		TupleObject _config = TupleObjectHelper.newObject(2).append("$CLASS", _record);
 
 		if (!StringUtils.isTrimEmpty(_record)) {
 			// 获取日志记录缓存最大值
@@ -68,7 +69,7 @@ public class LoggerFactory {
 		} else {
 			_logger.info(LocaleHelper.toLocaleText(TypeEnum.LOG, "RECORD.USE", RECORD.getId()));
 		}
-		waitFor(_log, _logger, 0);
+		waitFor(_log, _logger, Duration.ZERO);
 	}
 
 	private LoggerFactory() {
@@ -84,11 +85,11 @@ public class LoggerFactory {
 		// 获取日志配置路径
 		String _resource = ConfigureHelper.getConfig(TypeEnum.LOG, Constant.NAMING_SHORT + ".logger.resource",
 				"DEF_RESOURCE", "");
-		TupleObject _config = TupleObjectUtils.newObject(2).append("$CLASS", _clazz).append("$RESOURCE", _resource);
+		TupleObject _config = TupleObjectHelper.newObject(2).append("$CLASS", _clazz).append("$RESOURCE", _resource);
 		try {
 			factory.initialize(_config);
 		} catch (BaseException e) {
-			IOUtils.close(RECORD, 0);
+			SystemUtils.destroy(RECORD, Duration.ZERO);
 			throw new LogError(BasicCodeEnum.MSG_0019, e.getMessage(), e);
 		}
 		// for (String _item : LOGGERS.keySet()) {
@@ -96,14 +97,14 @@ public class LoggerFactory {
 		// }
 	}
 
-	static void waitFor(AbstractClassPlugin factory, Logger logger, int timeout) {
+	static void waitFor(AbstractClassPlugin factory, Logger logger, Duration timeout) {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
 				logger.info(LocaleHelper.toLocaleText(TypeEnum.LOG, "PLUGIN.DESTROY", ADAPTER.getId()));
 				LOGGERS.clear();
-				IOUtils.close(RECORD, timeout);
-				IOUtils.close(factory, timeout);
+				SystemUtils.destroy(RECORD, timeout);
+				SystemUtils.destroy(factory, timeout);
 			}
 		});
 	}
@@ -176,13 +177,13 @@ public class LoggerFactory {
 			try {
 				ADAPTER = ILoggerAdapter.class.cast(_tmp);
 			} catch (ClassCastException e) {
-				throw new BaseException(
+				throw new BaseException(BasicCodeEnum.MSG_0004,
 						LocaleHelper.toLocaleText(TypeEnum.LOG, "PLUGIN.CAST", ILoggerAdapter.class.getName()));
 			}
 		}
 
 		@Override
-		public void destroy(int timeout) {
+		public void destroy(Duration timeout) throws BaseException {
 			unloadPlugin(ADAPTER, timeout);
 		}
 
