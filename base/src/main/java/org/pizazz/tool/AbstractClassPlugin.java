@@ -5,10 +5,10 @@ import java.time.Duration;
 import org.pizazz.IPlugin;
 import org.pizazz.common.AssertUtils;
 import org.pizazz.common.ClassUtils;
-import org.pizazz.common.IOUtils;
 import org.pizazz.common.LocaleHelper;
-import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.common.StringUtils;
+import org.pizazz.common.SystemUtils;
+import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.context.PluginContext;
 import org.pizazz.data.TupleObject;
 import org.pizazz.exception.BaseException;
@@ -19,7 +19,7 @@ import org.pizazz.message.TypeEnum;
  * 通用加载器组件
  * 
  * @author xlgp2171
- * @version 1.0.181219
+ * @version 1.0.181220
  */
 public abstract class AbstractClassPlugin implements IPlugin {
 	private final TupleObject configure = TupleObjectHelper.newObject();
@@ -43,6 +43,10 @@ public abstract class AbstractClassPlugin implements IPlugin {
 	}
 
 	protected final TupleObject getConfig() {
+		return configure;
+	}
+
+	protected final TupleObject copyConfig() {
 		return configure.clone();
 	}
 
@@ -106,14 +110,14 @@ public abstract class AbstractClassPlugin implements IPlugin {
 	}
 
 	protected IPlugin initPlugin(IPlugin instance) throws BaseException {
-		instance.initialize(getConfig());
+		instance.initialize(copyConfig());
 		log(LocaleHelper.toLocaleText(TypeEnum.BASIC, "PLUGIN.INIT", instance.getId()), null);
 		return instance;
 	}
 
 	public void unloadPlugin(IPlugin plugin, Duration timeout) {
 		if (plugin != null) {
-			IOUtils.close(plugin, timeout);
+			SystemUtils.destroy(plugin, timeout);
 			PluginContext.getInstance().unregister(getClass(), plugin);
 			log(LocaleHelper.toLocaleText(TypeEnum.BASIC, "PLUGIN.UNLOAD", plugin.getId()), null);
 		}

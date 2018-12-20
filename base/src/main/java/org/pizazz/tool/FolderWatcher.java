@@ -14,6 +14,7 @@ import org.pizazz.IRunnable;
 import org.pizazz.common.AssertUtils;
 import org.pizazz.common.IOUtils;
 import org.pizazz.common.LocaleHelper;
+import org.pizazz.common.SystemUtils;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.message.TypeEnum;
@@ -22,7 +23,7 @@ import org.pizazz.message.TypeEnum;
  * 文件夹监视组件
  * 
  * @author xlgp2171
- * @version 1.0.181219
+ * @version 1.0.181220
  */
 public class FolderWatcher implements IRunnable {
 
@@ -73,6 +74,6 @@ public class FolderWatcher implements IRunnable {
 	@Override
 	public void destroy(Duration timeout) throws BaseException {
 		IOUtils.close(service);
-		IOUtils.close(watcher, timeout);
+		SystemUtils.destroy(watcher, timeout);
 	}
 }

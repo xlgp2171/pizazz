@@ -10,7 +10,6 @@ import org.pizazz.Constant;
 import org.pizazz.IMessageOutput;
 import org.pizazz.IPlugin;
 import org.pizazz.common.ConfigureHelper;
-import org.pizazz.common.IOUtils;
 import org.pizazz.common.LocaleHelper;
 import org.pizazz.common.StringUtils;
 import org.pizazz.common.SystemUtils;
@@ -25,7 +24,7 @@ import org.pizazz.message.TypeEnum;
  * 维持容器组件
  *
  * @author xlgp2171
- * @version 1.0.181219
+ * @version 1.0.181220
  */
 public class KeepContainer extends AbstractContainer<String> {
 
@@ -91,6 +90,6 @@ public class KeepContainer extends AbstractContainer<String> {
 		int _maxTimeout = ConfigureHelper.getInt(TypeEnum.BASIC, "DEF_CONTAINER_TIMEOUT_MAX", 60000);
 		int _exitTime = TupleObjectHelper.getInt(properties, KEY_CONTAINER_TIMEOUT, 20000);
 		_exitTime = (_exitTime > 0 && _exitTime <= _maxTimeout) ? _exitTime : _maxTimeout;
-		IOUtils.close(this, Duration.ofMillis(_exitTime));
+		SystemUtils.destroy(this, Duration.ofMillis(_exitTime));
 	}
 }

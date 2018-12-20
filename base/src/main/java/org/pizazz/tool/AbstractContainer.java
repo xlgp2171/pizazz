@@ -11,7 +11,6 @@ import org.pizazz.IMessageOutput;
 import org.pizazz.IPlugin;
 import org.pizazz.common.AssertUtils;
 import org.pizazz.common.ConfigureHelper;
-import org.pizazz.common.IOUtils;
 import org.pizazz.common.LocaleHelper;
 import org.pizazz.common.SystemUtils;
 import org.pizazz.common.TupleObjectHelper;
@@ -25,7 +24,7 @@ import org.pizazz.message.TypeEnum;
  * @param <T> 输出类型
  *
  * @author xlgp2171
- * @version 1.0.181219
+ * @version 1.0.181220
  */
 public abstract class AbstractContainer<T> implements IPlugin {
 	static final String KEY_CONTAINER_PORT = "$PORT";
@@ -98,7 +97,7 @@ public abstract class AbstractContainer<T> implements IPlugin {
 				Runtime.getRuntime().halt(_status);
 				return;
 			} finally {
-				IOUtils.close(output, Duration.ZERO);
+				SystemUtils.destroy(output, Duration.ZERO);
 			}
 		}
 		Runtime.getRuntime().exit(_status);
