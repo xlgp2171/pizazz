@@ -1,11 +1,14 @@
 package org.pizazz.kafka;
 
 import java.time.Duration;
+import java.util.Collection;
+import java.util.regex.Pattern;
 
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.TopicPartition;
 import org.pizazz.common.CollectionUtils;
 import org.pizazz.common.IOUtils;
 import org.pizazz.common.SystemUtils;
@@ -51,33 +54,46 @@ public class Subscription<K, V> extends AbstractClient {
 	@Override
 	public void initialize(TupleObject config) throws BaseException {
 		super.initialize(config);
-
 		// 创建Offset处理类
 		updateConfig(getConvertor().offsetProcessorConfig());
 		offset = cast(loadPlugin("classpath", new OffsetProcessor(), null, true), IOffsetProcessor.class);
-		offset.setMode(getConvertor().modeValue());
+		offset.set(getConvertor().modeValue(), getConvertor().ignoreValue());
 		// 数据处理类
-		processor = new DataProcessor<K, V>(offset, getConvertor().modeValue());
+		processor = new DataProcessor<K, V>(offset, getConvertor().modeValue(), getConvertor().ignoreValue());
 		processor.initialize(getConvertor().dataProcessorConfig());
 		// 创建Kafka消费类
 		consumer = new KafkaConsumer<K, V>(offset.optimizeKafkaConfig(getConvertor().kafkaConfig()));
 		LOGGER.info("subscription initialized,config=" + config);
 	}
 
-	public void assign() throws KafkaException {
-		getConsumer().assign(getConvertor().assignConfig());
+	public void assign(Collection<TopicPartition> partitions, IDataExecutor<K, V> executor) throws KafkaException {
+		getConsumer().assign(CollectionUtils.isEmpty(partitions) ? getConvertor().assignConfig() : partitions);
 		LOGGER.info("subscription:assign");
+		consume(executor);
 	}
 
-	public void subscribeByPattern(ConsumerRebalanceListener listener) throws KafkaException {
-		getConsumer().subscribe(getConvertor().topicPatternConfig(),
+	public void subscribeByPattern(Pattern pattern, IDataExecutor<K, V> executor) throws KafkaException {
+		subscribeByPattern(pattern, executor, null);
+	}
+
+	public void subscribeByPattern(Pattern pattern, IDataExecutor<K, V> executor, ConsumerRebalanceListener listener)
+			throws KafkaException {
+		getConsumer().subscribe(pattern == null ? getConvertor().topicPatternConfig() : pattern,
 				offset.getRebalanceListener(getConsumer(), listener));
 		LOGGER.info("subscription:subscribe,pattern=" + getConvertor().topicPatternConfig());
+		consume(executor);
 	}
 
-	public void subscribeByTopics(ConsumerRebalanceListener listener) throws KafkaException {
-		getConsumer().subscribe(getConvertor().topicConfig(), offset.getRebalanceListener(getConsumer(), listener));
+	public void subscribe(Collection<String> topics, IDataExecutor<K, V> executor) throws KafkaException {
+		subscribe(topics, executor, null);
+	}
+
+	public void subscribe(Collection<String> topics, IDataExecutor<K, V> executor, ConsumerRebalanceListener listener)
+			throws KafkaException {
+		getConsumer().subscribe(CollectionUtils.isEmpty(topics) ? getConvertor().topicConfig() : topics,
+				offset.getRebalanceListener(getConsumer(), listener));
 		LOGGER.info("subscription:subscribe,topics=" + CollectionUtils.toString(getConvertor().topicConfig()));
+		consume(executor);
 	}
 
 	public void unsubscribe() {
@@ -85,9 +101,7 @@ public class Subscription<K, V> extends AbstractClient {
 		LOGGER.info("subscription:unsubscribe");
 	}
 
-	public void consume(IDataExecutor<K, V> executor) throws KafkaException {
-		LOGGER.info("wating for consume record");
-
+	protected void consume(IDataExecutor<K, V> executor) throws KafkaException {
 		while (loop) {
 			ConsumerRecords<K, V> _records = getConsumer().poll(getConvertor().durationValue());
 			try {
@@ -97,7 +111,7 @@ public class Subscription<K, V> extends AbstractClient {
 				processor.consumeComplete(getConsumer(), null);
 			} catch (KafkaException e) {
 				processor.consumeComplete(getConsumer(), e);
-				LOGGER.error("consume error:" + e.getMessage(), e);
+				LOGGER.error(e.getMessage(), e);
 				throw e;
 			}
 		}

@@ -2,7 +2,7 @@ package org.pizazz.kafka.consumer;
 
 import org.pizazz.common.AssertUtils;
 import org.pizazz.exception.BaseException;
-import org.pizazz.message.BasicCodeEnum;
+import org.pizazz.kafka.exception.CodeEnum;
 
 public enum ConsumerModeEnum {
 	/**
@@ -50,14 +50,13 @@ public enum ConsumerModeEnum {
 
 	public static ConsumerModeEnum from(String mode) throws BaseException {
 		AssertUtils.assertNotNull("from", mode);
-		mode = mode.toUpperCase();
+		mode = mode.trim().toUpperCase();
 
 		for (ConsumerModeEnum _item : values()) {
 			if (_item.name().equals(mode)) {
 				return _item;
 			}
 		}
-		// TODO
-		throw new BaseException(BasicCodeEnum.MSG_0005, "");
+		throw new BaseException(CodeEnum.KFK_0007, mode);
 	}
 }

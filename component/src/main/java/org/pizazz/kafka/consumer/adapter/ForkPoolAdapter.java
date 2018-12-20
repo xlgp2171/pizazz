@@ -9,6 +9,7 @@ import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.data.TupleObject;
 import org.pizazz.exception.BaseException;
 import org.pizazz.kafka.KafkaConstant;
+import org.pizazz.kafka.consumer.ConsumerIgnoreEnum;
 import org.pizazz.kafka.consumer.ConsumerModeEnum;
 import org.pizazz.kafka.exception.CodeEnum;
 import org.pizazz.kafka.exception.KafkaException;
@@ -24,6 +25,7 @@ public class ForkPoolAdapter implements IProcessAdapter {
 	public void initialize(TupleObject config) throws BaseException {
 		pool = new ForkJoinPool(TupleObjectHelper.getInt(config, KafkaConstant.KEY_THREADS,
 				Runtime.getRuntime().availableProcessors()));
+		LOGGER.info("adapter ForkPoolAdapter initized,config=" + config);
 	}
 
 	@Override
@@ -34,13 +36,13 @@ public class ForkPoolAdapter implements IProcessAdapter {
 		case MANUAL_SYNC_EACH:
 			break;
 		default:
-			throw new KafkaException(CodeEnum.KAF_0001, "adapter not support:" + mode);
+			throw new KafkaException(CodeEnum.KFK_0001, "adapter not support:" + mode);
 		}
 		this.mode = mode;
 	}
 
 	@Override
-	public void accept(Bridge bridge) throws KafkaException {
+	public void accept(Bridge bridge, ConsumerIgnoreEnum ignore) throws KafkaException {
 		ForkJoinTask<?> _task = ForkJoinTask.adapt(new Runnable() {
 			@Override
 			public void run() {
@@ -51,7 +53,7 @@ public class ForkPoolAdapter implements IProcessAdapter {
 						LOGGER.debug("consume:" + bridge.getId());
 					}
 				} catch (Exception e) {
-					LOGGER.error("consume:" + e.getMessage(), e);
+					LOGGER.error("consume:" + bridge.getId(), e);
 				}
 			}
 		});
@@ -72,7 +74,7 @@ public class ForkPoolAdapter implements IProcessAdapter {
 		}
 		try {
 			return JSONUtils.toJSON(_tmp);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			return _tmp.toString();
 		}
 	}
@@ -84,6 +86,7 @@ public class ForkPoolAdapter implements IProcessAdapter {
 		} else {
 			pool.shutdown();
 		}
+		LOGGER.info("adapter ForkPoolAdapter destroyed,timeout=" + timeout);
 	}
 
 }

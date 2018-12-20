@@ -21,11 +21,13 @@ public class DataProcessor<K, V> extends AbstractClassPlugin {
 
 	private final IOffsetProcessor offset;
 	private final ConsumerModeEnum mode;
+	private final ConsumerIgnoreEnum ignore;
 	private IProcessAdapter adapter;
 
-	public DataProcessor(IOffsetProcessor offset, ConsumerModeEnum mode) {
+	public DataProcessor(IOffsetProcessor offset, ConsumerModeEnum mode, ConsumerIgnoreEnum ignore) {
 		this.offset = offset;
 		this.mode = mode;
+		this.ignore = ignore;
 	}
 
 	@Override
@@ -55,11 +57,15 @@ public class DataProcessor<K, V> extends AbstractClassPlugin {
 				executor.execute(record);
 				offset.each(consumer, record);
 			}
-		});
+		}, ignore);
 	}
 
-	public void consumeComplete(KafkaConsumer<K, V> consumer, KafkaException e) {
+	public void consumeComplete(KafkaConsumer<K, V> consumer, KafkaException e) throws KafkaException {
 		offset.complete(consumer, e);
+	}
+
+	public String monitor() {
+		return adapter.monitor();
 	}
 
 	@Override

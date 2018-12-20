@@ -4,9 +4,23 @@ import org.pizazz.message.ref.IMessageCode;
 
 public enum CodeEnum implements IMessageCode {
 	
-	KAF_0000("KAF0000#"),
+	KFK_0000("KFK0000#"),
 	/** 不支持的订阅模式 */
-	KAF_0001("KAF0001#");
+	KFK_0001("KFK0001#"),
+	/** 缺少消费模式assign配置 */
+	KFK_0002("KFK0002#"),
+	/** 消费模式assign配置参数错误 */
+	KFK_0003("KFK0003#"),
+	/** 缺少消费模式topic pattern配置 */
+	KFK_0004("KFK0004#"),
+	/** 缺少消费模式topic配置 */
+	KFK_0005("KFK0005#"),
+	/** 消费数据同步提交异常 */
+	KFK_0006("KFK0006#"),
+	/** 消费模式参数异常 */
+	KFK_0007("KFK0007#"),
+	/** 忽略模式参数异常 */
+	KFK_0008("KFK0008#");
 
 	private String code;
 	private StringBuffer message;
@@ -18,7 +32,7 @@ public enum CodeEnum implements IMessageCode {
 	
 	@Override
 	public String getPrefix() {
-		return "KAF";
+		return "KFK";
 	}
 
 	@Override

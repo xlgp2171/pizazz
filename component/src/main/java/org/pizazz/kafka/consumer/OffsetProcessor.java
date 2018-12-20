@@ -19,6 +19,7 @@ import org.pizazz.common.CollectionUtils;
 import org.pizazz.common.StringUtils;
 import org.pizazz.data.TupleObject;
 import org.pizazz.exception.BaseException;
+import org.pizazz.kafka.exception.CodeEnum;
 import org.pizazz.kafka.exception.KafkaException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ public class OffsetProcessor implements IOffsetProcessor {
 	protected final Map<TopicPartition, OffsetAndMetadata> offsetCommitted;
 	protected final ConcurrentMap<TopicPartition, OffsetAndMetadata> offsetCache;
 	private ConsumerModeEnum mode;
+	private ConsumerIgnoreEnum ignore;
 
 	private final OffsetCommitCallback callback = new OffsetCommitCallback() {
 		@Override
@@ -49,7 +51,7 @@ public class OffsetProcessor implements IOffsetProcessor {
 	public void initialize(TupleObject config) throws BaseException {
 	}
 
-	private <K, V> void offsetCommit(KafkaConsumer<K, V> consumer) {
+	private <K, V> void offsetCommit(KafkaConsumer<K, V> consumer) throws KafkaException {
 		Map<TopicPartition, OffsetAndMetadata> _tmp;
 
 		synchronized (offsetCache) {
@@ -59,8 +61,12 @@ public class OffsetProcessor implements IOffsetProcessor {
 			try {
 				consumer.commitSync(_tmp);
 			} catch (Exception e) {
-				LOGGER.error("consumer commit:" + _tmp, e);
-				return;
+				if (ignore.offsetThrowable()) {
+					throw new KafkaException(CodeEnum.KFK_0006, "consumer commit:" + _tmp, e);
+				} else {
+					LOGGER.warn("consumer commit:" + _tmp, e);
+					return;
+				}
 			}
 			offsetCommitted(_tmp);
 		} else {
@@ -89,7 +95,7 @@ public class OffsetProcessor implements IOffsetProcessor {
 	}
 
 	@Override
-	public <K, V> void each(KafkaConsumer<K, V> consumer, ConsumerRecord<K, V> record) {
+	public <K, V> void each(KafkaConsumer<K, V> consumer, ConsumerRecord<K, V> record) throws KafkaException {
 		if (!mode.isAuto() && mode.isEach()) {
 			TopicPartition _tp = new TopicPartition(record.topic(), record.partition());
 			// 若已有T&P提交，则验证offset大小
@@ -113,7 +119,7 @@ public class OffsetProcessor implements IOffsetProcessor {
 	}
 
 	@Override
-	public <K, V> void complete(KafkaConsumer<K, V> consumer, KafkaException e) {
+	public <K, V> void complete(KafkaConsumer<K, V> consumer, KafkaException e) throws KafkaException {
 		// 若手动提交且一轮提交且无异常
 		if (!mode.isAuto() && !mode.isEach() && e == null) {
 			offsetCommit(consumer);
@@ -146,7 +152,11 @@ public class OffsetProcessor implements IOffsetProcessor {
 			public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
 				// 若非自动提交且统一提交
 				if (!mode.isAuto() && !mode.isEach()) {
-					offsetCommit(consumer);
+					try {
+						offsetCommit(consumer);
+					} catch (KafkaException e) {
+						LOGGER.error(e.getMessage(), e);
+					}
 				}
 				if (listener != null) {
 					listener.onPartitionsRevoked(partitions);
@@ -178,12 +188,17 @@ public class OffsetProcessor implements IOffsetProcessor {
 	}
 
 	@Override
-	public void setMode(ConsumerModeEnum mode) {
+	public void set(ConsumerModeEnum mode, ConsumerIgnoreEnum ignore) {
 		this.mode = mode;
+		this.ignore = ignore;
 	}
 
 	protected ConsumerModeEnum getMode() {
 		return mode;
+	}
+
+	protected ConsumerIgnoreEnum getIgnore() {
+		return ignore;
 	}
 
 	@Override

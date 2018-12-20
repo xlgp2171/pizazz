@@ -10,11 +10,11 @@ import org.pizazz.kafka.exception.KafkaException;
 
 public interface IOffsetProcessor extends IPlugin {
 
-	public <K, V> void each(KafkaConsumer<K, V> consumer, ConsumerRecord<K, V> record);
+	public <K, V> void each(KafkaConsumer<K, V> consumer, ConsumerRecord<K, V> record) throws KafkaException;
 
-	public <K, V> void complete(KafkaConsumer<K, V> consumer, KafkaException e);
+	public <K, V> void complete(KafkaConsumer<K, V> consumer, KafkaException e) throws KafkaException;
 
-	public void setMode(ConsumerModeEnum mode);
+	public void set(ConsumerModeEnum mode, ConsumerIgnoreEnum ignore);
 
 	public void restOffsetCommitted();
 

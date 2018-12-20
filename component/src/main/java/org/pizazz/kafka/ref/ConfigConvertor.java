@@ -17,9 +17,12 @@ import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.data.TupleObject;
 import org.pizazz.exception.BaseException;
 import org.pizazz.kafka.KafkaConstant;
+import org.pizazz.kafka.consumer.ConsumerIgnoreEnum;
 import org.pizazz.kafka.consumer.ConsumerModeEnum;
+import org.pizazz.kafka.exception.CodeEnum;
 import org.pizazz.kafka.exception.KafkaError;
 import org.pizazz.kafka.exception.KafkaException;
+import org.pizazz.message.ErrorCodeEnum;
 
 public class ConfigConvertor implements ICloseable {
 	private final TupleObject config = TupleObjectHelper.newObject(2);
@@ -37,8 +40,7 @@ public class ConfigConvertor implements ICloseable {
 
 	private void parse(TupleObject config, Function<TupleObject, TupleObject> filter) {
 		if (config.isEmpty()) {
-			// TODO
-			throw new KafkaError(null, "");
+			throw new KafkaError(ErrorCodeEnum.ERR_0005, "config 'subscription' null");
 		} else if (filter == null) {
 			filter = _item -> _item;
 		}
@@ -70,9 +72,22 @@ public class ConfigConvertor implements ICloseable {
 	}
 
 	public ConsumerModeEnum modeValue() throws BaseException {
-		String _mode = TupleObjectHelper.getNestString(config, StringUtils.EMPTY, KafkaConstant.KEY_CONFIG,
+		String _value = TupleObjectHelper.getNestString(config, StringUtils.EMPTY, KafkaConstant.KEY_CONFIG,
 				KafkaConstant.KEY_MODE);
-		return ConsumerModeEnum.from(_mode);
+		return ConsumerModeEnum.from(_value);
+	}
+
+	public ConsumerIgnoreEnum ignoreValue() {
+		String _value = TupleObjectHelper.getNestString(config, StringUtils.EMPTY, KafkaConstant.KEY_CONFIG,
+				KafkaConstant.KEY_IGNORE);
+
+		if (!StringUtils.isEmpty(_value)) {
+			try {
+				return ConsumerIgnoreEnum.from(_value);
+			} catch (BaseException e) {
+			}
+		}
+		return ConsumerIgnoreEnum.NODE;
 	}
 
 	public Map<String, Object> kafkaConfig() {
@@ -84,8 +99,7 @@ public class ConfigConvertor implements ICloseable {
 				KafkaConstant.KEY_TOPIC_PARTITION);
 
 		if (CollectionUtils.isEmpty(_config)) {
-			// TODO
-			throw new KafkaException(null, "");
+			throw new KafkaException(CodeEnum.KFK_0002, "config 'topicPartition' null");
 		}
 		List<TopicPartition> _tp = new LinkedList<TopicPartition>();
 
@@ -93,15 +107,13 @@ public class ConfigConvertor implements ICloseable {
 			String[] _partitions = StringUtils.of(_item).split(KafkaConstant.SEPARATOR);
 
 			if (_partitions.length < 2) {
-				// TODO
-				throw new KafkaException(null, null);
+				throw new KafkaException(CodeEnum.KFK_0003, "topic partition format:T#[NUM]#[NUM]");
 			}
 			for (int _i = 1; _i < _partitions.length; _i++) {
 				int _partition = NumberUtils.toInt(_partitions[_i], -1);
 
 				if (_partition < 0) {
-					// TODO
-					throw new KafkaException(null, null);
+					throw new KafkaException(CodeEnum.KFK_0003, "partition format:[NUM]");
 				}
 				_tp.add(new TopicPartition(_partitions[0], _partition));
 			}
@@ -114,8 +126,7 @@ public class ConfigConvertor implements ICloseable {
 				KafkaConstant.KEY_TOPIC_PATTERN);
 
 		if (StringUtils.isTrimEmpty(_regex)) {
-			// TODO
-			throw new KafkaException(null, null);
+			throw new KafkaException(CodeEnum.KFK_0004, "config 'topicPattern' null");
 		}
 		return Pattern.compile(_regex);
 	}
@@ -124,8 +135,7 @@ public class ConfigConvertor implements ICloseable {
 		List<Object> _config = TupleObjectHelper.getNestList(config, KafkaConstant.KEY_CONFIG, KafkaConstant.KEY_TOPIC);
 
 		if (CollectionUtils.isEmpty(_config)) {
-			// TODO
-			throw new KafkaException(null, null);
+			throw new KafkaException(CodeEnum.KFK_0005, "config 'topic' null");
 		}
 		return CollectionUtils.convert(_config);
 	}

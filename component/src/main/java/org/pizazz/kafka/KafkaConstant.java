@@ -49,6 +49,10 @@ public class KafkaConstant {
 	/**
 	 * 
 	 */
+	public static final String KEY_IGNORE = "ignore";
+	/**
+	 * 
+	 */
 	public static final String KEY_OFFSET_PROCESSOR = "offsetProcessor";
 	/**
 	 * 
