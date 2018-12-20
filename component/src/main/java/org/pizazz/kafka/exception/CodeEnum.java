@@ -20,7 +20,9 @@ public enum CodeEnum implements IMessageCode {
 	/** 消费模式参数异常 */
 	KFK_0007("KFK0007#"),
 	/** 忽略模式参数异常 */
-	KFK_0008("KFK0008#");
+	KFK_0008("KFK0008#"),
+	/** 数据接口空值 */
+	KFK_0009("KFK0009#");
 
 	private String code;
 	private StringBuffer message;

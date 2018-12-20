@@ -18,6 +18,7 @@ import org.pizazz.kafka.consumer.DataProcessor;
 import org.pizazz.kafka.consumer.IDataExecutor;
 import org.pizazz.kafka.consumer.IOffsetProcessor;
 import org.pizazz.kafka.consumer.OffsetProcessor;
+import org.pizazz.kafka.exception.CodeEnum;
 import org.pizazz.kafka.exception.KafkaError;
 import org.pizazz.kafka.exception.KafkaException;
 import org.pizazz.kafka.ref.AbstractClient;
@@ -102,6 +103,9 @@ public class Subscription<K, V> extends AbstractClient {
 	}
 
 	protected void consume(IDataExecutor<K, V> executor) throws KafkaException {
+		if (executor == null) {
+			throw new KafkaException(CodeEnum.KFK_0009, "data executor null");
+		}
 		while (loop) {
 			ConsumerRecords<K, V> _records = getConsumer().poll(getConvertor().durationValue());
 			try {
