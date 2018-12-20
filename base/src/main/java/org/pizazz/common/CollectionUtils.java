@@ -16,7 +16,7 @@ import org.pizazz.exception.BaseException;
  * 集合工具
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.0.181220
  */
 public class CollectionUtils {
 
@@ -91,7 +91,7 @@ public class CollectionUtils {
 		}
 		List<String> _tmp;
 		try {
-			_tmp =  ClassUtils.newAndCast(target.getClass(), List.class);
+			_tmp = ClassUtils.newAndCast(target.getClass(), List.class);
 		} catch (BaseException e) {
 			_tmp = new LinkedList<String>();
 		}
@@ -99,5 +99,17 @@ public class CollectionUtils {
 			_tmp.add(StringUtils.of(_item));
 		}
 		return _tmp;
+	}
+
+	public static String toString(Collection<?> target) {
+		if (isEmpty(target)) {
+			return StringUtils.EMPTY;
+		}
+		StringBuilder _tmp = new StringBuilder("[");
+
+		for (Object _item : target) {
+			_tmp.append(_item).append(",");
+		}
+		return _tmp.deleteCharAt(_tmp.length() - 1).append("]").toString();
 	}
 }
