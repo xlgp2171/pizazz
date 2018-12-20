@@ -1,6 +1,7 @@
 package org.pizazz.log.plugin;
 
 import java.nio.file.Path;
+import java.time.Duration;
 
 import org.pizazz.common.SystemUtils;
 import org.pizazz.data.TupleObject;
@@ -10,6 +11,12 @@ import org.pizazz.log.record.RecordRunnable;
 import org.pizazz.log.ref.ILoggerAdapter;
 import org.pizazz.log.ref.LogEnum;
 
+/**
+ * 简单日志适配器组件
+ * 
+ * @author xlgp2171
+ * @version 1.0.181219
+ */
 public class SimpleAdapter implements ILoggerAdapter {
 	@Override
 	public String getId() {
@@ -45,6 +52,6 @@ public class SimpleAdapter implements ILoggerAdapter {
 	}
 
 	@Override
-	public void destroy(int timeout) throws BaseException {
+	public void destroy(Duration timeout) throws BaseException {
 	}
 }

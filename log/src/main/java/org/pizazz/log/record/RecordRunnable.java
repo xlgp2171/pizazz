@@ -1,5 +1,6 @@
 package org.pizazz.log.record;
 
+import java.time.Duration;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -9,12 +10,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.pizazz.Constant;
 import org.pizazz.IPlugin;
 import org.pizazz.IRunnable;
-import org.pizazz.common.IOUtils;
-import org.pizazz.common.TupleObjectUtils;
+import org.pizazz.common.LocaleHelper;
+import org.pizazz.common.SystemUtils;
+import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.data.TupleObject;
 import org.pizazz.exception.BaseException;
 import org.pizazz.log.ref.TypeEnum;
-import org.pizazz.message.LocaleHelper;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.tool.AbstractClassPlugin;
 import org.pizazz.tool.PThreadFactory;
@@ -23,7 +24,7 @@ import org.pizazz.tool.PThreadFactory;
  * 日志监控线程
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.0.181220
  */
 public class RecordRunnable extends AbstractClassPlugin implements IPlugin, IRunnable {
 	// 日志信息缓存
@@ -49,7 +50,7 @@ public class RecordRunnable extends AbstractClassPlugin implements IPlugin, IRun
 		}
 		if (loop.compareAndSet(false, record != null)) {
 			record.initialize(super.getConfig());
-			maxsize = TupleObjectUtils.getInt(config, "$SIZE", 1000);
+			maxsize = TupleObjectHelper.getInt(config, "$SIZE", 1000);
 			cache = new LinkedBlockingQueue<RecordEntity>(new Double(maxsize * 1.2).intValue());
 			//
 			thread = Executors.newSingleThreadExecutor(new PThreadFactory(Constant.NAMING_SHORT + "-log", true));
@@ -123,15 +124,16 @@ public class RecordRunnable extends AbstractClassPlugin implements IPlugin, IRun
 	 * 
 	 * @param timeout 销毁等待时间
 	 */
-	public void destroy(int timeout) {
+	@Override
+	public void destroy(Duration timeout) throws BaseException {
 		loop.set(false);
 
 		if (record != null) {
-			IOUtils.close(record, timeout);
+			SystemUtils.destroy(record, timeout);
 			log(LocaleHelper.toLocaleText(TypeEnum.LOG, "RECORD.DESTROY", getId(), timeout), null);
 		}
 		if (thread != null) {
-			if (timeout <= 0) {
+			if (timeout.isZero() || timeout.isZero()) {
 				thread.shutdownNow();
 			} else {
 				thread.shutdown();

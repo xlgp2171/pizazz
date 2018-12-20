@@ -1,5 +1,7 @@
 package org.pizazz.log.plugin;
 
+import java.time.Duration;
+
 import org.pizazz.data.TupleObject;
 import org.pizazz.exception.BaseException;
 import org.pizazz.log.AbstractLogger;
@@ -10,10 +12,10 @@ import org.pizazz.log.record.RecordRunnable;
 import org.pizazz.log.ref.LogEnum;
 
 /**
- * 简单日志组件
+ * 简单日志实现组件
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.0.181219
  */
 public class SimpleLogger extends AbstractLogger implements Logger {
 
@@ -107,6 +109,6 @@ public class SimpleLogger extends AbstractLogger implements Logger {
 	}
 
 	@Override
-	public void destroy(int timeout) throws BaseException {
+	public void destroy(Duration timeout) throws BaseException {
 	}
 }
