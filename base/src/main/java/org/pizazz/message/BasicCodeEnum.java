@@ -6,7 +6,7 @@ import org.pizazz.message.ref.IMessageCode;
  * 消息识别码
  * 
  * @author xlgp2171
- * @version 1.0.181217
+ * @version 1.0.181220
  */
 public enum BasicCodeEnum implements IMessageCode {
 	/** 预留 */
@@ -48,7 +48,9 @@ public enum BasicCodeEnum implements IMessageCode {
 	/** XMLException */
 	MSG_0018("MSG0018#"),
 	/** LOGException */
-	MSG_0019("MSG0019#");
+	MSG_0019("MSG0019#"),
+	/** InitializeException */
+	MSG_0020("MSG0020#");
 
 	private String code;
 	private StringBuffer message;
@@ -60,7 +62,7 @@ public enum BasicCodeEnum implements IMessageCode {
 
 	@Override
 	public String getPrefix() {
-		return "ERR";
+		return "MSG";
 	}
 
 	@Override
