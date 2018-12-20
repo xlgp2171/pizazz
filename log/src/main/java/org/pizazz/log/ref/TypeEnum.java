@@ -17,7 +17,7 @@ public enum TypeEnum implements IType {
 
 		@Override
 		public String toConfigureKey(String key) {
-			return new StringBuilder(key).insert(4, value() + "_").toString();
+			return value() + "." + key;
 		}
 
 		@Override
