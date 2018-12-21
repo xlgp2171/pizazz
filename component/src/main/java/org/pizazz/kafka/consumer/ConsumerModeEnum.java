@@ -5,26 +5,18 @@ import org.pizazz.exception.BaseException;
 import org.pizazz.kafka.exception.CodeEnum;
 
 public enum ConsumerModeEnum {
-	/**
-	 * 自动异步一轮
-	 */
+	/** 自动异步一轮 */
 	AUTO_ASYNC_ROUND(true, false, false),
-	/**
-	 * 手动异步每个
-	 */
+	/** 手动异步每个 */
 	MANUAL_ASYNC_EACH(false, false, true),
-	/**
-	 * 手动同步每个
-	 */
+	/** 手动同步每个 */
 	MANUAL_SYNC_EACH(false, true, true),
-	/**
-	 * 手动异步一轮
-	 */
+	/** 手动异步一轮 */
 	MANUAL_ASYNC_ROUND(false, false, false),
-	/**
-	 * 手动同步一轮
-	 */
-	MANUAL_SYNC_ROUND(false, true, false);
+	/** 手动同步一轮 */
+	MANUAL_SYNC_ROUND(false, true, false),
+	/** 手动无提交 */
+	MANUAL_NONE_NONE(false, false, false);
 
 	private final boolean isAuto;
 	private final boolean isSync;

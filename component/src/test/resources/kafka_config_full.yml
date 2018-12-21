@@ -1,0 +1,61 @@
+piz_kafka:
+  subscription:
+    client:
+      # 服务地址(逗号分割)
+      bootstrap.servers: localhost:9092
+      # 请求服务器返回的最小字节数,数据不足则等待(默认:1)
+      fetch.min.bytes: 1
+      # 组ID
+      group.id: DemoGroup
+      # 与服务器的约定时间,用于获取其它节点上下线(默认:3*1000,不能大于配置session.timeout.ms)
+      heartbeat.interval.ms: 3000
+      # 每个partition最大返回数据量(默认:1024*1024)
+      max.partition.fetch.bytes: 1048576
+      # 与服务器的心跳时间,用于监测当前节点存活(默认:10*1000,不能大于BROKER配置group.min.session.timeout)
+      session.timeout.ms: 10000
+      # 初始偏移量设置,包括'earliest'(最新未提交的offset),'latest'(最新的offset),'none'(若没有获取到以前的offset则抛出异常).(默认:latest)
+      auto.offset.reset: earliest
+      # 开启自动提交Offset(默认:true)(该值会因为subscription/config/mode设置自动修改)
+      enable.auto.commit: false
+      # 是否只能使用订阅确定主题方式，排除正则匹配等(默认:true)
+      exclude.internal.topics: true
+      # 服务器单次请求返回最大数据量(默认:1024*1024*50)
+      fetch.max.bytes: 52428800
+      # 控制读取以事务方式写入的消息,包括:'read_committed'(只能读取第一个未提交事务的Producer之前的事务offset或非事务offset),'read_uncommitted'(任意offset)
+      isolation.level: read_uncommitted
+      # 与服务器的约定时间，用于监测两次poll调用之间时间，超时则断掉(默认:5*60*1000)
+      max.poll.interval.ms: 300000
+      # 单次poll调用获取最大数据量(默认:500)
+      max.poll.records: 500
+      # 读取数据使用缓冲区大小(默认:1024*64,-1为使用OS设置)
+      receive.buffer.bytes: 65536
+      # 发送数据使用缓冲区大小(默认:1024*128,-1为使用OS设置)
+      send.buffer.bytes: 131072
+      # 自动提交周期(默认:5*1000,需要配置enable.auto.commit为true)
+      auto.commit.interval.ms： 3000
+      # 客户端ID(默认:"")
+      # client.id:
+      # 无法满足配置fetch.min.bytes的情况下等待最大时间(默认:0.5*1000)
+      fetch.max.wait.ms: 500
+      # 消费端拦截器,需要实现org.apache.kafka.clients.consumer.ConsumerInterceptor接口(默认:"",逗号分割)
+      # interceptor.classes:
+      # 序列化KEY
+      key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      # 序列化VALUE
+      value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    config:
+      mode: AUTO_ASYNC_ROUND
+      ignore: NONE
+      duration: 10000
+      topicPartition:
+        - TopicA#1#2
+        - TopicB#2
+      topicPattern: Topic*
+      topic:
+        - TopicA
+        - TopicB
+      offsetProcessor:
+        classpath: org.pizazz.kafka.consumer.OffsetProcessor
+      dataProcessor:
+        threads: 8
+        classpath: org.pizazz.kafka.consumer.adapter.ForkPoolAdapter

@@ -2,6 +2,7 @@ package org.pizazz.kafka;
 
 import java.time.Duration;
 import java.util.Collection;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
@@ -11,6 +12,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
 import org.pizazz.common.CollectionUtils;
 import org.pizazz.common.IOUtils;
+import org.pizazz.common.StringUtils;
 import org.pizazz.common.SystemUtils;
 import org.pizazz.data.TupleObject;
 import org.pizazz.exception.BaseException;
@@ -44,7 +46,6 @@ import org.slf4j.LoggerFactory;
  * @param <V>
  */
 public class Subscription<K, V> extends AbstractClient {
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(Subscription.class);
 
 	private boolean loop = true;
@@ -63,7 +64,8 @@ public class Subscription<K, V> extends AbstractClient {
 		processor = new DataProcessor<K, V>(offset, getConvertor().modeValue(), getConvertor().ignoreValue());
 		processor.initialize(getConvertor().dataProcessorConfig());
 		// 创建Kafka消费类
-		consumer = new KafkaConsumer<K, V>(offset.optimizeKafkaConfig(getConvertor().kafkaConfig()));
+		Map<String, Object> _config = offset.optimizeKafkaConfig(getConvertor().kafkaConfig());
+		consumer = new KafkaConsumer<K, V>(processor.optimizeKafkaConfig(_config));
 		LOGGER.info("subscription initialized,config=" + config);
 	}
 
@@ -97,6 +99,15 @@ public class Subscription<K, V> extends AbstractClient {
 		consume(executor);
 	}
 
+	public String getGroupId() {
+		String _tmp = StringUtils.EMPTY;
+
+		if (getConvertor() != null) {
+			_tmp = getConvertor().getConsumerGroupId();
+		}
+		return _tmp;
+	}
+
 	public void unsubscribe() {
 		getConsumer().unsubscribe();
 		LOGGER.info("subscription:unsubscribe");
@@ -106,27 +117,32 @@ public class Subscription<K, V> extends AbstractClient {
 		if (executor == null) {
 			throw new KafkaException(CodeEnum.KFK_0009, "data executor null");
 		}
+		ConsumerRecords<K, V> _records;
+
 		while (loop) {
-			ConsumerRecords<K, V> _records = getConsumer().poll(getConvertor().durationValue());
+			try {
+				_records = getConsumer().poll(getConvertor().durationValue());
+			} catch (Exception e) {
+				if (getConvertor().ignoreValue().consumeThrowable()) {
+					throw new KafkaException(CodeEnum.KFK_0010, "poll data:" + getConvertor().durationValue(), e);
+				}
+				LOGGER.error("pool data:" + e.getMessage(), e);
+				continue;
+			}
+			if (_records.isEmpty()) {
+				continue;
+			}
+			processor.consumeReady(getConsumer(), executor);
 			try {
 				for (ConsumerRecord<K, V> _item : _records) {
 					processor.consume(getConsumer(), _item, executor);
 				}
-				processor.consumeComplete(getConsumer(), null);
+				processor.consumeComplete(getConsumer(), executor, null);
 			} catch (KafkaException e) {
-				processor.consumeComplete(getConsumer(), e);
-				LOGGER.error(e.getMessage(), e);
+				processor.consumeComplete(getConsumer(), executor, e);
+				LOGGER.error("consume data:" + e.getMessage(), e);
 				throw e;
 			}
-		}
-	}
-
-	@Override
-	protected void log(String msg, BaseException e) {
-		if (e != null) {
-			LOGGER.error(msg, e);
-		} else if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(msg);
 		}
 	}
 

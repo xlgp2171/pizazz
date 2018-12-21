@@ -8,9 +8,11 @@ import org.pizazz.data.TupleObject;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.tool.AbstractClassPlugin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractClient extends AbstractClassPlugin {
-
+	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractClient.class);
 	private final AtomicBoolean initialized = new AtomicBoolean(false);
 
 	private ConfigConvertor convertor;
@@ -30,6 +32,15 @@ public abstract class AbstractClient extends AbstractClassPlugin {
 
 	protected ConfigConvertor getConvertor() {
 		return convertor;
+	}
+
+	@Override
+	protected void log(String msg, BaseException e) {
+		if (e != null) {
+			LOGGER.error(msg, e);
+		} else if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug(msg);
+		}
 	}
 
 	@Override

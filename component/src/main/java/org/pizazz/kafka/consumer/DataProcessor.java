@@ -1,6 +1,7 @@
 package org.pizazz.kafka.consumer;
 
 import java.time.Duration;
+import java.util.Map;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -10,6 +11,7 @@ import org.pizazz.exception.BaseException;
 import org.pizazz.kafka.KafkaConstant;
 import org.pizazz.kafka.consumer.adapter.Bridge;
 import org.pizazz.kafka.consumer.adapter.IProcessAdapter;
+import org.pizazz.kafka.consumer.adapter.OrderLoopAdapter;
 import org.pizazz.kafka.exception.KafkaException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.tool.AbstractClassPlugin;
@@ -33,13 +35,21 @@ public class DataProcessor<K, V> extends AbstractClassPlugin {
 	@Override
 	public void initialize(TupleObject config) throws BaseException {
 		setConfig(config);
-		adapter = cast(loadPlugin("classpath", null, null, true), IProcessAdapter.class);
+		adapter = cast(loadPlugin("classpath", new OrderLoopAdapter(), null, true), IProcessAdapter.class);
 		try {
 			adapter.set(mode);
 		} catch (KafkaException e) {
 			throw new BaseException(BasicCodeEnum.MSG_0005, e.getMessage(), e);
 		}
 		LOGGER.info("subscription data processor initialized,config=" + config);
+	}
+
+	public Map<String, Object> optimizeKafkaConfig(Map<String, Object> kafkaConfig) {
+		return kafkaConfig;
+	}
+
+	public void consumeReady(KafkaConsumer<K, V> consumer, IDataExecutor<K, V> executor) {
+		executor.begin();
 	}
 
 	public void consume(KafkaConsumer<K, V> consumer, ConsumerRecord<K, V> record, IDataExecutor<K, V> executor)
@@ -60,7 +70,13 @@ public class DataProcessor<K, V> extends AbstractClassPlugin {
 		}, ignore);
 	}
 
-	public void consumeComplete(KafkaConsumer<K, V> consumer, KafkaException e) throws KafkaException {
+	public void consumeComplete(KafkaConsumer<K, V> consumer, IDataExecutor<K, V> executor, KafkaException e)
+			throws KafkaException {
+		if (e != null) {
+			executor.throwException(e);
+		} else {
+			executor.end(offset);
+		}
 		offset.complete(consumer, e);
 	}
 

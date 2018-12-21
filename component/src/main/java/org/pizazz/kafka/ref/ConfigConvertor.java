@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.TopicPartition;
+import org.pizazz.Constant;
 import org.pizazz.ICloseable;
 import org.pizazz.common.AssertUtils;
 import org.pizazz.common.CollectionUtils;
@@ -92,6 +94,11 @@ public class ConfigConvertor implements ICloseable {
 
 	public Map<String, Object> kafkaConfig() {
 		return TupleObjectHelper.getTupleObject(config, KafkaConstant.KEY_CLIENT).asMap();
+	}
+
+	public String getConsumerGroupId() {
+		return TupleObjectHelper.getNestString(config, Constant.NAMING, KafkaConstant.KEY_CLIENT,
+				ConsumerConfig.GROUP_ID_CONFIG);
 	}
 
 	public List<TopicPartition> assignConfig() throws KafkaException {

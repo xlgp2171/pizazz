@@ -14,6 +14,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.consumer.OffsetCommitCallback;
 import org.apache.kafka.common.TopicPartition;
+import org.pizazz.Constant;
 import org.pizazz.common.BooleanUtils;
 import org.pizazz.common.CollectionUtils;
 import org.pizazz.common.StringUtils;
@@ -59,7 +60,11 @@ public class OffsetProcessor implements IOffsetProcessor {
 		}
 		if (mode.isSync()) {
 			try {
-				consumer.commitSync(_tmp);
+				if (mode.isEach()) {
+					consumer.commitSync(_tmp);
+				} else {
+					consumer.commitSync();
+				}
 			} catch (Exception e) {
 				if (ignore.offsetThrowable()) {
 					throw new KafkaException(CodeEnum.KFK_0006, "consumer commit:" + _tmp, e);
@@ -69,8 +74,10 @@ public class OffsetProcessor implements IOffsetProcessor {
 				}
 			}
 			offsetCommitted(_tmp);
-		} else {
+		} else if (mode.isEach()){
 			consumer.commitAsync(_tmp, callback);
+		} else {
+			consumer.commitAsync(callback);
 		}
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("consumer commit:" + _tmp);
@@ -96,32 +103,37 @@ public class OffsetProcessor implements IOffsetProcessor {
 
 	@Override
 	public <K, V> void each(KafkaConsumer<K, V> consumer, ConsumerRecord<K, V> record) throws KafkaException {
-		if (!mode.isAuto() && mode.isEach()) {
-			TopicPartition _tp = new TopicPartition(record.topic(), record.partition());
-			// 若已有T&P提交，则验证offset大小
-			if (offsetCommitted.containsKey(_tp)) {
-				// 若当前提交是否大于已提交offset，则写入缓存
-				if (record.offset() > offsetCommitted.get(_tp).offset()) {
-					synchronized (offsetCache) {
-						offsetCache.put(_tp, new OffsetAndMetadata(record.offset()));
-						offsetCommit(consumer);
-					}
-				} else if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug(_tp + " consumed:" + record.offset());
-				}
-			} else {
+		TopicPartition _tp = new TopicPartition(record.topic(), record.partition());
+		// 若已有T&P提交，则验证offset大小
+		if (offsetCommitted.containsKey(_tp)) {
+			// 若当前提交是否大于已提交offset，则写入缓存
+			if (record.offset() > offsetCommitted.get(_tp).offset()) {
 				synchronized (offsetCache) {
 					offsetCache.put(_tp, new OffsetAndMetadata(record.offset()));
+
+					if (mode != ConsumerModeEnum.MANUAL_NONE_NONE && !mode.isAuto()) {
+						offsetCommit(consumer);
+					}
+				}
+			} else if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug(_tp + " consumed:" + record.offset());
+			}
+		} else {
+			synchronized (offsetCache) {
+				offsetCache.put(_tp, new OffsetAndMetadata(record.offset()));
+
+				if (mode != ConsumerModeEnum.MANUAL_NONE_NONE && !mode.isAuto()) {
 					offsetCommit(consumer);
 				}
 			}
 		}
+
 	}
 
 	@Override
 	public <K, V> void complete(KafkaConsumer<K, V> consumer, KafkaException e) throws KafkaException {
 		// 若手动提交且一轮提交且无异常
-		if (!mode.isAuto() && !mode.isEach() && e == null) {
+		if (mode != ConsumerModeEnum.MANUAL_NONE_NONE && !mode.isAuto() && e == null) {
 			offsetCommit(consumer);
 
 			if (LOGGER.isDebugEnabled()) {
@@ -141,6 +153,11 @@ public class OffsetProcessor implements IOffsetProcessor {
 			LOGGER.info(new StringBuilder("set subscription config:").append(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG)
 					.append("=").append(_commitMode).append(",mode=").append(mode).toString());
 		}
+		if (!config.containsKey(ConsumerConfig.GROUP_ID_CONFIG)) {
+			config.put(ConsumerConfig.GROUP_ID_CONFIG, Constant.NAMING);
+			LOGGER.info(new StringBuilder("set subscription config:").append(ConsumerConfig.GROUP_ID_CONFIG).append("=")
+					.append(Constant.NAMING).toString());
+		}
 		return config;
 	}
 
@@ -151,7 +168,7 @@ public class OffsetProcessor implements IOffsetProcessor {
 			@Override
 			public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
 				// 若非自动提交且统一提交
-				if (!mode.isAuto() && !mode.isEach()) {
+				if (mode != ConsumerModeEnum.MANUAL_NONE_NONE && !mode.isAuto() && !mode.isEach()) {
 					try {
 						offsetCommit(consumer);
 					} catch (KafkaException e) {
@@ -177,6 +194,13 @@ public class OffsetProcessor implements IOffsetProcessor {
 				LOGGER.info("subscription partitions assigned:" + CollectionUtils.toString(partitions));
 			}
 		};
+	}
+
+	@Override
+	public Map<TopicPartition, OffsetAndMetadata> getOffsetCache() {
+		synchronized (offsetCache) {
+			return new HashMap<TopicPartition, OffsetAndMetadata>(offsetCache);
+		}
 	}
 
 	@Override
