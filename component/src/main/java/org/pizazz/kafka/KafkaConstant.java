@@ -57,7 +57,19 @@ public class KafkaConstant {
 	/**
 	 * 
 	 */
+	public static final String KEY_TRANSACTION_PROCESSOR = "transactionProcessor";
+	/**
+	 * 
+	 */
 	public static final String KEY_DATA_PROCESSOR = "dataProcessor";
+	/**
+	 * 
+	 */
+	public static final String KEY_SENDER_PROCESSOR = "senderProcessor";
+	/**
+	 * 
+	 */
+	public static final String KEY_TEMPLATE = "template";
 
 	public static final int DEF_DURATION_MAX = 60000;
 	public static final int DEF_DURATION = 10000;

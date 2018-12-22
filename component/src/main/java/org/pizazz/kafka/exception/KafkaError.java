@@ -9,4 +9,8 @@ public class KafkaError extends AbstractError {
 	public KafkaError(IMessageCode code, String message) {
 		super(code, message);
 	}
+
+	public KafkaError(IMessageCode code, Throwable cause) {
+		super(code, cause);
+	}
 }

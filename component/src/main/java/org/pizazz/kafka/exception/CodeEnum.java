@@ -24,7 +24,13 @@ public enum CodeEnum implements IMessageCode {
 	/** 数据接口空值 */
 	KFK_0009("KFK0009#"),
 	/** 订阅数据异常 */
-	KFK_0010("KFK0010#");
+	KFK_0010("KFK0010#"),
+	/** 生产模式参数异常 */
+	KFK_0011("KFK0011#"),
+	/** 发送数据异常 */
+	KFK_0012("KFK0012#"),
+	/** 发送数据事务异常 */
+	KFK_0013("KFK0013#");
 
 	private String code;
 	private StringBuffer message;

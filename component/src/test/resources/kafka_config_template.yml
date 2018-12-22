@@ -1,0 +1,18 @@
+piz_kafka:
+  subscription:
+    client:
+      bootstrap.servers: localhost:9092
+      group.id: DemoGroup
+      auto.offset.reset: earliest
+      key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    config:
+    template: CONSUMER_NORMAL
+  production:
+    client:
+       bootstrap.servers: localhost:9092
+       key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+       value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    config:
+    template: PRODUCTION_NORMAL
+      

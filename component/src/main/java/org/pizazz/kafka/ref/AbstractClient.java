@@ -20,10 +20,10 @@ public abstract class AbstractClient extends AbstractClassPlugin {
 	@Override
 	public void initialize(TupleObject config) throws BaseException {
 		if (!initialized.compareAndSet(false, true)) {
-			throw new BaseException(BasicCodeEnum.MSG_0020, "subscription initialized");
+			throw new BaseException(BasicCodeEnum.MSG_0020, "client initialized");
 		}
 		// 创建配置类
-		convertor = new ConfigConvertor(config, _item -> _item);
+		convertor = new ConfigConvertor(config);
 	}
 
 	protected boolean isInitialize() {

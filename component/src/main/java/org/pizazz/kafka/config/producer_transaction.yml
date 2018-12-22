@@ -1,0 +1,16 @@
+client:
+  acks: all
+  buffer.memory: 33554432
+  retries: 3
+  batch.size: 16384
+  linger.ms: 0
+  request.timeout.ms: 30000
+  send.buffer.bytes: 131072
+  enable.idempotence: true
+  max.in.flight.requests.per.connection: 5
+  transaction.timeout.ms: 60000
+config:
+  mode: ASYNC_TRANSACTION
+  transactionProcessor:
+    classpath: org.pizazz.kafka.producer.TransactionProcessor
+  senderProcessor: 

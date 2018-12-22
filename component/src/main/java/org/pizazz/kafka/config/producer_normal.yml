@@ -1,0 +1,11 @@
+client:
+  acks: 1
+  retries: 1
+  batch.size: 1024
+  linger.ms: 1
+  enable.idempotence: true
+config:
+  mode: ASYNC
+  transactionProcessor:
+    classpath: org.pizazz.kafka.producer.TransactionProcessor
+  senderProcessor: 

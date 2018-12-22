@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -21,35 +20,39 @@ import org.pizazz.exception.BaseException;
 import org.pizazz.kafka.KafkaConstant;
 import org.pizazz.kafka.consumer.ConsumerIgnoreEnum;
 import org.pizazz.kafka.consumer.ConsumerModeEnum;
+import org.pizazz.kafka.consumer.ConsumerTemplateEnum;
 import org.pizazz.kafka.exception.CodeEnum;
 import org.pizazz.kafka.exception.KafkaError;
 import org.pizazz.kafka.exception.KafkaException;
+import org.pizazz.kafka.producer.ProducerModeEnum;
+import org.pizazz.kafka.producer.ProducerTemplateEnum;
 import org.pizazz.message.ErrorCodeEnum;
 
 public class ConfigConvertor implements ICloseable {
 	private final TupleObject config = TupleObjectHelper.newObject(2);
+	private String template;
 
-	public ConfigConvertor(TupleObject config, Function<TupleObject, TupleObject> filter) throws BaseException {
+	public ConfigConvertor(TupleObject config) throws BaseException {
 		AssertUtils.assertNotNull("ConfigConvertor", config);
-		parse(config, filter);
+		parse(config);
 	}
 
-	public ConfigConvertor(TupleObject config, String key, Function<TupleObject, TupleObject> filter)
-			throws BaseException {
-		AssertUtils.assertNotNull("ConfigConvertor", config, key);
-		parse(TupleObjectHelper.getTupleObject(config, key), filter);
-	}
-
-	private void parse(TupleObject config, Function<TupleObject, TupleObject> filter) {
+	private void parse(TupleObject config) throws BaseException {
 		if (config.isEmpty()) {
-			throw new KafkaError(ErrorCodeEnum.ERR_0005, "config 'subscription' null");
-		} else if (filter == null) {
-			filter = _item -> _item;
+			throw new KafkaError(ErrorCodeEnum.ERR_0005, "base config null");
 		}
 		TupleObject _clientC = TupleObjectHelper.getTupleObject(config, KafkaConstant.KEY_CLIENT);
 		TupleObject _configC = TupleObjectHelper.getTupleObject(config, KafkaConstant.KEY_CONFIG);
-		this.config.append(KafkaConstant.KEY_CLIENT, filter.apply(_clientC)).append(KafkaConstant.KEY_CONFIG,
-				filter.apply(_configC));
+		template = TupleObjectHelper.getString(config, KafkaConstant.KEY_TEMPLATE, StringUtils.EMPTY);
+		tryUseTemplate(_clientC, _configC);
+		this.config.append(KafkaConstant.KEY_CLIENT, _clientC).append(KafkaConstant.KEY_CONFIG, _configC);
+	}
+
+	private void tryUseTemplate(TupleObject clientC, TupleObject configC) throws BaseException {
+		if (!StringUtils.isEmpty(template)) {
+			ProducerTemplateEnum.from(template).fill(clientC, configC);
+			ConsumerTemplateEnum.from(template).fill(clientC, configC);
+		}
 	}
 
 	public String configFromKeys(String... keys) throws BaseException {
@@ -62,8 +65,18 @@ public class ConfigConvertor implements ICloseable {
 				KafkaConstant.KEY_OFFSET_PROCESSOR);
 	}
 
+	public TupleObject transactionProcessorConfig() {
+		return TupleObjectHelper.getNestTupleObject(config, KafkaConstant.KEY_CONFIG,
+				KafkaConstant.KEY_TRANSACTION_PROCESSOR);
+	}
+
 	public TupleObject dataProcessorConfig() {
 		return TupleObjectHelper.getNestTupleObject(config, KafkaConstant.KEY_CONFIG, KafkaConstant.KEY_DATA_PROCESSOR);
+	}
+
+	public TupleObject senderProcessorConfig() {
+		return TupleObjectHelper.getNestTupleObject(config, KafkaConstant.KEY_CONFIG,
+				KafkaConstant.KEY_SENDER_PROCESSOR);
 	}
 
 	public Duration durationValue() {
@@ -73,13 +86,19 @@ public class ConfigConvertor implements ICloseable {
 				? KafkaConstant.DEF_DURATION : _duration);
 	}
 
-	public ConsumerModeEnum modeValue() throws BaseException {
+	public ConsumerModeEnum consumerModeValue() throws BaseException {
 		String _value = TupleObjectHelper.getNestString(config, StringUtils.EMPTY, KafkaConstant.KEY_CONFIG,
 				KafkaConstant.KEY_MODE);
 		return ConsumerModeEnum.from(_value);
 	}
 
-	public ConsumerIgnoreEnum ignoreValue() {
+	public ProducerModeEnum producerModeValue() throws BaseException {
+		String _value = TupleObjectHelper.getNestString(config, StringUtils.EMPTY, KafkaConstant.KEY_CONFIG,
+				KafkaConstant.KEY_MODE);
+		return ProducerModeEnum.from(_value);
+	}
+
+	public ConsumerIgnoreEnum consumerIgnoreValue() {
 		String _value = TupleObjectHelper.getNestString(config, StringUtils.EMPTY, KafkaConstant.KEY_CONFIG,
 				KafkaConstant.KEY_IGNORE);
 

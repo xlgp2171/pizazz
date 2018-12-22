@@ -59,9 +59,10 @@ public class Subscription<K, V> extends AbstractClient {
 		// 创建Offset处理类
 		updateConfig(getConvertor().offsetProcessorConfig());
 		offset = cast(loadPlugin("classpath", new OffsetProcessor(), null, true), IOffsetProcessor.class);
-		offset.set(getConvertor().modeValue(), getConvertor().ignoreValue());
+		offset.set(getConvertor().consumerModeValue(), getConvertor().consumerIgnoreValue());
 		// 数据处理类
-		processor = new DataProcessor<K, V>(offset, getConvertor().modeValue(), getConvertor().ignoreValue());
+		processor = new DataProcessor<K, V>(offset, getConvertor().consumerModeValue(),
+				getConvertor().consumerIgnoreValue());
 		processor.initialize(getConvertor().dataProcessorConfig());
 		// 创建Kafka消费类
 		Map<String, Object> _config = offset.optimizeKafkaConfig(getConvertor().kafkaConfig());
@@ -123,7 +124,7 @@ public class Subscription<K, V> extends AbstractClient {
 			try {
 				_records = getConsumer().poll(getConvertor().durationValue());
 			} catch (Exception e) {
-				if (getConvertor().ignoreValue().consumeThrowable()) {
+				if (getConvertor().consumerIgnoreValue().consumeThrowable()) {
 					throw new KafkaException(CodeEnum.KFK_0010, "poll data:" + getConvertor().durationValue(), e);
 				}
 				LOGGER.error("pool data:" + e.getMessage(), e);
