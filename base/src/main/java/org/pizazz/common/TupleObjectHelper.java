@@ -12,7 +12,7 @@ import org.pizazz.exception.BaseException;
  * 通用对象工具
  * 
  * @author xlgp2171
- * @version 1.2.181219
+ * @version 1.2.181224
  */
 public class TupleObjectHelper {
 
@@ -30,6 +30,10 @@ public class TupleObjectHelper {
 
 	public static TupleObject newObject(String key, Object value) {
 		return newObject().append(key, value);
+	}
+
+	public static TupleObject newObject(Map<String, Object> map) {
+		return new TupleObject(map);
 	}
 
 	public static boolean isEmpty(TupleObject target) {
@@ -96,7 +100,7 @@ public class TupleObjectHelper {
 		if (keys.length == 1) {
 			return getString(target, keys[0], defValue);
 		}
-		String[] _tmp = new String[keys.length];
+		String[] _tmp = new String[keys.length - 1];
 		System.arraycopy(keys, 0, _tmp, 0, keys.length - 1);
 		target = getNestTupleObject(target, _tmp);
 		return getString(target, keys[keys.length - 1], defValue);
@@ -220,14 +224,21 @@ public class TupleObjectHelper {
 		return getBoolean(target, keys[keys.length - 1], defValue);
 	}
 
+	@SuppressWarnings("unchecked")
 	public static TupleObject getTupleObject(TupleObject target, String key) {
 		if (target == null || !target.containsKey(key)) {
 			return emptyObject();
 		}
+		Object _item = target.get(key);
 		try {
-			return ClassUtils.cast(target.get(key), TupleObject.class);
-		} catch (BaseException e) {
-			return emptyObject();
+			return ClassUtils.cast(_item, TupleObject.class);
+		} catch (BaseException e1) {
+			try {
+				return newObject(ClassUtils.cast(_item, Map.class));
+			} catch (BaseException e2) {
+				return emptyObject();
+			}
+			
 		}
 	}
 
@@ -238,12 +249,12 @@ public class TupleObjectHelper {
 		if (keys.length == 1) {
 			return getTupleObject(target, keys[0]);
 		}
-		for (int _i = 0; _i < keys.length - 1; _i ++) {
+		for (int _i = 0; _i < keys.length; _i++) {
 			target = getTupleObject(target, keys[_i]);
 		}
-		return getTupleObject(target, keys[keys.length - 1]);
+		return target;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static List<Object> getList(TupleObject target, String key) {
 		if (target == null || !target.containsKey(key)) {
