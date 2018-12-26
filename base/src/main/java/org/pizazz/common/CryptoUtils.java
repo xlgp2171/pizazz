@@ -15,6 +15,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+import java.util.Base64;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -24,8 +25,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 
-import org.apache.commons.codec.binary.Base32;
-import org.apache.commons.codec.binary.Base64;
 import org.pizazz.common.ref.KeySpecEnum;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
@@ -35,31 +34,31 @@ import org.pizazz.message.TypeEnum;
  * 加密解密工具
  *
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.0.181224
  */
 public class CryptoUtils {
 	public static String encodeBase64String(byte[] target) {
-		return Base64.encodeBase64String(target);
+		return Base64.getEncoder().encodeToString(target);
 	}
 
 	public static byte[] encodeBase64(byte[] target) {
-		return Base64.encodeBase64(target);
+		return Base64.getEncoder().encode(target);
 	}
 
 	public static byte[] decodeBase64(String target) {
-		return Base64.decodeBase64(target);
+		return Base64.getDecoder().decode(target);
 	}
 
 	public static byte[] decodeBase64(byte[] target) {
-		return Base64.decodeBase64(target);
+		return Base64.getDecoder().decode(target);
 	}
 
 	public static String encodeBase32(byte[] target) {
-		return new Base32().encodeAsString(target);
+		return new org.apache.commons.codec.binary.Base32().encodeAsString(target);
 	}
 
 	public static byte[] decodeBase32(String target) {
-		return new Base32().decode(target);
+		return new org.apache.commons.codec.binary.Base32().decode(target);
 	}
 
 	public static SecretKey newSecretKey(String algorithm, KeySpec keySpec) throws BaseException {
