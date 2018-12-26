@@ -26,41 +26,66 @@ public class TransactionProcessor implements ITransactionProcessor {
 
 	@Override
 	public <K, V> void initTransactions(KafkaProducer<K, V> producer) throws KafkaException {
-		try {
-			producer.initTransactions();
-		} catch (Exception e) {
-			throw new KafkaException(CodeEnum.KFK_0013, "about transaction:" + e.getMessage(), e);
+		if (mode.isTransaction()) {
+			try {
+				producer.initTransactions();
+				LOGGER.info("producer init transactions");
+			} catch (Exception e) {
+				throw new KafkaException(CodeEnum.KFK_0013, "about transaction:" + e.getMessage(), e);
+			}
 		}
 	}
 
 	@Override
 	public <K, V> void beginTransaction(KafkaProducer<K, V> producer) throws KafkaException {
-		try {
-			producer.beginTransaction();
-		} catch (Exception e) {
-			throw new KafkaException(CodeEnum.KFK_0013, "about transaction:" + e.getMessage(), e);
+		if (mode.isTransaction()) {
+			try {
+				producer.beginTransaction();
+
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("producer begin transactions");
+				}
+			} catch (Exception e) {
+				throw new KafkaException(CodeEnum.KFK_0013, "about transaction:" + e.getMessage(), e);
+			}
 		}
 	}
 
 	@Override
 	public <K, V> void commitTransaction(KafkaProducer<K, V> producer, Map<TopicPartition, OffsetAndMetadata> offsets,
 			String groupId) throws KafkaException {
-		try {
-			if (offsets == null || StringUtils.isBlank(groupId)) {
-				producer.sendOffsetsToTransaction(offsets, groupId);
+		if (mode.isTransaction()) {
+			try {
+				if (offsets == null || StringUtils.isBlank(groupId)) {
+					producer.sendOffsetsToTransaction(offsets, groupId);
+
+					if (LOGGER.isDebugEnabled()) {
+						LOGGER.info("producer send offset to transactions:" + offsets + ",groupId=" + groupId);
+					}
+				}
+				producer.commitTransaction();
+
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.info("producer commit transactions");
+				}
+			} catch (Exception e) {
+				throw new KafkaException(CodeEnum.KFK_0013, "commit transaction:" + e.getMessage(), e);
 			}
-			producer.abortTransaction();
-		} catch (Exception e) {
-			throw new KafkaException(CodeEnum.KFK_0013, "about transaction:" + e.getMessage(), e);
 		}
 	}
 
 	@Override
 	public <K, V> void abortTransaction(KafkaProducer<K, V> producer) throws KafkaException {
-		try {
-			producer.abortTransaction();
-		} catch (Exception e) {
-			throw new KafkaException(CodeEnum.KFK_0013, "about transaction:" + e.getMessage(), e);
+		if (mode.isTransaction()) {
+			try {
+				producer.abortTransaction();
+
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.info("producer about transactions");
+				}
+			} catch (Exception e) {
+				throw new KafkaException(CodeEnum.KFK_0013, "about transaction:" + e.getMessage(), e);
+			}
 		}
 	}
 

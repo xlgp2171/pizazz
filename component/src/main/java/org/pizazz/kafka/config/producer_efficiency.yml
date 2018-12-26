@@ -1,5 +1,5 @@
 client:
-  acks: 0
+  acks: "0"
   buffer.memory: 67108864
   compression.type: none
   retries: 0

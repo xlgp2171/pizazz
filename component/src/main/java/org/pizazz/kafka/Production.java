@@ -53,7 +53,12 @@ public class Production<K, V> extends AbstractClient {
 	}
 
 	public Production<K, V> beginTransaction() throws KafkaException {
+		try {
 		transaction.beginTransaction(getProducer());
+		} catch(KafkaException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw e;
+		}
 		return this;
 	}
 
@@ -63,12 +68,22 @@ public class Production<K, V> extends AbstractClient {
 
 	public Production<K, V> commitTransaction(Map<TopicPartition, OffsetAndMetadata> offsets, String groupId)
 			throws KafkaException {
+		try {
 		transaction.commitTransaction(getProducer(), offsets, groupId);
+	} catch(KafkaException e) {
+		LOGGER.error(e.getMessage(), e);
+		throw e;
+	}
 		return this;
 	}
 
 	public void abortTransaction() throws KafkaException {
+		try {
 		transaction.abortTransaction(getProducer());
+	} catch(KafkaException e) {
+		LOGGER.error(e.getMessage(), e);
+		throw e;
+	}
 	}
 
 	public Future<RecordMetadata> sent(ProducerRecord<K, V> record) throws KafkaException {

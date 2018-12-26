@@ -1,5 +1,5 @@
 client:
-  acks: all
+  acks: "all"
   buffer.memory: 33554432
   retries: 3
   batch.size: 16384

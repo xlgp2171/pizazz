@@ -13,7 +13,7 @@ public enum ProducerTemplateEnum {
 	/** 标准 */
 	PRODUCER_NORMAL,
 	/** 事务 */
-	CONSUMER_TRANSACTION,
+	PRODUCER_TRANSACTION,
 	/** 无 */
 	NONE;
 

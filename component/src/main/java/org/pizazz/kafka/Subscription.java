@@ -1,6 +1,7 @@
 package org.pizazz.kafka;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -10,6 +11,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
+import org.pizazz.common.ArrayUtils;
 import org.pizazz.common.CollectionUtils;
 import org.pizazz.common.IOUtils;
 import org.pizazz.common.StringUtils;
@@ -76,27 +78,27 @@ public class Subscription<K, V> extends AbstractClient {
 		consume(executor);
 	}
 
-	public void subscribeByPattern(Pattern pattern, IDataExecutor<K, V> executor) throws KafkaException {
-		subscribeByPattern(pattern, executor, null);
+	public void subscribe(Pattern pattern, IDataExecutor<K, V> executor) throws KafkaException {
+		subscribe(pattern, executor, null);
 	}
 
-	public void subscribeByPattern(Pattern pattern, IDataExecutor<K, V> executor, ConsumerRebalanceListener listener)
+	public void subscribe(Pattern pattern, IDataExecutor<K, V> executor, ConsumerRebalanceListener listener)
 			throws KafkaException {
-		getConsumer().subscribe(pattern == null ? getConvertor().topicPatternConfig() : pattern,
-				offset.getRebalanceListener(getConsumer(), listener));
-		LOGGER.info("subscription:subscribe,pattern=" + getConvertor().topicPatternConfig());
+		Pattern _pattern = pattern == null ? getConvertor().topicPatternConfig() : pattern;
+		getConsumer().subscribe(_pattern, offset.getRebalanceListener(getConsumer(), listener));
+		LOGGER.info("subscription:subscribe,pattern=" + _pattern);
 		consume(executor);
 	}
 
-	public void subscribe(Collection<String> topics, IDataExecutor<K, V> executor) throws KafkaException {
-		subscribe(topics, executor, null);
+	public void subscribe(IDataExecutor<K, V> executor, String... topics) throws KafkaException {
+		subscribe(executor, null, topics);
 	}
 
-	public void subscribe(Collection<String> topics, IDataExecutor<K, V> executor, ConsumerRebalanceListener listener)
+	public void subscribe(IDataExecutor<K, V> executor, ConsumerRebalanceListener listener, String... topics)
 			throws KafkaException {
-		getConsumer().subscribe(CollectionUtils.isEmpty(topics) ? getConvertor().topicConfig() : topics,
-				offset.getRebalanceListener(getConsumer(), listener));
-		LOGGER.info("subscription:subscribe,topics=" + CollectionUtils.toString(getConvertor().topicConfig()));
+		Collection<String> _topics = ArrayUtils.isEmpty(topics) ? getConvertor().topicConfig() : Arrays.asList(topics);
+		getConsumer().subscribe(_topics, offset.getRebalanceListener(getConsumer(), listener));
+		LOGGER.info("subscription:subscribe,topics=" + _topics);
 		consume(executor);
 	}
 

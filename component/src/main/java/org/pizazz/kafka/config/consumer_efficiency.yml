@@ -12,7 +12,7 @@ client:
   max.poll.records: 500
   receive.buffer.bytes: 65536
   send.buffer.bytes: 131072
-  auto.commit.interval.ms： 5000
+  auto.commit.interval.ms: 5000
   fetch.max.wait.ms: 100
 config:
   mode: AUTO_ASYNC_ROUND
