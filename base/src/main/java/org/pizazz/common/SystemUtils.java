@@ -67,7 +67,7 @@ public class SystemUtils {
 	static {
 		LOCAL_OS = getOSType(getSystemProperty("os.name", StringUtils.EMPTY).toLowerCase());
 		// 默认中文环境
-		String _tmp = SystemUtils.getSystemProperty(Constant.NAMING_SHORT + ".locale", "zh_CN");
+		String _tmp = SystemUtils.getSystemProperty(Constant.NAMING_SHORT + ".locale", "en_US");
 		Locale _tmpL = Locale.forLanguageTag(_tmp);
 		LOCAL_LOCALE = StringUtils.isTrimEmpty(_tmpL.toString()) ? Locale.forLanguageTag("zh_CN") : _tmpL;
 		Path _tmpPath;
