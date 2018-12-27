@@ -8,11 +8,18 @@
 
 	<modules>
 		<module>base</module>
+		<module>log</module>
+		<module>temp</module>
+		<module>component</module>
+		<module>algorithm</module>
 	</modules>
 
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- JAVA -->
 		<java.version>1.8</java.version>
+		<!-- PIZAZZ -->
+		<piz.version>1.0.0</piz.version>
 		<!-- JUNIT -->
 		<junit.version>4.12</junit.version>
 	</properties>
@@ -28,6 +35,7 @@
 
 	<build>
 		<plugins>
+			<!-- 编译 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -43,6 +51,45 @@
 					<skipTests>true</skipTests>
 				</configuration>
 			</plugin>
+			<!-- 源码 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.0.1</version>
+				<configuration>
+					<attach>true</attach>
+				</configuration>
+				<executions>
+					<execution>
+						<!-- 在编译时打包 -->
+						<phase>package</phase>
+						<goals>
+							<!-- 在绑定的phase执行 -->
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- API说明 -->
+			<!-- 
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.0.1</version>
+				<configuration>
+					<aggregate>true</aggregate>
+					<additionalparam>-Xdoclint:none</additionalparam>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			 -->
 		</plugins>
 	</build>
 </project>
