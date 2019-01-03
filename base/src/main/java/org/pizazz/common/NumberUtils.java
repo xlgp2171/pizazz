@@ -80,7 +80,7 @@ public class NumberUtils {
 		return new BigDecimal(target).setScale(scale, BigDecimal.ROUND_HALF_UP).doubleValue();
 	}
 
-	public static int limit(int min, int max) {
+	public static int random(int min, int max) {
 		if (min >= max) {
 			return max;
 		}
