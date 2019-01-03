@@ -68,10 +68,6 @@ public class FolderWatcher implements IRunnable {
 	}
 
 	@Override
-	public void enable() throws BaseException {
-	}
-
-	@Override
 	public void destroy(Duration timeout) throws BaseException {
 		IOUtils.close(service);
 		SystemUtils.destroy(watcher, timeout);
