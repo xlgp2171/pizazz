@@ -24,7 +24,7 @@ public class RedissonAdapter implements IRedisInstance {
 		try {
 			instance = new RedissonInstance(Config.fromJSON(_tmp));
 		} catch (IOException e) {
-			throw new BaseException(CodeEnum.KFK_0001, "config:" + _config, e);
+			throw new BaseException(CodeEnum.RDS_0001, "config:" + _config, e);
 		}
 	}
 

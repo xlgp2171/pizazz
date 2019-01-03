@@ -4,9 +4,11 @@ import org.pizazz.message.ref.IMessageCode;
 
 public enum CodeEnum implements IMessageCode {
 	
-	KFK_0000("RDS0000#"),
+	RDS_0000("RDS0000#"),
 	/** 配置异常 */
-	KFK_0001("RDS0001#");
+	RDS_0001("RDS0001#"),
+	/** 连接异常 */
+	RDS_0002("RDS0002#");
 
 	private String code;
 	private StringBuffer message;
