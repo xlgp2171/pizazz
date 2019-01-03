@@ -24,7 +24,7 @@ import org.pizazz.message.TypeEnum;
  * @param <T> 输出类型
  *
  * @author xlgp2171
- * @version 1.0.181220
+ * @version 1.0.181227
  */
 public abstract class AbstractContainer<T> implements IPlugin {
 	static final String KEY_CONTAINER_PORT = "$PORT";
@@ -75,7 +75,10 @@ public abstract class AbstractContainer<T> implements IPlugin {
 		int _status = 0;
 
 		if (timeout == null) {
-			timeout = Duration.ofMillis(-1);
+			int _maxTimeout = ConfigureHelper.getInt(TypeEnum.BASIC, "DEF_CONTAINER_TIMEOUT_MAX", 60000);
+			int _exitTime = TupleObjectHelper.getInt(properties, KEY_CONTAINER_TIMEOUT, 20000);
+			_exitTime = (_exitTime > 0 && _exitTime <= _maxTimeout) ? _exitTime : _maxTimeout;
+			timeout = Duration.ofMillis(_exitTime);
 		}
 		if (timeout.isZero() || timeout.isNegative()) {
 			try {
