@@ -19,7 +19,7 @@ public enum ConsumerTemplateEnum {
 
 	public void fill(TupleObject clientC, TupleObject configC) throws BaseException {
 		if (this != ConsumerTemplateEnum.NONE) {
-			TupleObject _tmp = YAMLUtils.fromYAML("org/pizazz/kafka/config/" + name().toLowerCase() + ".yml");
+			TupleObject _tmp = YAMLUtils.fromYAML(name().toLowerCase() + ".yml");
 			TupleObjectHelper.merge(clientC, TupleObjectHelper.getTupleObject(_tmp, KafkaConstant.KEY_CLIENT));
 			TupleObjectHelper.merge(configC, TupleObjectHelper.getTupleObject(_tmp, KafkaConstant.KEY_CONFIG));
 		}
