@@ -8,7 +8,7 @@ import org.pizazz.exception.BaseException;
  * 数值工具
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.0.181227
  */
 public class NumberUtils {
 	/** int判断最大位数 */
@@ -78,5 +78,12 @@ public class NumberUtils {
 
 	public static double round(double target, int scale) {
 		return new BigDecimal(target).setScale(scale, BigDecimal.ROUND_HALF_UP).doubleValue();
+	}
+
+	public static int limit(int min, int max) {
+		if (min >= max) {
+			return max;
+		}
+		return min + new Double(Math.random() * max).intValue();
 	}
 }
