@@ -45,8 +45,8 @@ public class LoggerFactory {
 		if (!StringUtils.isTrimEmpty(_record)) {
 			// 获取日志记录缓存最大值
 			int _maxsize = ConfigureHelper.getConfig(TypeEnum.LOG, Constant.NAMING_SHORT + ".logger.record.size",
-					"DEF_RECORD_SIZE", 1000);
-			_config.put("$SIZE", _maxsize > 0 ? _maxsize : 1000);
+					"DEF_RECORD_SIZE", 10000);
+			_config.put("$SIZE", _maxsize > 0 ? _maxsize : 10000);
 		}
 		// 初始化日志容器
 		LOGGERS = new ConcurrentHashMap<String, Logger>();
@@ -117,7 +117,19 @@ public class LoggerFactory {
 	 */
 	public static Logger getLogger(Class<?> key) {
 		String _clazz = key.getName();
-		return getLogger(_clazz);
+		Logger _logger = LOGGERS.get(_clazz);
+
+		if (_logger == null) {
+			synchronized (LOGGERS) {
+				_logger = LOGGERS.get(_clazz);
+
+				if (_logger == null) {
+					_logger = ADAPTER.getLogger(key, RECORD);
+					LOGGERS.putIfAbsent(_clazz, _logger);
+				}
+			}
+		}
+		return _logger;
 	}
 
 	/**
@@ -130,8 +142,14 @@ public class LoggerFactory {
 		Logger _logger = LOGGERS.get(key);
 
 		if (_logger == null) {
-			_logger = ADAPTER.getLogger(key, RECORD);
-			LOGGERS.putIfAbsent(key, _logger);
+			synchronized (LOGGERS) {
+				_logger = LOGGERS.get(key);
+
+				if (_logger == null) {
+					_logger = ADAPTER.getLogger(key, RECORD);
+					LOGGERS.putIfAbsent(key, _logger);
+				}
+			}
 		}
 		return _logger;
 	}
