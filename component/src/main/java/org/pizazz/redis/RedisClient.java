@@ -2,7 +2,6 @@ package org.pizazz.redis;
 
 import java.time.Duration;
 
-import org.pizazz.common.SystemUtils;
 import org.pizazz.data.TupleObject;
 import org.pizazz.exception.BaseException;
 import org.pizazz.redis.redisson.RedissonAdapter;
@@ -36,7 +35,7 @@ public class RedisClient extends AbstractClassPlugin {
 
 	@Override
 	public void destroy(Duration timeout) throws BaseException {
-		SystemUtils.destroy(instance, timeout);
+		unloadPlugin(instance, timeout);
 		LOGGER.info("redis destroyed,timeout=" + timeout);
 	}
 }

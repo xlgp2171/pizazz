@@ -111,7 +111,7 @@ public class Production<K, V> extends AbstractClient {
 			flush();
 			super.destroy(timeout);
 			SystemUtils.destroy(processor, timeout);
-			SystemUtils.destroy(transaction, timeout);
+			unloadPlugin(transaction, timeout);
 			IOUtils.close(producer);
 			LOGGER.info("production destroyed,timeout=" + timeout);
 		}

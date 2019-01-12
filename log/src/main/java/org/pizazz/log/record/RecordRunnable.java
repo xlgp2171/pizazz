@@ -11,7 +11,6 @@ import org.pizazz.Constant;
 import org.pizazz.IPlugin;
 import org.pizazz.IRunnable;
 import org.pizazz.common.LocaleHelper;
-import org.pizazz.common.SystemUtils;
 import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.data.TupleObject;
 import org.pizazz.exception.BaseException;
@@ -129,7 +128,7 @@ public class RecordRunnable extends AbstractClassPlugin implements IPlugin, IRun
 		loop.set(false);
 
 		if (record != null) {
-			SystemUtils.destroy(record, timeout);
+			unloadPlugin(record, timeout);
 			log(LocaleHelper.toLocaleText(TypeEnum.LOG, "RECORD.DESTROY", getId(), timeout), null);
 		}
 		if (thread != null) {

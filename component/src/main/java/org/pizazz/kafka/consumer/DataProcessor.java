@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.pizazz.common.SystemUtils;
 import org.pizazz.data.TupleObject;
 import org.pizazz.exception.BaseException;
 import org.pizazz.kafka.KafkaConstant;
@@ -95,7 +94,7 @@ public class DataProcessor<K, V> extends AbstractClassPlugin {
 
 	@Override
 	public void destroy(Duration timeout) throws BaseException {
-		SystemUtils.destroy(adapter, timeout);
+		unloadPlugin(adapter, timeout);
 		LOGGER.info("subscription data processor destroyed,timeout=" + timeout);
 	}
 }

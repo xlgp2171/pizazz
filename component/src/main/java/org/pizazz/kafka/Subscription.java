@@ -164,7 +164,7 @@ public class Subscription<K, V> extends AbstractClient {
 			consumer.wakeup();
 			super.destroy(timeout);
 			SystemUtils.destroy(processor, timeout);
-			SystemUtils.destroy(offset, timeout);
+			unloadPlugin(offset, timeout);
 			IOUtils.close(consumer);
 			LOGGER.info("subscription destroyed,timeout=" + timeout);
 		}
