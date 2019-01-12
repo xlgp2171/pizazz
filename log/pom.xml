@@ -6,12 +6,12 @@
 		<artifactId>pizazz</artifactId>
 		<version>1.0.0</version>
 	</parent>
-	<artifactId>log</artifactId>
+	<artifactId>piz-log</artifactId>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.pizazz</groupId>
-			<artifactId>base</artifactId>
+			<artifactId>piz-base</artifactId>
 			<version>${piz.version}</version>
 			<scope>compile</scope>
 		</dependency>

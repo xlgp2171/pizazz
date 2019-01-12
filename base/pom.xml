@@ -6,10 +6,10 @@
 		<artifactId>pizazz</artifactId>
 		<version>1.0.0</version>
 	</parent>
-	<artifactId>base</artifactId>
+	<artifactId>piz-base</artifactId>
 
 	<properties>
-		<jackson.version>2.9.5</jackson.version>
+		<jackson.version>2.9.6</jackson.version>
 		<kryo.version>4.0.2</kryo.version>
 		<codec.version>1.11</codec.version>
 	</properties>
