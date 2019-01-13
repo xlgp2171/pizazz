@@ -46,4 +46,33 @@ public class BytesUtils {
 	public static String toString(byte[] target, Charset charset) {
 		return new String(target, charset);
 	}
+
+	public static byte[] buffer(int length, Object... data) {
+		ByteBuffer _tmp = ByteBuffer.allocate(length > 0 ? length : 0);
+
+		for (Object _item : data) {
+			if (_item instanceof ByteBuffer) {
+				_tmp.put((ByteBuffer) _item);
+			} else if (_item instanceof Integer) {
+				_tmp.putInt((int) _item);
+			} else if (_item instanceof Byte) {
+				_tmp.put((byte) _item);
+			} else if (_item instanceof Short) {
+				_tmp.putShort((short) _item);
+			} else if (_item instanceof byte[]) {
+				_tmp.put((byte[]) _item);
+			} else if (_item instanceof Short) {
+				_tmp.putShort((short) _item);
+			} else if (_item instanceof Character) {
+				_tmp.putChar((char) _item);
+			} else if (_item instanceof Double) {
+				_tmp.putDouble((double) _item);
+			} else if (_item instanceof Float) {
+				_tmp.putFloat((float) _item);
+			} else if (_item instanceof Long) {
+				_tmp.putLong((long) _item);
+			}
+		}
+		return _tmp.array();
+	}
 }

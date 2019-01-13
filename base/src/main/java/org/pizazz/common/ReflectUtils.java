@@ -17,7 +17,7 @@ import org.pizazz.message.TypeEnum;
  * 反射工具
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.1.191013
  */
 public class ReflectUtils {
 
@@ -119,33 +119,78 @@ public class ReflectUtils {
 		return clazz.getFields();
 	}
 
-	public static Map<String, Object> invokeFields(Object target, boolean accessible) throws BaseException {
-		AssertUtils.assertNotNull("invokeFields", target);
+	public static Map<String, Object> invokeGetFields(Object target, boolean accessible) throws BaseException {
+		AssertUtils.assertNotNull("invokeGetFields", target);
 		Field[] _fields = getFields(target instanceof Class ? (Class<?>) target : target.getClass(), accessible);
 		Map<String, Object> _tmp = new HashMap<String, Object>();
 
 		for (Field _item : _fields) {
-			Object _value = invokeField(_item, Modifier.isStatic(_item.getModifiers()) ? target.getClass() : target,
+			Object _value = invokeGetField(_item, Modifier.isStatic(_item.getModifiers()) ? target.getClass() : target,
 					Object.class, accessible);
 			_tmp.put(_item.getName(), _value);
 		}
 		return _tmp;
 	}
 
-	public static <T> T invokeField(Field field, Object target, Class<T> returnType, boolean accessible)
+	public static void invokeSetField(String name, Object target, Object value, boolean accessible)
 			throws BaseException {
-		AssertUtils.assertNotNull("invokeField", field, target, returnType);
+		AssertUtils.assertNotNull("invokeSetField", name, target, value);
+		Class<?> _type = target instanceof Class ? (Class<?>) target : target.getClass();
+		Field _field;
+		try {
+			_field = accessible ? _type.getDeclaredField(name) : _type.getField(name);
+		} catch (NoSuchFieldException | SecurityException e) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.FIELD.GET", _type.getName(), name,
+					e.getMessage());
+			throw new BaseException(BasicCodeEnum.MSG_0010, _msg, e);
+		}
+		invokeSetField(_field, target, value, accessible);
+	}
+
+	public static void invokeSetField(Field field, Object target, Object value, boolean accessible)
+			throws BaseException {
+		AssertUtils.assertNotNull("invokeSetField", field, target);
+		field.setAccessible(accessible);
+		try {
+			field.set(target, value);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.FIELD.SET", field.getName(),
+					target.getClass().getName(), e.getMessage());
+			throw new BaseException(BasicCodeEnum.MSG_0010, _msg, e);
+		} finally {
+			field.setAccessible(false);
+		}
+	}
+
+	public static <T> T invokeGetField(String name, Object target, Class<T> returnType, boolean accessible)
+			throws BaseException {
+		AssertUtils.assertNotNull("invokeGetField", name, target, returnType);
+		Class<?> _type = target instanceof Class ? (Class<?>) target : target.getClass();
+		Field _field;
+		try {
+			_field = accessible ? _type.getDeclaredField(name) : _type.getField(name);
+		} catch (NoSuchFieldException | SecurityException e) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.FIELD.GET", _type.getName(), name,
+					e.getMessage());
+			throw new BaseException(BasicCodeEnum.MSG_0010, _msg, e);
+		}
+		return invokeGetField(_field, target, returnType, accessible);
+	}
+
+	public static <T> T invokeGetField(Field field, Object target, Class<T> returnType, boolean accessible)
+			throws BaseException {
+		AssertUtils.assertNotNull("invokeGetField", field, target, returnType);
 		field.setAccessible(accessible);
 		Object _tmp;
 		try {
 			_tmp = field.get(target);
 		} catch (IllegalArgumentException | IllegalAccessException e) {
-			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.FIELD.REF", target.getClass().getName(),
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.FIELD.GET", target.getClass().getName(),
 					field.getName(), e.getMessage());
 			throw new BaseException(BasicCodeEnum.MSG_0010, _msg, e);
 		} finally {
 			field.setAccessible(false);
 		}
-		return ClassUtils.cast(_tmp, returnType);
+		return _tmp == null ? null : ClassUtils.cast(_tmp, returnType);
 	}
 }

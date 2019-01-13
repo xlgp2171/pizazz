@@ -7,6 +7,9 @@ import org.pizazz.exception.BaseException;
  * 
  * @author xlgp2171
  * @version 1.0.181210
+ * 
+ * @see IObject
+ * @see ICloseable
  */
 public interface IRunnable extends IObject, ICloseable, Runnable {
 

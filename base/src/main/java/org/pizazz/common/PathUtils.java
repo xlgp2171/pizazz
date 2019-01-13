@@ -5,11 +5,15 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.channels.FileChannel;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
@@ -19,9 +23,19 @@ import org.pizazz.message.TypeEnum;
  * 文件工具
  * 
  * @author xlgp2171
- * @version 1.1.181217
+ * @version 1.2.191013
  */
 public class PathUtils {
+
+	public static URI toURI(String uri) throws BaseException {
+		try {
+			return new URI(uri);
+		} catch (URISyntaxException e) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "BASIC.ERR.PATH.FORMAT", "URI", uri,
+					e.getMessage());
+			throw new BaseException(BasicCodeEnum.MSG_0005, _msg, e);
+		}
+	}
 
 	public static byte[] toByteArray(Path path) throws BaseException {
 		AssertUtils.assertNotNull("toByteArray", path);
@@ -57,6 +71,30 @@ public class PathUtils {
 				Files.delete(path);
 			} catch (IOException e) {
 			}
+		}
+	}
+
+	public static Path[] listPaths(Path dir, Predicate<Path> filter, boolean includeDir) throws BaseException {
+		try (Stream<Path> _stream = Files.walk(dir)) {
+			Stream<Path> _tmp = _stream;
+
+			if (includeDir) {
+				if (filter != null) {
+					_tmp = _tmp.filter(_item -> filter.test(_item));
+				}
+			} else {
+				if (filter != null) {
+					_tmp = _tmp.filter(
+							_item -> Files.isRegularFile(_item) && Files.isReadable(_item) && filter.test(_item));
+				} else {
+					_tmp = _tmp.filter(_item -> Files.isRegularFile(_item) && Files.isReadable(_item));
+				}
+			}
+			return _tmp.toArray(Path[]::new);
+		} catch (IOException e) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO.PATH", dir.toAbsolutePath(),
+					e.getMessage());
+			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
 		}
 	}
 
@@ -104,7 +142,8 @@ public class PathUtils {
 		try {
 			return Files.createDirectories(dir);
 		} catch (IOException e) {
-			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.DIR", dir.toAbsolutePath(), e.getMessage());
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.DIR", dir.toAbsolutePath(),
+					e.getMessage());
 			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
 		}
 	}
@@ -135,7 +174,8 @@ public class PathUtils {
 		try (ByteArrayInputStream _in = new ByteArrayInputStream(data)) {
 			Files.copy(_in, _tmp, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
-			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.WRITE", _tmp.toAbsolutePath(), e.getMessage());
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.WRITE", _tmp.toAbsolutePath(),
+					e.getMessage());
 			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
 		}
 		return _tmp;

@@ -47,8 +47,8 @@ public class ExpressionConstant {
 	public static final String LETTER_DIGITAL = "^[A-Za-z0-9]+$";
 	/** 验证用资金帐户编号非负整数，不包括0 */ // ^[1-9]+\d*$
 	public static final String ACCOUNTID = "^[1-9]+\\d*$";
-	/** 验证密码 6个数字 */
-	public static final String PWD = "^\\d{6}$";
+	/** 验证密码由大小写字母、数字和符号的8-20位组成 */
+	public static final String PWD = "^(?![A-Za-z0-9]+$)(?![a-z0-9\\W]+$)(?![A-Za-z\\W]+$)(?![A-Z0-9\\W]+$)[a-zA-Z0-9\\W]{8,20}$";
 	/** 验证金额 */ // ^\d+(\.\d+)?$
 	public static final String MONEY = "^[1-9]+\\d*(\\.\\d+)?$";
 	/** 非空字符 */

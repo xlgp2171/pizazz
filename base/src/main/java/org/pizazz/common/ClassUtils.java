@@ -6,16 +6,18 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.pizazz.Constant;
+import org.pizazz.data.TupleObject;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.message.ExpressionConstant;
 import org.pizazz.message.TypeEnum;
 
 /**
- * 类处理工具
+ * 类处理工具<br>
+ * 参考org.apache.commons.beanutils.BeanUtilsBean
  * 
  * @author xlgp2171
- * @version 1.0.181218
+ * @version 1.1.191013
  */
 public class ClassUtils {
 	// 包装类型对应包装类
@@ -302,6 +304,19 @@ public class ClassUtils {
 		} catch (InstantiationException | IllegalAccessException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CLASS.INIT", target.getName(), e.getMessage());
 			throw new BaseException(BasicCodeEnum.MSG_0001, _msg, e);
+		}
+	}
+
+	public static void simplePopulate(Object target, TupleObject properties) throws BaseException {
+		AssertUtils.assertNotNull("populate", target);
+
+		if (properties != null) {
+			for (Map.Entry<String, Object> _item : properties.entrySet()) {
+				try {
+					ReflectUtils.invokeSetField(_item.getKey(), target, _item.getValue(), true);
+				} catch (BaseException e) {
+				}
+			}
 		}
 	}
 }

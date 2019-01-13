@@ -10,8 +10,6 @@ import org.pizazz.exception.BaseException;
  * 
  * @author xlgp2171
  * @version 1.1.181219
- * 
- * @see AutoCloseable
  */
 public interface ICloseable extends AutoCloseable {
 	@Override

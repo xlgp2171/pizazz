@@ -6,51 +6,53 @@ import org.pizazz.message.ref.IMessageCode;
  * 消息识别码
  * 
  * @author xlgp2171
- * @version 1.0.181220
+ * @version 1.0.191013
  */
 public enum BasicCodeEnum implements IMessageCode {
 	/** 预留 */
 	MSG_0000("MSG0000#"),
-	/** NullPointException */
+	/** 空指针异常：NullPointException */
 	MSG_0001("MSG0001#"),
-	/** SecurityException */
+	/** 安全异常：SecurityException */
 	MSG_0002("MSG0002#"),
-	/** IOException */
+	/** 输入输出异常：IOException */
 	MSG_0003("MSG0003#"),
-	/** 类转换异常 */
+	/** 类转换异常：ClassCastException */
 	MSG_0004("MSG0004#"),
-	/** IllegalArgumentException */
+	/** 非法参数异常：IllegalArgumentException */
 	MSG_0005("MSG0005#"),
-	/** 目标异常 InvocationTargetException */
+	/** 调用目标异常：InvocationTargetException */
 	MSG_0006("MSG0006#"),
-	/** 反射内容异常 IllegalAccessException */
+	/** 非法使用异常：IllegalAccessException */
 	MSG_0007("MSG0007#"),
-	/** 实例化异常 InstantiationException */
+	/** 实例化异常：InstantiationException */
 	MSG_0008("MSG0008#"),
-	/** ClassNotFoundException */
+	/** 类无法找到异常：ClassNotFoundException */
 	MSG_0009("MSG0009#"),
-	/** ReflectException */
+	/** 反射异常：ReflectException */
 	MSG_0010("MSG0010#"),
-	/** RegistryException */
+	/** 注册异常：RegistryException */
 	MSG_0011("MSG0011#"),
-	/** InterruptedException */
+	/** 中断异常：InterruptedException */
 	MSG_0012("MSG0012#"),
-	/** SerializationException */
+	/** 序列化异常：SerializationException */
 	MSG_0013("MSG0013#"),
-	/** PluginException */
+	/** 插件异常：PluginException */
 	MSG_0014("MSG0014#"),
-	/** CryptoException */
+	/** 加密解密异常：CryptoException */
 	MSG_0015("MSG0015#"),
-	/** SocketException */
+	/** 套接字异常：SocketException */
 	MSG_0016("MSG0016#"),
-	/** DateException */
+	/** 日期时间异常：DateException */
 	MSG_0017("MSG0017#"),
-	/** XMLException */
+	/** XML异常：XMLException */
 	MSG_0018("MSG0018#"),
-	/** LOGException */
+	/** 日志异常：LogException */
 	MSG_0019("MSG0019#"),
-	/** InitializeException */
-	MSG_0020("MSG0020#");
+	/** 初始化异常：InitializeException */
+	MSG_0020("MSG0020#"),
+	/** 数据库异常：DatabaseException */
+	MSG_0021("MSG0021#");
 
 	private String code;
 	private StringBuffer message;
