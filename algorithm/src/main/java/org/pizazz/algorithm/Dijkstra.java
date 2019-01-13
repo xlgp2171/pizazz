@@ -12,7 +12,8 @@ import java.util.Map.Entry;
 
 /**
  * 最短路径算法(参考)<br>
- * Dijkstra(迪杰斯特拉)算法
+ * Dijkstra(迪杰斯特拉)算法<br>
+ * 优化设计：现在方式为全遍历，优化为方向性遍历（需要配合经纬度）
  * 
  * @author xlgp2171
  * @version 1.0.181223
