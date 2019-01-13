@@ -1,7 +1,11 @@
 package org.pizazz.berkley.operator;
 
+import java.time.Duration;
+
+import org.pizazz.ICloseable;
 import org.pizazz.common.ArrayUtils;
 import org.pizazz.common.IOUtils;
+import org.pizazz.exception.BaseException;
 
 import com.sleepycat.bind.serial.SerialBinding;
 import com.sleepycat.bind.serial.StoredClassCatalog;
@@ -11,7 +15,7 @@ import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
 
-public class Connection<E> implements Iterable<DataObject<E>> {
+public class Connection<E> implements Iterable<DataObject<E>>, ICloseable {
 	private final StoredClassCatalog log;
 	private final Database data;
 	private final Database clazz;
@@ -96,8 +100,8 @@ public class Connection<E> implements Iterable<DataObject<E>> {
 		this.autoCommit = autoCommit;
 	}
 
-	public void close() {
-		commit();
+	@Override
+	public void destroy(Duration timeout) throws BaseException {
 		IOUtils.close(data);
 		IOUtils.close(clazz);
 		IOUtils.close(log);

@@ -1,7 +1,10 @@
 package org.pizazz.berkley.operator;
 
+import java.time.Duration;
 import java.util.Iterator;
 
+import org.pizazz.ICloseable;
+import org.pizazz.common.IOUtils;
 import org.pizazz.exception.BaseError;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.ErrorCodeEnum;
@@ -15,7 +18,7 @@ import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
 
-public class Looper<E> implements Iterator<DataObject<E>> {
+public class Looper<E> implements Iterator<DataObject<E>>, ICloseable {
 
 	private final Cursor cursor;
 	private final EntryBinding<E> binding;
@@ -29,8 +32,7 @@ public class Looper<E> implements Iterator<DataObject<E>> {
 
 	@Override
 	public boolean hasNext() {
-		return cursor.getNext(key, data, LockMode.DEFAULT)
-		        .equals(OperationStatus.SUCCESS);
+		return cursor.getNext(key, data, LockMode.DEFAULT) == OperationStatus.SUCCESS;
 	}
 
 	@Override
@@ -47,7 +49,8 @@ public class Looper<E> implements Iterator<DataObject<E>> {
 		cursor.delete();
 	}
 
-	public void close() {
-		cursor.close();
+	@Override
+	public void destroy(Duration timeout) throws BaseException {
+		IOUtils.close(cursor);
 	}
 }

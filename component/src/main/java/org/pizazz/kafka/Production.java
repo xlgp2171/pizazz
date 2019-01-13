@@ -19,7 +19,7 @@ import org.pizazz.kafka.exception.KafkaException;
 import org.pizazz.kafka.producer.ITransactionProcessor;
 import org.pizazz.kafka.producer.SenderProcessor;
 import org.pizazz.kafka.producer.TransactionProcessor;
-import org.pizazz.kafka.ref.AbstractClient;
+import org.pizazz.kafka.support.AbstractClient;
 import org.pizazz.message.ErrorCodeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

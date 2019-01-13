@@ -25,7 +25,7 @@ import org.pizazz.kafka.consumer.OffsetProcessor;
 import org.pizazz.kafka.exception.CodeEnum;
 import org.pizazz.kafka.exception.KafkaError;
 import org.pizazz.kafka.exception.KafkaException;
-import org.pizazz.kafka.ref.AbstractClient;
+import org.pizazz.kafka.support.AbstractClient;
 import org.pizazz.message.ErrorCodeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

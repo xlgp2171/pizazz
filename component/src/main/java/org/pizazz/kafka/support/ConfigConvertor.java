@@ -1,4 +1,4 @@
-package org.pizazz.kafka.ref;
+package org.pizazz.kafka.support;
 
 import java.time.Duration;
 import java.util.LinkedList;
