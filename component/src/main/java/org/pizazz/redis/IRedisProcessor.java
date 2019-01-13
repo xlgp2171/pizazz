@@ -5,10 +5,10 @@ import java.util.Map;
 import org.pizazz.redis.exception.RedisException;
 
 public interface IRedisProcessor {
-	public void set(String key, String value) throws RedisException;
-	public void bset(String key, byte[] value) throws RedisException;
-	public void hmset(String key, Map<String, String> map) throws RedisException;
-	public void hset(String key, String field, String value) throws RedisException;
+	public String set(String key, String value) throws RedisException;
+	public String bset(String key, byte[] value) throws RedisException;
+	public String hmset(String key, Map<String, String> map) throws RedisException;
+	public String hset(String key, String field, String value) throws RedisException;
 
 	public String get(String key) throws RedisException;
 	public byte[] bget(String key) throws RedisException;

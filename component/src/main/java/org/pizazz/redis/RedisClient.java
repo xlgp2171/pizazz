@@ -11,17 +11,17 @@ import org.slf4j.LoggerFactory;
 
 public class RedisClient extends AbstractClassPlugin {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RedisClient.class);
-	private IRedisInstance instance;
+	private IRedisAdapter adapter;
 
 	@Override
 	public void initialize(TupleObject config) throws BaseException {
 		updateConfig(config);
-		instance = cast(loadPlugin("classpath", new RedissonAdapter(), null, true), IRedisInstance.class);
+		adapter = cast(loadPlugin("classpath", new RedissonAdapter(), null, true), IRedisAdapter.class);
 		LOGGER.info("redis initialized,config=" + config);
 	}
 
 	public IRedisProcessor getProcessor() {
-		return instance.getProcessor();
+		return adapter.getProcessor();
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class RedisClient extends AbstractClassPlugin {
 
 	@Override
 	public void destroy(Duration timeout) throws BaseException {
-		unloadPlugin(instance, timeout);
+		unloadPlugin(adapter, timeout);
 		LOGGER.info("redis destroyed,timeout=" + timeout);
 	}
 }

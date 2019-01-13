@@ -8,13 +8,13 @@ import org.pizazz.common.JSONUtils;
 import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.data.TupleObject;
 import org.pizazz.exception.BaseException;
-import org.pizazz.redis.IRedisInstance;
+import org.pizazz.redis.IRedisAdapter;
 import org.pizazz.redis.IRedisProcessor;
 import org.pizazz.redis.RedisConstant;
 import org.pizazz.redis.exception.CodeEnum;
 import org.redisson.config.Config;
 
-public class RedissonAdapter implements IRedisInstance {
+public class RedissonAdapter implements IRedisAdapter {
 	private RedissonInstance instance;
 
 	@Override

@@ -57,49 +57,49 @@ public class ConfigConvertor implements ICloseable {
 
 	public String configFromKeys(String... keys) throws BaseException {
 		AssertUtils.assertNotNull("configFromKeys", keys, 0);
-		return TupleObjectHelper.getNestString(config, null, keys);
+		return TupleObjectHelper.getNestedString(config, null, keys);
 	}
 
 	public TupleObject offsetProcessorConfig() {
-		return TupleObjectHelper.getNestTupleObject(config, KafkaConstant.KEY_CONFIG,
+		return TupleObjectHelper.getNestedTupleObject(config, KafkaConstant.KEY_CONFIG,
 				KafkaConstant.KEY_OFFSET_PROCESSOR);
 	}
 
 	public TupleObject transactionProcessorConfig() {
-		return TupleObjectHelper.getNestTupleObject(config, KafkaConstant.KEY_CONFIG,
+		return TupleObjectHelper.getNestedTupleObject(config, KafkaConstant.KEY_CONFIG,
 				KafkaConstant.KEY_TRANSACTION_PROCESSOR);
 	}
 
 	public TupleObject dataProcessorConfig() {
-		return TupleObjectHelper.getNestTupleObject(config, KafkaConstant.KEY_CONFIG, KafkaConstant.KEY_DATA_PROCESSOR);
+		return TupleObjectHelper.getNestedTupleObject(config, KafkaConstant.KEY_CONFIG, KafkaConstant.KEY_DATA_PROCESSOR);
 	}
 
 	public TupleObject senderProcessorConfig() {
-		return TupleObjectHelper.getNestTupleObject(config, KafkaConstant.KEY_CONFIG,
+		return TupleObjectHelper.getNestedTupleObject(config, KafkaConstant.KEY_CONFIG,
 				KafkaConstant.KEY_SENDER_PROCESSOR);
 	}
 
 	public Duration durationValue() {
-		int _duration = TupleObjectHelper.getNestInt(config, KafkaConstant.DEF_DURATION, KafkaConstant.KEY_CONFIG,
+		int _duration = TupleObjectHelper.getNestedInt(config, KafkaConstant.DEF_DURATION, KafkaConstant.KEY_CONFIG,
 				KafkaConstant.KEY_DURATION);
 		return Duration.ofMillis((_duration <= 0 || _duration > KafkaConstant.DEF_DURATION_MAX)
 				? KafkaConstant.DEF_DURATION : _duration);
 	}
 
 	public ConsumerModeEnum consumerModeValue() throws BaseException {
-		String _value = TupleObjectHelper.getNestString(config, StringUtils.EMPTY, KafkaConstant.KEY_CONFIG,
+		String _value = TupleObjectHelper.getNestedString(config, StringUtils.EMPTY, KafkaConstant.KEY_CONFIG,
 				KafkaConstant.KEY_MODE);
 		return ConsumerModeEnum.from(_value);
 	}
 
 	public ProducerModeEnum producerModeValue() throws BaseException {
-		String _value = TupleObjectHelper.getNestString(config, StringUtils.EMPTY, KafkaConstant.KEY_CONFIG,
+		String _value = TupleObjectHelper.getNestedString(config, StringUtils.EMPTY, KafkaConstant.KEY_CONFIG,
 				KafkaConstant.KEY_MODE);
 		return ProducerModeEnum.from(_value);
 	}
 
 	public ConsumerIgnoreEnum consumerIgnoreValue() {
-		String _value = TupleObjectHelper.getNestString(config, StringUtils.EMPTY, KafkaConstant.KEY_CONFIG,
+		String _value = TupleObjectHelper.getNestedString(config, StringUtils.EMPTY, KafkaConstant.KEY_CONFIG,
 				KafkaConstant.KEY_IGNORE);
 
 		if (!StringUtils.isEmpty(_value)) {
@@ -116,12 +116,12 @@ public class ConfigConvertor implements ICloseable {
 	}
 
 	public String getConsumerGroupId() {
-		return TupleObjectHelper.getNestString(config, Constant.NAMING, KafkaConstant.KEY_CLIENT,
+		return TupleObjectHelper.getNestedString(config, Constant.NAMING, KafkaConstant.KEY_CLIENT,
 				ConsumerConfig.GROUP_ID_CONFIG);
 	}
 
 	public List<TopicPartition> assignConfig() throws KafkaException {
-		List<Object> _config = TupleObjectHelper.getNestList(config, KafkaConstant.KEY_CONFIG,
+		List<Object> _config = TupleObjectHelper.getNestedList(config, KafkaConstant.KEY_CONFIG,
 				KafkaConstant.KEY_TOPIC_PARTITION);
 
 		if (CollectionUtils.isEmpty(_config)) {
@@ -148,7 +148,7 @@ public class ConfigConvertor implements ICloseable {
 	}
 
 	public Pattern topicPatternConfig() throws KafkaException {
-		String _regex = TupleObjectHelper.getNestString(config, KafkaConstant.KEY_CONFIG, null,
+		String _regex = TupleObjectHelper.getNestedString(config, KafkaConstant.KEY_CONFIG, null,
 				KafkaConstant.KEY_TOPIC_PATTERN);
 
 		if (StringUtils.isTrimEmpty(_regex)) {
@@ -158,7 +158,7 @@ public class ConfigConvertor implements ICloseable {
 	}
 
 	public List<String> topicConfig() throws KafkaException {
-		List<Object> _config = TupleObjectHelper.getNestList(config, KafkaConstant.KEY_CONFIG, KafkaConstant.KEY_TOPIC);
+		List<Object> _config = TupleObjectHelper.getNestedList(config, KafkaConstant.KEY_CONFIG, KafkaConstant.KEY_TOPIC);
 
 		if (CollectionUtils.isEmpty(_config)) {
 			throw new KafkaException(CodeEnum.KFK_0005, "config 'topic' null");

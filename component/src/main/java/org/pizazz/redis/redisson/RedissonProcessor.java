@@ -4,9 +4,10 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import org.pizazz.redis.IRedisProcessor;
+import org.pizazz.redis.RedisConstant;
+import org.pizazz.redis.RedisHelper;
 import org.pizazz.redis.exception.CodeEnum;
 import org.pizazz.redis.exception.RedisException;
-import org.pizazz.redis.util.RedisHelper;
 
 public class RedissonProcessor implements IRedisProcessor {
 	private final RedissonInstance instance;
@@ -23,31 +24,31 @@ public class RedissonProcessor implements IRedisProcessor {
 		}
 	}
 
-	private void tryMethod(String method, Runnable runnable) throws RedisException {
-		tryMethod(method, () -> {
+	private String tryMethod(String method, Runnable runnable) throws RedisException {
+		return tryMethod(method, () -> {
 			runnable.run();
-			return null;
+			return RedisConstant.STATUS_OK;
 		});
 	}
 
 	@Override
-	public void set(String key, String value) throws RedisException {
-		bset(key, RedisHelper.fromString(value));
+	public String set(String key, String value) throws RedisException {
+		return bset(key, RedisHelper.fromString(value));
 	}
 
 	@Override
-	public void bset(String key, byte[] value) throws RedisException {
-		tryMethod("bset", () -> instance.getBinaryStream(key).set(value));
+	public String bset(String key, byte[] value) throws RedisException {
+		return tryMethod("bset", () -> instance.getBinaryStream(key).set(value));
 	}
 
 	@Override
-	public void hmset(String key, Map<String, String> map) throws RedisException {
-		tryMethod("hmset", () -> instance.getSSMap(key).putAll(map));
+	public String hmset(String key, Map<String, String> map) throws RedisException {
+		return tryMethod("hmset", () -> instance.getSSMap(key).putAll(map));
 	}
 
 	@Override
-	public void hset(String key, String field, String value) throws RedisException {
-		tryMethod("hset", () -> instance.getSSMap(key).put(field, value));
+	public String hset(String key, String field, String value) throws RedisException {
+		return tryMethod("hset", () -> instance.getSSMap(key).put(field, value));
 	}
 
 	@Override

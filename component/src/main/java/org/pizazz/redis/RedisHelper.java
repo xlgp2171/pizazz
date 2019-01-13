@@ -1,4 +1,4 @@
-package org.pizazz.redis.util;
+package org.pizazz.redis;
 
 import java.nio.charset.StandardCharsets;
 
