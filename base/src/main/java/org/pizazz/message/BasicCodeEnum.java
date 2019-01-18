@@ -52,7 +52,9 @@ public enum BasicCodeEnum implements IMessageCode {
 	/** 初始化异常：InitializeException */
 	MSG_0020("MSG0020#"),
 	/** 数据库异常：DatabaseException */
-	MSG_0021("MSG0021#");
+	MSG_0021("MSG0021#"),
+	/** 编译异常：CompileException */
+	MSG_0022("MSG0022#");
 
 	private String code;
 	private StringBuffer message;

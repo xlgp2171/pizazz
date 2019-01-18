@@ -2,6 +2,8 @@ package org.pizazz.common;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Path;
 
 import org.pizazz.Constant;
 import org.pizazz.common.ref.IJacksonConfig;
@@ -15,7 +17,7 @@ import org.pizazz.message.TypeEnum;
  * 使用jackson组件
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.1.191016
  */
 public class YAMLUtils {
 
@@ -52,5 +54,36 @@ public class YAMLUtils {
 		} catch (IOException e) {
 			return TupleObjectHelper.emptyObject();
 		}
+	}
+
+	public static <T> void toYAML(OutputStream target, T data, IJacksonConfig config) throws BaseException {
+		AssertUtils.assertNotNull("toYAML", target, data);
+
+		if (config == null) {
+			config = new IJacksonConfig() {
+			};
+		}
+		com.fasterxml.jackson.databind.ObjectMapper _mapper = new com.fasterxml.jackson.databind.ObjectMapper(
+				new com.fasterxml.jackson.dataformat.yaml.YAMLFactory());
+		config.set(_mapper);
+		try {
+			_mapper.writeValue(target, data);
+		} catch (IOException e) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.JACKSON.PROCESS", e.getMessage());
+			throw new BaseException(BasicCodeEnum.MSG_0013, _msg, e);
+		}
+	}
+
+	public static void toYAML(OutputStream target, TupleObject data) throws BaseException {
+		AssertUtils.assertNotNull("toYAML", target, data);
+		try {
+			toYAML(target, data, null);
+		} finally {
+			IOUtils.close(target);
+		}
+	}
+
+	public static void toYAML(Path path, TupleObject data) throws BaseException {
+		toYAML(PathUtils.getOutputStream(path), data);
 	}
 }

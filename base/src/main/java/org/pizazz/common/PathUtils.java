@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.channels.FileChannel;
@@ -23,7 +24,7 @@ import org.pizazz.message.TypeEnum;
  * 文件工具
  * 
  * @author xlgp2171
- * @version 1.2.191013
+ * @version 1.3.191016
  */
 public class PathUtils {
 
@@ -35,6 +36,10 @@ public class PathUtils {
 					e.getMessage());
 			throw new BaseException(BasicCodeEnum.MSG_0005, _msg, e);
 		}
+	}
+
+	public static boolean isRegularFile(Path path) {
+		return Files.isReadable(path) && Files.isRegularFile(path);
 	}
 
 	public static byte[] toByteArray(Path path) throws BaseException {
@@ -56,6 +61,17 @@ public class PathUtils {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO.PATH", path.toAbsolutePath(),
 					e.getMessage());
 			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
+		}
+	}
+
+	public static OutputStream getOutputStream(Path path) throws BaseException {
+		AssertUtils.assertNotNull("getOutputStream", path);
+		try {
+			return Files.newOutputStream(path);
+		} catch (IOException e) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO.PATH", path.toAbsolutePath(),
+					e.getMessage());
+			throw new BaseException(BasicCodeEnum.MSG_0003, _msg);
 		}
 	}
 
@@ -133,6 +149,17 @@ public class PathUtils {
 			return Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH", path.toAbsolutePath(), e.getMessage());
+			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
+		}
+	}
+
+	public static Path copy(Path source, Path target) throws BaseException {
+		AssertUtils.assertNotNull("copy", source, target);
+		try {
+			return Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.COPY", source.toAbsolutePath(),
+					target.toAbsolutePath(), e.getMessage());
 			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
 		}
 	}
