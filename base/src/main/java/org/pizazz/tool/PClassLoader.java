@@ -15,6 +15,8 @@ import java.util.WeakHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import javax.tools.JavaFileObject;
+
 import org.pizazz.Constant;
 import org.pizazz.IObject;
 import org.pizazz.common.ArrayUtils;
@@ -34,7 +36,7 @@ import org.pizazz.message.TypeEnum;
  * 类加载组件
  * 
  * @author xlgp2171
- * @version 1.1.181218
+ * @version 1.1.191014
  */
 public class PClassLoader extends URLClassLoader implements IObject {
 	/**
@@ -70,7 +72,7 @@ public class PClassLoader extends URLClassLoader implements IObject {
 	}
 
 	private Class<?> toClass(String name) throws ClassNotFoundException {
-		String _path = name.replace('.', '/').concat(".class");
+		String _path = name.replace('.', '/').concat(JavaFileObject.Kind.CLASS.extension);
 		Path _classFile = getDirectory().resolve(_path);
 
 		if (!Files.isReadable(_classFile) || !Files.isRegularFile(_classFile)) {
@@ -79,8 +81,8 @@ public class PClassLoader extends URLClassLoader implements IObject {
 		}
 		byte[] _data;
 		try {
-			_data = Files.readAllBytes(_classFile);
-		} catch (IOException e) {
+			_data = PathUtils.toByteArray(_classFile);
+		} catch (BaseException e) {
 			throw new ClassNotFoundException(e.getMessage(), e);
 		}
 		Class<?> _tmp = defineClass(name, _data, 0, _data.length);
@@ -107,8 +109,8 @@ public class PClassLoader extends URLClassLoader implements IObject {
 		return _in;
 	}
 
-	public synchronized PClassLoader addJAR(Path path) throws BaseException {
-		AssertUtils.assertNotNull("addJAR", path);
+	public synchronized PClassLoader extractJAR(Path path) throws BaseException {
+		AssertUtils.assertNotNull("extractJAR", path);
 
 		try (JarFile _item = new JarFile(path.toFile())) {
 			Enumeration<JarEntry> _entries = _item.entries();
@@ -120,10 +122,14 @@ public class PClassLoader extends URLClassLoader implements IObject {
 				if (_entry.isDirectory()) {
 					PathUtils.createDirectories(getDirectory().resolve(_name));
 				} else {
-					Path _dir = getDirectory().resolve(Paths.get(_name).getParent());
+					Path _tmp = Paths.get(_name);
 
-					if (!Files.exists(_dir)) {
-						PathUtils.createDirectories(_dir);
+					if (_tmp.getParent() != null) {
+						Path _dir = getDirectory().resolve(_tmp.getParent());
+
+						if (!Files.exists(_dir)) {
+							PathUtils.createDirectories(_dir);
+						}
 					}
 					try (InputStream _in = _item.getInputStream(_entry)) {
 						PathUtils.copyToPath(getDirectory().resolve(_name), _in);
