@@ -13,13 +13,13 @@ import org.pizazz.kafka.exception.KafkaException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OrderLoopAdapter implements IProcessAdapter {
-	private static final Logger LOGGER = LoggerFactory.getLogger(OrderLoopAdapter.class);
+public class SequenceAdapter implements IProcessAdapter {
+	private static final Logger LOGGER = LoggerFactory.getLogger(SequenceAdapter.class);
 	private ConsumerModeEnum mode;
 
 	@Override
 	public void initialize(TupleObject config) throws BaseException {
-		LOGGER.info("adapter OrderLoopAdapter initized,config=" + config);
+		LOGGER.info("adapter SequenceAdapter initialized,config=" + config);
 	}
 
 	@Override
@@ -70,6 +70,6 @@ public class OrderLoopAdapter implements IProcessAdapter {
 
 	@Override
 	public void destroy(Duration timeout) throws BaseException {
-		LOGGER.info("adapter OrderLoopAdapter destroyed,timeout=" + timeout);
+		LOGGER.info("adapter SequenceAdapter destroyed,timeout=" + timeout);
 	}
 }

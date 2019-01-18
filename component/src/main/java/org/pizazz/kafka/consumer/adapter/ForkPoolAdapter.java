@@ -25,7 +25,7 @@ public class ForkPoolAdapter implements IProcessAdapter {
 	public void initialize(TupleObject config) throws BaseException {
 		pool = new ForkJoinPool(TupleObjectHelper.getInt(config, KafkaConstant.KEY_THREADS,
 				Runtime.getRuntime().availableProcessors()));
-		LOGGER.info("adapter ForkPoolAdapter initized,config=" + config);
+		LOGGER.info("adapter ForkPoolAdapter initialized,config=" + config);
 	}
 
 	@Override

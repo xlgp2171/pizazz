@@ -4,8 +4,6 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
@@ -28,7 +26,7 @@ import org.slf4j.LoggerFactory;
 public class OffsetProcessor implements IOffsetProcessor {
 	private static final Logger LOGGER = LoggerFactory.getLogger(OffsetProcessor.class);
 	protected final Map<TopicPartition, OffsetAndMetadata> offsetCommitted;
-	protected final ConcurrentMap<TopicPartition, OffsetAndMetadata> offsetCache;
+	protected final Map<TopicPartition, OffsetAndMetadata> offsetCache;
 	private ConsumerModeEnum mode;
 	private ConsumerIgnoreEnum ignore;
 
@@ -38,29 +36,26 @@ public class OffsetProcessor implements IOffsetProcessor {
 			if (e != null) {
 				LOGGER.error("consumer commit:" + offsets, e);
 			} else if (offsets != null) {
-				offsetCommitted(offsets);
+				markCommitted(offsets);
 			}
 		}
 	};
 
 	public OffsetProcessor() {
 		offsetCommitted = new HashMap<TopicPartition, OffsetAndMetadata>();
-		offsetCache = new ConcurrentHashMap<TopicPartition, OffsetAndMetadata>();
+		offsetCache = new HashMap<TopicPartition, OffsetAndMetadata>();
 	}
 
 	@Override
 	public void initialize(TupleObject config) throws BaseException {
 	}
 
-	private <K, V> void offsetCommit(KafkaConsumer<K, V> consumer) throws KafkaException {
-		Map<TopicPartition, OffsetAndMetadata> _tmp;
+	private <K, V> void offsetCommit(KafkaConsumer<K, V> consumer, boolean force) throws KafkaException {
+		Map<TopicPartition, OffsetAndMetadata> _tmp = getOffsetCache();
 
-		synchronized (offsetCache) {
-			_tmp = new HashMap<TopicPartition, OffsetAndMetadata>(offsetCache);
-		}
-		if (mode.isSync()) {
+		if (mode.isSync() || force) {
 			try {
-				if (mode.isEach()) {
+				if (mode.isEach() && !force) {
 					consumer.commitSync(_tmp);
 				} else {
 					consumer.commitSync();
@@ -73,7 +68,7 @@ public class OffsetProcessor implements IOffsetProcessor {
 					return;
 				}
 			}
-			offsetCommitted(_tmp);
+			markCommitted(_tmp);
 		} else if (mode.isEach()){
 			consumer.commitAsync(_tmp, callback);
 		} else {
@@ -84,7 +79,7 @@ public class OffsetProcessor implements IOffsetProcessor {
 		}
 	}
 
-	private void offsetCommitted(Map<TopicPartition, OffsetAndMetadata> offsets) {
+	private void markCommitted(Map<TopicPartition, OffsetAndMetadata> offsets) {
 		synchronized (offsetCommitted) {
 			offsets.forEach((_k, _v) -> {
 				if (offsetCommitted.containsKey(_k)) {
@@ -112,7 +107,7 @@ public class OffsetProcessor implements IOffsetProcessor {
 					offsetCache.put(_tp, new OffsetAndMetadata(record.offset()));
 
 					if (mode != ConsumerModeEnum.MANUAL_NONE_NONE && !mode.isAuto()) {
-						offsetCommit(consumer);
+						offsetCommit(consumer, false);
 					}
 				}
 			} else if (LOGGER.isDebugEnabled()) {
@@ -123,7 +118,7 @@ public class OffsetProcessor implements IOffsetProcessor {
 				offsetCache.put(_tp, new OffsetAndMetadata(record.offset()));
 
 				if (mode != ConsumerModeEnum.MANUAL_NONE_NONE && !mode.isAuto()) {
-					offsetCommit(consumer);
+					offsetCommit(consumer, false);
 				}
 			}
 		}
@@ -134,7 +129,7 @@ public class OffsetProcessor implements IOffsetProcessor {
 	public <K, V> void complete(KafkaConsumer<K, V> consumer, KafkaException e) throws KafkaException {
 		// 若手动提交且一轮提交且无异常
 		if (mode != ConsumerModeEnum.MANUAL_NONE_NONE && !mode.isAuto() && e == null) {
-			offsetCommit(consumer);
+			offsetCommit(consumer, false);
 
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("consumer commit sync:" + mode.isSync());
@@ -170,7 +165,7 @@ public class OffsetProcessor implements IOffsetProcessor {
 				// 若非自动提交且统一提交
 				if (mode != ConsumerModeEnum.MANUAL_NONE_NONE && !mode.isAuto() && !mode.isEach()) {
 					try {
-						offsetCommit(consumer);
+						offsetCommit(consumer, true);
 					} catch (KafkaException e) {
 						LOGGER.error(e.getMessage(), e);
 					}

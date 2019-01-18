@@ -29,6 +29,10 @@ public class KafkaConstant {
 	/**
 	 * 
 	 */
+	public static final String KEY_MONITORING = "monitoring";
+	/**
+	 * 
+	 */
 	public static final String KEY_TOPIC_PARTITION = "topicPartition";
 	/**
 	 * 

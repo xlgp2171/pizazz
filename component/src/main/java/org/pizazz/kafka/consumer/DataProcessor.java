@@ -10,7 +10,7 @@ import org.pizazz.exception.BaseException;
 import org.pizazz.kafka.KafkaConstant;
 import org.pizazz.kafka.consumer.adapter.Bridge;
 import org.pizazz.kafka.consumer.adapter.IProcessAdapter;
-import org.pizazz.kafka.consumer.adapter.OrderLoopAdapter;
+import org.pizazz.kafka.consumer.adapter.SequenceAdapter;
 import org.pizazz.kafka.exception.KafkaException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.tool.AbstractClassPlugin;
@@ -34,7 +34,7 @@ public class DataProcessor<K, V> extends AbstractClassPlugin {
 	@Override
 	public void initialize(TupleObject config) throws BaseException {
 		setConfig(config);
-		adapter = cast(loadPlugin("classpath", new OrderLoopAdapter(), null, true), IProcessAdapter.class);
+		adapter = cast(loadPlugin("classpath", new SequenceAdapter(), null, true), IProcessAdapter.class);
 		try {
 			adapter.set(mode);
 		} catch (KafkaException e) {
