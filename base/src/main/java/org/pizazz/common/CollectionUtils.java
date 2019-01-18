@@ -103,7 +103,7 @@ public class CollectionUtils {
 
 	public static String toString(Collection<?> target) {
 		if (isEmpty(target)) {
-			return StringUtils.EMPTY;
+			return "[]";
 		}
 		StringBuilder _tmp = new StringBuilder("[");
 

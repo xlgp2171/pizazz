@@ -60,5 +60,5 @@ public class ExpressionConstant {
 	/** 匹配包名称 */
 	public static final String PACKAGE_NAME = "package\\s+([$_a-zA-Z][$_a-zA-Z0-9\\.]*);";
 	/** 匹配类名称 */
-	public static final String CLASS_NAME = "class\\s+([$_a-zA-Z][$_a-zA-Z0-9]*)\\s+";
+	public static final String CLASS_NAME = "class\\s+([$_a-zA-Z][$_a-zA-Z0-9]*)[\\s<\\{]+";
 }

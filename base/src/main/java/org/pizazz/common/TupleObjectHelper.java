@@ -12,7 +12,7 @@ import org.pizazz.exception.BaseException;
  * 通用对象工具
  * 
  * @author xlgp2171
- * @version 1.3.191013
+ * @version 1.3.191016
  */
 public class TupleObjectHelper {
 
@@ -32,7 +32,7 @@ public class TupleObjectHelper {
 		return newObject().append(key, value);
 	}
 
-	public static TupleObject newObject(Map<String, Object> map) {
+	public static TupleObject newObject(Map<String, ? extends Object> map) {
 		return new TupleObject(map);
 	}
 

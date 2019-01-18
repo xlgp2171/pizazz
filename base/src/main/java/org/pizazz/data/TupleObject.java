@@ -29,7 +29,7 @@ public class TupleObject extends LinkedHashMap<String, Object> implements IObjec
 		super(size);
 	}
 
-	public TupleObject(Map<String, Object> target) {
+	public TupleObject(Map<String, ? extends Object> target) {
 		super(target);
 	}
 
@@ -42,7 +42,7 @@ public class TupleObject extends LinkedHashMap<String, Object> implements IObjec
 		return this;
 	}
 
-	public TupleObject append(Map<String, Object> value) {
+	public TupleObject append(Map<String, ? extends Object> value) {
 		if (value != null) {
 			putAll(value);
 		}

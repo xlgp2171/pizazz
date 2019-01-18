@@ -26,12 +26,12 @@ import org.pizazz.message.TypeEnum;
  * 输入输出工具
  * 
  * @author xlgp2171
- * @version 1.0.181220
+ * @version 1.0.191015
  */
 public class IOUtils {
 
-	public static String readInputStream(InputStream is, boolean close) throws BaseException {
-		byte[] _data = toByteArray(is, close);
+	public static String readInputStream(InputStream is) throws BaseException {
+		byte[] _data = toByteArray(is);
 		return new String(_data, StandardCharsets.UTF_8);
 	}
 
@@ -68,6 +68,10 @@ public class IOUtils {
 			close(in);
 			close(call);
 		}
+	}
+
+	public static InputStream getResourceAsStream(String resource) throws BaseException {
+		return getResourceAsStream(resource, null, null);
 	}
 
 	public static InputStream getResourceAsStream(String resource, Class<?> clazz, Thread current)
@@ -156,17 +160,13 @@ public class IOUtils {
 		return _count > Integer.MAX_VALUE ? -1 : new Long(_count).intValue();
 	}
 
-	public static byte[] toByteArray(InputStream input, boolean close) throws BaseException {
+	public static byte[] toByteArray(InputStream input) throws BaseException {
 		try (ByteArrayOutputStream _output = new ByteArrayOutputStream()) {
 			copy(input, _output);
 			return _output.toByteArray();
 		} catch (IOException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO.OUT", e.getMessage());
 			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
-		} finally {
-			if (close) {
-				close(input);
-			}
 		}
 	}
 
