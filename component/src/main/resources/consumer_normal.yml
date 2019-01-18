@@ -1,6 +1,5 @@
 client:
   fetch.min.bytes: 64
-  group.id: DemoGroup
   enable.auto.commit: false
   isolation.level: read_uncommitted
   max.poll.records: 400
@@ -11,4 +10,4 @@ config:
   offsetProcessor:
     classpath: org.pizazz.kafka.consumer.OffsetProcessor
   dataProcessor:
-    classpath: org.pizazz.kafka.consumer.adapter.OrderLoopAdapter
+    classpath: org.pizazz.kafka.consumer.adapter.SequenceAdapter

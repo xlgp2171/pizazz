@@ -21,4 +21,4 @@ config:
   offsetProcessor:
     classpath: org.pizazz.kafka.consumer.OffsetProcessor
   dataProcessor:
-    classpath: org.pizazz.kafka.consumer.adapter.OrderLoopAdapter
+    classpath: org.pizazz.kafka.consumer.adapter.SequenceAdapter
