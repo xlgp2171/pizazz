@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.ConsumerGroupDescription;
@@ -20,6 +21,8 @@ import org.apache.kafka.common.TopicPartition;
 import org.pizazz.common.IOUtils;
 import org.pizazz.data.TupleObject;
 import org.pizazz.exception.BaseException;
+import org.pizazz.kafka.exception.CodeEnum;
+import org.pizazz.kafka.exception.KafkaException;
 import org.pizazz.kafka.support.AbstractClient;
 
 public class Management<K, V> extends AbstractClient {
@@ -44,6 +47,15 @@ public class Management<K, V> extends AbstractClient {
 
 	public Map<String, KafkaFuture<ConsumerGroupDescription>> describedGroups(Collection<String> groupIds) {
 		return admin.describeConsumerGroups(groupIds).describedGroups();
+	}
+
+	public Map<String, ConsumerGroupDescription> describedGroupsSync(Collection<String> groupIds)
+			throws KafkaException {
+		try {
+			return admin.describeConsumerGroups(groupIds).all().get();
+		} catch (InterruptedException | ExecutionException e) {
+			throw new KafkaException(CodeEnum.KFK_0014, e.getMessage(), e);
+		}
 	}
 
 	public Map<TopicPartition, Long> getEndOffsets(Collection<TopicPartition> partitions) {
