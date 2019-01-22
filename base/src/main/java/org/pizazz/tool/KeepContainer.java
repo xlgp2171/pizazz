@@ -22,7 +22,7 @@ import org.pizazz.message.TypeEnum;
  * 维持容器组件
  *
  * @author xlgp2171
- * @version 1.1.181227
+ * @version 1.1.190121
  */
 public class KeepContainer extends AbstractContainer<String> {
 
@@ -40,18 +40,9 @@ public class KeepContainer extends AbstractContainer<String> {
 		return getClass().getName();
 	}
 
-	protected void addShutdownHook() {
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			@Override
-			public void run() {
-				SystemUtils.destroy(KeepContainer.this, null);
-			}
-		});
-	}
-
 	@Override
 	public void waitForShutdown() {
-		addShutdownHook();
+		SystemUtils.addShutdownHook(this);
 		int _port = TupleObjectHelper.getInt(properties, KEY_CONTAINER_PORT, 10420);
 		String _key = TupleObjectHelper.getString(properties, KEY_CONTAINER_KEY, Constant.NAMING);
 		DatagramSocket _socket;
