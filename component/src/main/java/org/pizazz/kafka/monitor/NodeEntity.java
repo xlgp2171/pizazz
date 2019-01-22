@@ -8,9 +8,9 @@ import org.pizazz.common.StringUtils;
 
 public final class NodeEntity implements IObject, Comparable<NodeEntity> {
 
-	private final Node node;
-	private final ConsumerGroupListing group;
-	private final ConsumerGroupState state;
+	private Node node;
+	private ConsumerGroupListing group;
+	private ConsumerGroupState state;
 
 	public NodeEntity(Node node, String groupId) {
 		this(node, new ConsumerGroupListing(groupId, false), null);
@@ -20,6 +20,12 @@ public final class NodeEntity implements IObject, Comparable<NodeEntity> {
 		this.node = node;
 		this.group = group;
 		this.state = state;
+	}
+
+	public void update(NodeEntity entity) {
+		this.node = entity.node;
+		this.group = entity.group;
+		this.state = entity.state;
 	}
 
 	public String getId() {
@@ -67,5 +73,13 @@ public final class NodeEntity implements IObject, Comparable<NodeEntity> {
 			return getGroupId().compareTo(o.getGroupId());
 		}
 		return getPort() < o.getPort() ? -1 : 1;
+	}
+
+	@Override
+	public String toString() {
+		// (1@127.0.0.1:80/rack)GROUP[STATE]
+		return new StringBuilder("(").append(getId()).append("@").append(getHost()).append(":").append(getPort())
+				.append("/").append(getRack()).append(")").append(getGroupId()).append("[").append(getState())
+				.append("]").toString();
 	}
 }

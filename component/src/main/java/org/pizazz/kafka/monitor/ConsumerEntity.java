@@ -4,9 +4,7 @@ import org.apache.kafka.clients.admin.ConsumerGroupListing;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.pizazz.IObject;
-import org.pizazz.common.JSONUtils;
 import org.pizazz.common.StringUtils;
-import org.pizazz.exception.BaseException;
 
 public final class ConsumerEntity implements IObject, Comparable<ConsumerEntity> {
 	/** 消费者ID */
@@ -94,15 +92,6 @@ public final class ConsumerEntity implements IObject, Comparable<ConsumerEntity>
 	}
 
 	@Override
-	public String toString() {
-		try {
-			return JSONUtils.toJSON(this);
-		} catch (BaseException e) {
-			return e.getMessage();
-		}
-	}
-
-	@Override
 	public int compareTo(ConsumerEntity o) {
 		int _result = getGroupId().compareTo(o.getGroupId());
 
@@ -117,5 +106,13 @@ public final class ConsumerEntity implements IObject, Comparable<ConsumerEntity>
 			return 0;
 		}
 		return getPartition() < o.getPartition() ? -1 : 1;
+	}
+
+	@Override
+	public String toString() {
+		// ID/127.0.0.1[GROUP-TOPIC-0](0/1)metadata
+		return new StringBuilder().append(getId()).append(getHost()).append("[").append(getGroupId()).append("-")
+				.append(getTopic()).append("-").append(getPartition()).append("](").append(getOffset()).append("/")
+				.append(getEndOffset()).append(")").append(getMetadata()).toString();
 	}
 }

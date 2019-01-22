@@ -78,7 +78,7 @@ public class BaseMonitor<K, V> implements IPlugin {
 	}
 
 	private void refreshConsumerEntities() {
-		getGroupIds().parallelStream().forEach(_item -> {
+		getGroupIds().stream().forEach(_item -> {
 			Map<TopicPartition, OffsetAndMetadata> _tmp = null;
 			try {
 				_tmp = management_.getTopicPartition(_item).get();
@@ -103,6 +103,9 @@ public class BaseMonitor<K, V> implements IPlugin {
 	}
 
 	private void resetConsumerEntities() {
+		ConcurrentSkipListSet<ConsumerEntity> _consumers = new ConcurrentSkipListSet<ConsumerEntity>(
+				(_o1, _o2) -> _o1.compareTo(_o2));
+
 		synchronized (nodes_) {
 			nodes_.clear();
 			management_.describedGroups(getGroupIds()).values().parallelStream().forEach(_item -> {
@@ -116,28 +119,39 @@ public class BaseMonitor<K, V> implements IPlugin {
 					ConsumerGroupListing _group = new ConsumerGroupListing(_description.groupId(),
 							_description.isSimpleConsumerGroup());
 					nodes_.add(new NodeEntity(_description.coordinator(), _group, _description.state()));
-					resetConsumerEntities(_description, _group);
+					resetConsumerEntities(_description, _group, _consumers);
 				}
 			});
 		}
+		if (_consumers.isEmpty()) {
+			consumers_.clear();
+		} else {
+			resetConsumerEntities(_consumers);
+		}
 	}
 
-	protected void resetConsumerEntities(final ConsumerGroupDescription description, ConsumerGroupListing group) {
-		synchronized (consumers_) {
-			ConcurrentSkipListSet<ConsumerEntity> _cloneC = consumers_.clone();
-			consumers_.clear();
-			description.members().parallelStream()
-					.forEach(_item -> _item.assignment().topicPartitions().parallelStream().forEach(_tp -> {
-						ConsumerEntity _source = new ConsumerEntity(group.groupId(), _tp);
-						ConsumerEntity _target = _cloneC.ceiling(_source);
+	protected void resetConsumerEntities(ConsumerGroupDescription description, ConsumerGroupListing group,
+			ConcurrentSkipListSet<ConsumerEntity> consumers) {
+		description.members().stream().forEach(_item -> _item.assignment().topicPartitions().stream().forEach(_tp -> {
+			ConsumerEntity _entity = new ConsumerEntity(_item.consumerId(), _item.host(), group, _tp);
 
-						if (_target == null || _source.compareTo(_target) != 0) {
-							consumers_.add(new ConsumerEntity(_item.consumerId(), _item.host(), group, _tp));
-						} else {
-							consumers_.add(_target.setHost(_item.host()));
-						}
-					}));
-		}
+			if (!consumers_.contains(_entity)) {
+				consumers_.add(_entity);
+			}
+			consumers.add(_entity);
+		}));
+	}
+
+	protected void resetConsumerEntities(ConcurrentSkipListSet<ConsumerEntity> consumers) {
+		consumers_.stream().forEach(_item -> {
+			ConsumerEntity _target = consumers.ceiling(_item);
+
+			if (_target != null && _item.compareTo(_target) == 0) {
+				_item.setHost(_target.getHost());
+			} else {
+				consumers_.remove(_item);
+			}
+		});
 	}
 
 	public final ConsumerEntity[] consumerCache() {
@@ -145,7 +159,9 @@ public class BaseMonitor<K, V> implements IPlugin {
 	}
 
 	public final NodeEntity[] nodeCache() {
-		return nodes_.stream().map(_item -> _item.clone()).toArray(NodeEntity[]::new);
+		synchronized (nodes_) {
+			return nodes_.stream().map(_item -> _item.clone()).toArray(NodeEntity[]::new);
+		}
 	}
 
 	@Override
