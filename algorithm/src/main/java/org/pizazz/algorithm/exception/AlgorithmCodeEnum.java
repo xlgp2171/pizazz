@@ -6,7 +6,7 @@ import org.pizazz.message.ref.IMessageCode;
  * 算法识别码
  * 
  * @author xlgp2171
- * @version 1.0.181223
+ * @version 1.1.190122
  */
 public enum AlgorithmCodeEnum implements IMessageCode {
 	/** 参数异常 */
@@ -15,8 +15,6 @@ public enum AlgorithmCodeEnum implements IMessageCode {
 	ALG_0002("ALG0002#");
 
 	private String code;
-	private StringBuffer message;
-	private final Object lock = new Object();
 
 	private AlgorithmCodeEnum(String code) {
 		this.code = code;
@@ -28,20 +26,12 @@ public enum AlgorithmCodeEnum implements IMessageCode {
 	}
 
 	@Override
-	public String getValue() {
-		return message == null ? code : code + message.toString();
+	public String getCode() {
+		return code;
 	}
 
 	@Override
-	public IMessageCode append(Object target) {
-		if (message == null) {
-			synchronized (lock) {
-				if (message == null) {
-					message = new StringBuffer();
-				}
-			}
-		}
-		message.append(target);
-		return this;
+	public StringBuffer append(Object target) {
+		return new StringBuffer(code).append(target);
 	}
 }

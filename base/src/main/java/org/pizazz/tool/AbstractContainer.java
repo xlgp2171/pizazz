@@ -24,7 +24,7 @@ import org.pizazz.message.TypeEnum;
  * @param <T> 输出类型
  *
  * @author xlgp2171
- * @version 1.0.181227
+ * @version 1.0.190122
  */
 public abstract class AbstractContainer<T> implements IPlugin {
 	static final String KEY_CONTAINER_PORT = "$PORT";
@@ -92,7 +92,7 @@ public abstract class AbstractContainer<T> implements IPlugin {
 						TimeUnit.MILLISECONDS);
 			} catch (TimeoutException e) {
 				String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CONTAINER.TIMEOUT", timeout);
-				SystemUtils.println(System.err, new StringBuilder(_msg));
+				SystemUtils.println(System.err, new StringBuffer(_msg));
 				_status = -2;
 			} catch (Exception e) {
 				_status = -3;

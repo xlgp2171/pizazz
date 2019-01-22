@@ -35,7 +35,7 @@ import org.pizazz.message.TypeEnum;
  * 系统工具
  * 
  * @author xlgp2171
- * @version 1.0.181220
+ * @version 1.1.190122
  */
 public class SystemUtils {
 	/**
@@ -93,8 +93,8 @@ public class SystemUtils {
 		try {
 			return System.getProperty(property, defValue);
 		} catch (SecurityException e) {
-			println(System.err, new StringBuilder(BasicCodeEnum.MSG_0002.getValue()).append("getProperty'")
-					.append(property).append("':").append(e.getMessage()));
+			println(System.err,
+					BasicCodeEnum.MSG_0002.append("getProperty'").append(property).append("':").append(e.getMessage()));
 			return defValue;
 		}
 	}
@@ -113,7 +113,7 @@ public class SystemUtils {
 		throw new BaseError(ErrorCodeEnum.ERR_0001, "OSType:" + osType);
 	}
 
-	public static void println(PrintStream target, StringBuilder message) {
+	public static void println(PrintStream target, StringBuffer message) {
 		if (target != null) {
 			target.println(message);
 		} else {
@@ -176,6 +176,12 @@ public class SystemUtils {
 		return getProcessID(ManagementFactory.getRuntimeMXBean());
 	}
 
+	public static Thread addShutdownHook(ICloseable closeable) {
+		Thread _tmp = new Thread(() -> destroy(closeable, Duration.ZERO));
+		Runtime.getRuntime().addShutdownHook(_tmp);
+		return _tmp;
+	}
+
 	public static String createID(Object target) {
 		if (target == null) {
 			return "null";
@@ -193,7 +199,7 @@ public class SystemUtils {
 
 	public static void destroy(ICloseable target, Duration timeout) {
 		if (target != null) {
-			if (timeout!= null && !timeout.isNegative()) {
+			if (timeout != null && !timeout.isNegative()) {
 				try {
 					target.destroy(timeout);
 				} catch (BaseException e) {

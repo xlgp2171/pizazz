@@ -30,11 +30,11 @@ public enum CodeEnum implements IMessageCode {
 	/** 发送数据异常 */
 	KFK_0012("KFK0012#"),
 	/** 发送数据事务异常 */
-	KFK_0013("KFK0013#");
+	KFK_0013("KFK0013#"),
+	/** 节点信息获取异常 */
+	KFK_0014("KFK0014#");
 
 	private String code;
-	private StringBuffer message;
-	private final Object lock = new Object();
 
 	private CodeEnum(String code) {
 		this.code = code;
@@ -46,21 +46,12 @@ public enum CodeEnum implements IMessageCode {
 	}
 
 	@Override
-	public String getValue() {
-		return message == null ? code : code + message.toString();
+	public String getCode() {
+		return code;
 	}
 
 	@Override
-	public IMessageCode append(Object target) {
-		if (message == null) {
-			synchronized (lock) {
-				if (message == null) {
-					message = new StringBuffer();
-				}
-			}
-		}
-		message.append(target);
-		return this;
+	public StringBuffer append(Object target) {
+		return new StringBuffer(code).append(target);
 	}
-
 }

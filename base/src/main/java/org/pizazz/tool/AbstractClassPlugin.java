@@ -78,7 +78,7 @@ public abstract class AbstractClassPlugin implements IPlugin {
 		try {
 			return load(_classpath, key, defPlugin, loader, initialize, null);
 		} catch (BaseException e) {
-			if (e.getMessage().startsWith(BasicCodeEnum.MSG_0014.getValue())) {
+			if (e.getMessage().startsWith(BasicCodeEnum.MSG_0014.getCode())) {
 				throw e;
 			}
 			log(e.getMessage(), e);

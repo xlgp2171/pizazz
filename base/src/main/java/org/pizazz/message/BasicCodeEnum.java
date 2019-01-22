@@ -6,7 +6,7 @@ import org.pizazz.message.ref.IMessageCode;
  * 消息识别码
  * 
  * @author xlgp2171
- * @version 1.0.191013
+ * @version 1.1.190122
  */
 public enum BasicCodeEnum implements IMessageCode {
 	/** 预留 */
@@ -57,8 +57,6 @@ public enum BasicCodeEnum implements IMessageCode {
 	MSG_0022("MSG0022#");
 
 	private String code;
-	private StringBuffer message;
-	private final Object lock = new Object();
 
 	private BasicCodeEnum(String code) {
 		this.code = code;
@@ -70,20 +68,12 @@ public enum BasicCodeEnum implements IMessageCode {
 	}
 
 	@Override
-	public String getValue() {
-		return message == null ? code : code + message.toString();
+	public String getCode() {
+		return code;
 	}
 
 	@Override
-	public IMessageCode append(Object target) {
-		if (message == null) {
-			synchronized (lock) {
-				if (message == null) {
-					message = new StringBuffer();
-				}
-			}
-		}
-		message.append(target);
-		return this;
+	public StringBuffer append(Object target) {
+		return new StringBuffer(code).append(target);
 	}
 }

@@ -11,6 +11,6 @@ public class BDBException extends AbstractException {
 	}
 
 	public BDBException(IMessageCode code, String message, Throwable cause) {
-		super(code.append(message).getValue(), cause);
+		super(code.append(message).toString(), cause);
 	}
 }

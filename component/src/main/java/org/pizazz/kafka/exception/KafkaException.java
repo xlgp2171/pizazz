@@ -11,6 +11,6 @@ public class KafkaException extends AbstractException {
 	}
 
 	public KafkaException(IMessageCode code, String message, Throwable cause) {
-		super(code.append(message).getValue(), cause);
+		super(code.append(message).toString(), cause);
 	}
 }
