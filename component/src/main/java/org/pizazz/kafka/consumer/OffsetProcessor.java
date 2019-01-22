@@ -56,7 +56,9 @@ public class OffsetProcessor implements IOffsetProcessor {
 		if (mode.isSync() || force) {
 			try {
 				if (mode.isEach() && !force) {
-					consumer.commitSync(_tmp);
+					if (!CollectionUtils.isEmpty(_tmp)) {
+						consumer.commitSync(_tmp);
+					}
 				} else {
 					consumer.commitSync();
 				}
