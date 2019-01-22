@@ -67,7 +67,7 @@ public final class ConfigureContext implements ICloseable {
 			Properties _tmp = ResourceUtils.loadProperties(type.value() + _postfix + ".properties");
 			tree.put(type, _tmp);
 		} catch (BaseException e) {
-			SystemUtils.println(System.err, new StringBuilder(e.getMessage()));
+			SystemUtils.println(System.err, new StringBuffer(e.getMessage()));
 		}
 	}
 
