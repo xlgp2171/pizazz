@@ -12,7 +12,7 @@ import org.pizazz.exception.BaseException;
  * 通用对象工具
  * 
  * @author xlgp2171
- * @version 1.3.191016
+ * @version 1.3.191022
  */
 public class TupleObjectHelper {
 
@@ -233,12 +233,14 @@ public class TupleObjectHelper {
 		try {
 			return ClassUtils.cast(_item, TupleObject.class);
 		} catch (BaseException e1) {
+			TupleObject _tmp;
 			try {
-				return newObject(ClassUtils.cast(_item, Map.class));
+				_tmp = newObject(ClassUtils.cast(_item, Map.class));
+				target.put(key, _tmp);
 			} catch (BaseException e2) {
-				return emptyObject();
+				_tmp = emptyObject();
 			}
-			
+			return _tmp;
 		}
 	}
 
