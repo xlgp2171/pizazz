@@ -15,7 +15,7 @@ import org.pizazz.message.ErrorCodeEnum;
  * 通用对象
  * 
  * @author xlgp2171
- * @version 1.0.181218
+ * @version 1.0.190122
  */
 public class TupleObject extends LinkedHashMap<String, Object> implements IObject {
 	private static final long serialVersionUID = 2892973669901268754L;
@@ -38,7 +38,7 @@ public class TupleObject extends LinkedHashMap<String, Object> implements IObjec
 	}
 
 	public TupleObject append(String key, Object value) {
-		putIfAbsent(key, value);
+		put(key, value);
 		return this;
 	}
 
