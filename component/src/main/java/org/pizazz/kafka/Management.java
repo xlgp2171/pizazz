@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -13,6 +14,7 @@ import org.apache.kafka.clients.admin.KafkaAdminClient;
 import org.apache.kafka.clients.admin.ListConsumerGroupsResult;
 import org.apache.kafka.clients.admin.NewPartitions;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.admin.TopicDescription;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
@@ -37,12 +39,19 @@ public class Management<K, V> extends AbstractClient {
 	}
 
 	public ConsumerRecords<K, V> getRecords(TopicPartition tp, long offset) {
+		List<TopicPartition> _tmp = Arrays.asList(tp);
+		consumer.assign(_tmp);
+		
 		if (offset == -1) {
-			consumer.seekToEnd(Arrays.asList(tp));
+			consumer.seekToEnd(_tmp);
 		} else {
 			consumer.seek(tp, offset);
 		}
 		return consumer.poll(getConvertor().durationValue());
+	}
+
+	public Map<String, KafkaFuture<TopicDescription>> describeTopics(Collection<String> topics) {
+		return admin.describeTopics(topics).values();
 	}
 
 	public Map<String, KafkaFuture<ConsumerGroupDescription>> describedGroups(Collection<String> groupIds) {
