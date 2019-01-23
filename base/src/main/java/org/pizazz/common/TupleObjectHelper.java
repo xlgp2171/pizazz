@@ -12,7 +12,7 @@ import org.pizazz.exception.BaseException;
  * 通用对象工具
  * 
  * @author xlgp2171
- * @version 1.3.191022
+ * @version 1.4.191022
  */
 public class TupleObjectHelper {
 
@@ -138,7 +138,7 @@ public class TupleObjectHelper {
 		if (keys.length == 1) {
 			return getInt(target, keys[0], defValue);
 		}
-		String[] _tmp = new String[keys.length];
+		String[] _tmp = new String[keys.length - 1];
 		System.arraycopy(keys, 0, _tmp, 0, keys.length - 1);
 		target = getNestedTupleObject(target, _tmp);
 		return getInt(target, keys[keys.length - 1], defValue);
@@ -158,7 +158,7 @@ public class TupleObjectHelper {
 		if (keys.length == 1) {
 			return getLong(target, keys[0], defValue);
 		}
-		String[] _tmp = new String[keys.length];
+		String[] _tmp = new String[keys.length - 1];
 		System.arraycopy(keys, 0, _tmp, 0, keys.length - 1);
 		target = getNestedTupleObject(target, _tmp);
 		return getLong(target, keys[keys.length - 1], defValue);
@@ -178,7 +178,7 @@ public class TupleObjectHelper {
 		if (keys.length == 1) {
 			return getShort(target, keys[0], defValue);
 		}
-		String[] _tmp = new String[keys.length];
+		String[] _tmp = new String[keys.length - 1];
 		System.arraycopy(keys, 0, _tmp, 0, keys.length - 1);
 		target = getNestedTupleObject(target, _tmp);
 		return getShort(target, keys[keys.length - 1], defValue);
@@ -198,7 +198,7 @@ public class TupleObjectHelper {
 		if (keys.length == 1) {
 			return getDouble(target, keys[0], defValue);
 		}
-		String[] _tmp = new String[keys.length];
+		String[] _tmp = new String[keys.length - 1];
 		System.arraycopy(keys, 0, _tmp, 0, keys.length - 1);
 		target = getNestedTupleObject(target, _tmp);
 		return getDouble(target, keys[keys.length - 1], defValue);
@@ -218,7 +218,7 @@ public class TupleObjectHelper {
 		if (keys.length == 1) {
 			return getBoolean(target, keys[0], defValue);
 		}
-		String[] _tmp = new String[keys.length];
+		String[] _tmp = new String[keys.length - 1];
 		System.arraycopy(keys, 0, _tmp, 0, keys.length - 1);
 		target = getNestedTupleObject(target, _tmp);
 		return getBoolean(target, keys[keys.length - 1], defValue);
@@ -284,7 +284,7 @@ public class TupleObjectHelper {
 		if (keys.length == 1) {
 			return getList(target, keys[0]);
 		}
-		String[] _tmp = new String[keys.length];
+		String[] _tmp = new String[keys.length - 1];
 		System.arraycopy(keys, 0, _tmp, 0, keys.length - 1);
 		target = getNestedTupleObject(target, _tmp);
 		return getList(target, keys[keys.length - 1]);
