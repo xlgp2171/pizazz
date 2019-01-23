@@ -20,8 +20,8 @@ public final class ConsumerEntity implements IObject, Comparable<ConsumerEntity>
 	/** 最终偏移 */
 	private long endOffset;
 
-	public ConsumerEntity(String groupId, TopicPartition topicPartition) {
-		this(null, null, new ConsumerGroupListing(groupId, false), topicPartition);
+	public ConsumerEntity(ConsumerGroupListing group, TopicPartition topicPartition) {
+		this(null, null, group, topicPartition);
 	}
 
 	public ConsumerEntity(String id, String host, ConsumerGroupListing group, TopicPartition topicPartition) {
@@ -31,9 +31,16 @@ public final class ConsumerEntity implements IObject, Comparable<ConsumerEntity>
 		this.topicPartition = topicPartition;
 	}
 
+	public ConsumerEntity(ConsumerGroupListing group, TopicPartition topicPartition, OffsetAndMetadata metadata,
+			long endOffset) {
+		this(group, topicPartition);
+		setOffsetAndMetadata(metadata);
+		setEndOffset(endOffset);
+	}
+
 	@Override
 	public String getId() {
-		return id;
+		return id == null ? StringUtils.EMPTY : id;
 	}
 
 	public ConsumerEntity setHost(String host) {
@@ -42,7 +49,7 @@ public final class ConsumerEntity implements IObject, Comparable<ConsumerEntity>
 	}
 
 	public String getHost() {
-		return host;
+		return host == null ? StringUtils.EMPTY : host;
 	}
 
 	public String getGroupId() {
@@ -64,6 +71,10 @@ public final class ConsumerEntity implements IObject, Comparable<ConsumerEntity>
 	public ConsumerEntity setOffsetAndMetadata(OffsetAndMetadata metadata) {
 		this.metadata = metadata;
 		return this;
+	}
+
+	public OffsetAndMetadata getOffsetAndMetadata() {
+		return metadata;
 	}
 
 	public long getOffset() {

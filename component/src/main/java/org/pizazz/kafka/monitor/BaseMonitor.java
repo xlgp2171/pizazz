@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 
 import org.apache.kafka.clients.admin.ConsumerGroupDescription;
 import org.apache.kafka.clients.admin.ConsumerGroupListing;
@@ -46,11 +47,12 @@ public class BaseMonitor<K, V> implements IPlugin {
 		LOGGER.info("BaseMonitor initialized,config=" + config);
 	}
 
-	public final void activate(Duration period) {
+	public final void activate(Duration period, boolean realtime) {
 		Duration _period = (period == null || period.isZero() || period.isNegative()) ? Duration.ofMillis(30000)
 				: period;
-		scheduled.scheduleAtFixedRate(() -> resetConsumerEntities(), 1000, _period.toMillis(), TimeUnit.MILLISECONDS);
-		scheduled.scheduleWithFixedDelay(() -> refreshConsumerEntities(), 1000 * 2, _period.toMillis() / 3,
+		scheduled.scheduleAtFixedRate(() -> resetConsumerEntities(realtime), 1000, _period.toMillis(),
+				TimeUnit.MILLISECONDS);
+		scheduled.scheduleWithFixedDelay(() -> refreshConsumerEntities(realtime), 1000 * 2, _period.toMillis() / 3,
 				TimeUnit.MILLISECONDS);
 		LOGGER.info("BaseMonitor scheduled,period=" + period);
 	}
@@ -77,23 +79,43 @@ public class BaseMonitor<K, V> implements IPlugin {
 		return Arrays.asList(_tmp);
 	}
 
-	private void refreshConsumerEntities() {
-		getGroupIds().stream().forEach(_item -> {
+	private void refreshConsumerEntities(boolean realtime) {
+		ConcurrentSkipListSet<ConsumerEntity> _consumers = new ConcurrentSkipListSet<ConsumerEntity>(
+				(_o1, _o2) -> _o1.compareTo(_o2));
+
+		getGroups().stream().forEach(_item -> {
 			Map<TopicPartition, OffsetAndMetadata> _tmp = null;
 			try {
-				_tmp = management_.getTopicPartition(_item).get();
+				_tmp = management_.getTopicPartition(_item.groupId()).get();
 			} catch (InterruptedException | ExecutionException e) {
 				LOGGER.warn("listConsumerGroupOffsets:" + e.getMessage(), e);
 			}
 			if (!CollectionUtils.isEmpty(_tmp)) {
-				refreshConsumerEntities(_item, _tmp);
+				refreshConsumerEntities(_item, _tmp, realtime ? null : _consumers);
 			}
 		});
+		if (!realtime) {
+			if (_consumers.isEmpty()) {
+				consumers_.clear();
+			} else {
+				resetConsumerEntities(_consumers, (_item, _target) -> _item
+						.setOffsetAndMetadata(_target.getOffsetAndMetadata()).setEndOffset(_target.getEndOffset()));
+			}
+		}
 	}
 
-	protected void refreshConsumerEntities(final String groupId, final Map<TopicPartition, OffsetAndMetadata> data) {
+	private void refreshConsumerEntities(ConsumerGroupListing group, Map<TopicPartition, OffsetAndMetadata> data,
+			ConcurrentSkipListSet<ConsumerEntity> consumers) {
+		if (consumers == null) {
+			refreshConsumerEntities(group, data);
+		} else {
+			resetConsumerEntities(group, data, consumers);
+		}
+	}
+
+	protected void refreshConsumerEntities(ConsumerGroupListing group, Map<TopicPartition, OffsetAndMetadata> data) {
 		management_.getEndOffsets(data.keySet()).forEach((_tp, _l) -> {
-			ConsumerEntity _source = new ConsumerEntity(groupId, _tp);
+			ConsumerEntity _source = new ConsumerEntity(group, _tp);
 			ConsumerEntity _target = consumers_.ceiling(_source);
 
 			if (_target != null && _source.compareTo(_target) == 0) {
@@ -102,7 +124,20 @@ public class BaseMonitor<K, V> implements IPlugin {
 		});
 	}
 
-	private void resetConsumerEntities() {
+	protected void resetConsumerEntities(ConsumerGroupListing group, Map<TopicPartition, OffsetAndMetadata> data,
+			ConcurrentSkipListSet<ConsumerEntity> consumers) {
+		management_.getEndOffsets(data.keySet()).forEach(
+				(_tp, _l) -> addConsumerEntities(new ConsumerEntity(group, _tp, data.get(_tp), _l), consumers));
+	}
+
+	private void addConsumerEntities(ConsumerEntity entity, ConcurrentSkipListSet<ConsumerEntity> consumers) {
+		if (!consumers_.contains(entity)) {
+			consumers_.add(entity);
+		}
+		consumers.add(entity);
+	}
+
+	private void resetConsumerEntities(boolean realtime) {
 		ConcurrentSkipListSet<ConsumerEntity> _consumers = new ConcurrentSkipListSet<ConsumerEntity>(
 				(_o1, _o2) -> _o1.compareTo(_o2));
 
@@ -119,35 +154,37 @@ public class BaseMonitor<K, V> implements IPlugin {
 					ConsumerGroupListing _group = new ConsumerGroupListing(_description.groupId(),
 							_description.isSimpleConsumerGroup());
 					nodes_.add(new NodeEntity(_description.coordinator(), _group, _description.state()));
-					resetConsumerEntities(_description, _group, _consumers);
+
+					if (realtime) {
+						resetConsumerEntities(_description, _group, _consumers);
+					}
 				}
 			});
 		}
-		if (_consumers.isEmpty()) {
-			consumers_.clear();
-		} else {
-			resetConsumerEntities(_consumers);
+		if (realtime) {
+			if (_consumers.isEmpty()) {
+				consumers_.clear();
+			} else {
+				resetConsumerEntities(_consumers, (_item, _target) -> _item.setHost(_target.getHost()));
+			}
 		}
 	}
 
 	protected void resetConsumerEntities(ConsumerGroupDescription description, ConsumerGroupListing group,
 			ConcurrentSkipListSet<ConsumerEntity> consumers) {
-		description.members().stream().forEach(_item -> _item.assignment().topicPartitions().stream().forEach(_tp -> {
-			ConsumerEntity _entity = new ConsumerEntity(_item.consumerId(), _item.host(), group, _tp);
-
-			if (!consumers_.contains(_entity)) {
-				consumers_.add(_entity);
-			}
-			consumers.add(_entity);
-		}));
+		description.members()
+				.stream().forEach(_item -> _item.assignment().topicPartitions().stream().forEach(
+						_tp -> addConsumerEntities(new ConsumerEntity(_item.consumerId(), _item.host(), group, _tp),
+								consumers)));
 	}
 
-	protected void resetConsumerEntities(ConcurrentSkipListSet<ConsumerEntity> consumers) {
+	private void resetConsumerEntities(ConcurrentSkipListSet<ConsumerEntity> consumers,
+			BiConsumer<ConsumerEntity, ConsumerEntity> consumer) {
 		consumers_.stream().forEach(_item -> {
 			ConsumerEntity _target = consumers.ceiling(_item);
 
 			if (_target != null && _item.compareTo(_target) == 0) {
-				_item.setHost(_target.getHost());
+				consumer.accept(_item, _target);
 			} else {
 				consumers_.remove(_item);
 			}
