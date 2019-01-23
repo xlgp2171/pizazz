@@ -24,17 +24,33 @@ import org.pizazz.message.TypeEnum;
  * 文件工具
  * 
  * @author xlgp2171
- * @version 1.3.191016
+ * @version 1.3.190122
  */
 public class PathUtils {
 
 	public static URI toURI(String uri) throws BaseException {
 		try {
 			return new URI(uri);
-		} catch (URISyntaxException e) {
-			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "BASIC.ERR.PATH.FORMAT", "URI", uri,
-					e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0005, _msg, e);
+		} catch (URISyntaxException e1) {
+			try {
+				return new URI("string://" + uri);
+			} catch (URISyntaxException e2) {
+				String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "BASIC.ERR.PATH.FORMAT", "URI", uri,
+						e2.getMessage());
+				throw new BaseException(BasicCodeEnum.MSG_0005, _msg, e2);
+			}
+		}
+	}
+
+	public static URI resolve(URI uri, String target) {
+		if (StringUtils.of(uri).endsWith("/")) {
+			return uri.resolve(target);
+		} else {
+			try {
+				return toURI(uri.toString() + "/").resolve(target);
+			} catch (BaseException e) {
+				return uri.resolve(target);
+			}
 		}
 	}
 
