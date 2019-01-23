@@ -71,7 +71,7 @@ public class OffsetProcessor implements IOffsetProcessor {
 				}
 			}
 			markCommitted(_tmp);
-		} else if (mode.isEach()){
+		} else if (mode.isEach()) {
 			consumer.commitAsync(_tmp, callback);
 		} else {
 			consumer.commitAsync(callback);
@@ -94,7 +94,7 @@ public class OffsetProcessor implements IOffsetProcessor {
 			});
 		}
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("consumer committid:" + offsets);
+			LOGGER.debug("consumer mark committid:" + offsets);
 		}
 	}
 
@@ -105,26 +105,23 @@ public class OffsetProcessor implements IOffsetProcessor {
 		if (offsetCommitted.containsKey(_tp)) {
 			// 若当前提交是否大于已提交offset，则写入缓存
 			if (record.offset() > offsetCommitted.get(_tp).offset()) {
-				synchronized (offsetCache) {
-					offsetCache.put(_tp, new OffsetAndMetadata(record.offset()));
-
-					if (mode != ConsumerModeEnum.MANUAL_NONE_NONE && !mode.isAuto()) {
-						offsetCommit(consumer, false);
-					}
-				}
+				setAndCommit(consumer, record, _tp);
 			} else if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug(_tp + " consumed:" + record.offset());
 			}
 		} else {
-			synchronized (offsetCache) {
-				offsetCache.put(_tp, new OffsetAndMetadata(record.offset()));
-
-				if (mode != ConsumerModeEnum.MANUAL_NONE_NONE && !mode.isAuto()) {
-					offsetCommit(consumer, false);
-				}
-			}
+			setAndCommit(consumer, record, _tp);
 		}
+	}
 
+	private <K, V> void setAndCommit(KafkaConsumer<K, V> consumer, ConsumerRecord<K, V> record, TopicPartition tp)
+			throws KafkaException {
+		synchronized (offsetCache) {
+			offsetCache.put(tp, new OffsetAndMetadata(record.offset()));
+		}
+		if (mode != ConsumerModeEnum.MANUAL_NONE_NONE && !mode.isAuto() && mode.isEach()) {
+			offsetCommit(consumer, false);
+		}
 	}
 
 	@Override
