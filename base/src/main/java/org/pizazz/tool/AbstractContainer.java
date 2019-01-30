@@ -74,24 +74,27 @@ public abstract class AbstractContainer<T> implements IPlugin {
 	public void destroy(Duration timeout) throws BaseException {
 		int _status = 0;
 
-		if (timeout == null) {
+		if (timeout == null || timeout.isNegative()) {
 			int _maxTimeout = ConfigureHelper.getInt(TypeEnum.BASIC, "DEF_CONTAINER_TIMEOUT_MAX", 60000);
 			int _exitTime = TupleObjectHelper.getInt(properties, KEY_CONTAINER_TIMEOUT, 20000);
-			_exitTime = (_exitTime > 0 && _exitTime <= _maxTimeout) ? _exitTime : _maxTimeout;
-			timeout = Duration.ofMillis(_exitTime);
+			timeout = Duration.ofMillis((_exitTime > 0 && _exitTime <= _maxTimeout) ? _exitTime : _maxTimeout);
 		}
-		if (timeout.isZero() || timeout.isNegative()) {
+		if (timeout.isZero()) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "CONTAINER.DESTROY");
+			SystemUtils.println(System.out, new StringBuffer(_msg));
 			try {
 				_status = callable.call();
 			} catch (Exception e) {
 				output.throwException(e);
 			}
 		} else {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "CONTAINER.DESTROY.TIMEOUT", timeout.toMillis());
+			SystemUtils.println(System.out, new StringBuffer(_msg));
 			try {
 				_status = Executors.newSingleThreadExecutor().submit(callable).get(timeout.toMillis(),
 						TimeUnit.MILLISECONDS);
 			} catch (TimeoutException e) {
-				String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CONTAINER.TIMEOUT", timeout);
+				_msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CONTAINER.TIMEOUT", timeout);
 				SystemUtils.println(System.err, new StringBuffer(_msg));
 				_status = -2;
 			} catch (Exception e) {

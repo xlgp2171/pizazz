@@ -12,14 +12,14 @@ import org.pizazz.message.TypeEnum;
  * 使用jackson组件
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.0.190124
  */
 public class JSONUtils {
 
 	public static String toJSON(Object target, IJacksonConfig config) throws BaseException {
-		AssertUtils.assertNotNull("toJSON", target);
-
-		if (config == null) {
+		if (target == null) {
+			return "{}";
+		} else if (config == null) {
 			config = new IJacksonConfig() {
 			};
 		}

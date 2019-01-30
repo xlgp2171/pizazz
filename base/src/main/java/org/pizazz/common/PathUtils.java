@@ -6,8 +6,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -24,16 +26,17 @@ import org.pizazz.message.TypeEnum;
  * 文件工具
  * 
  * @author xlgp2171
- * @version 1.3.190122
+ * @version 1.3.190130
  */
 public class PathUtils {
 
 	public static URI toURI(String uri) throws BaseException {
+		AssertUtils.assertNotNull("toURI", uri);
 		try {
 			return new URI(uri);
 		} catch (URISyntaxException e1) {
 			try {
-				return new URI("string://" + uri);
+				return new URI("string", null, uri, null);
 			} catch (URISyntaxException e2) {
 				String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "BASIC.ERR.PATH.FORMAT", "URI", uri,
 						e2.getMessage());
@@ -43,19 +46,28 @@ public class PathUtils {
 	}
 
 	public static URI resolve(URI uri, String target) {
-		if (StringUtils.of(uri).endsWith("/")) {
-			return uri.resolve(target);
-		} else {
+		URI _uri;
+		try {
+			_uri = toURI(StringUtils.of(uri) + (StringUtils.of(uri).endsWith("/") ? StringUtils.EMPTY : "/"));
+		} catch (BaseException e) {
+			return uri;
+		}
+		try {
+			return _uri.resolve(target);
+		} catch (IllegalArgumentException e1) {
+			String _target;
 			try {
-				return toURI(uri.toString() + "/").resolve(target);
-			} catch (BaseException e) {
-				return uri.resolve(target);
+				_target = URLEncoder.encode(target, SystemUtils.LOCAL_ENCODING.name());
+			} catch (UnsupportedEncodingException e2) {
+				return uri;
 			}
+			return _uri.resolve(_target.replaceAll("\\+", "%20").replaceAll("\\%21", "!").replaceAll("\\%27", "'")
+					.replaceAll("\\%28", "(").replaceAll("\\%29", ")").replaceAll("\\%7E", "~"));
 		}
 	}
 
 	public static boolean isRegularFile(Path path) {
-		return Files.isReadable(path) && Files.isRegularFile(path);
+		return path == null ? false : Files.isReadable(path) && Files.isRegularFile(path);
 	}
 
 	public static byte[] toByteArray(Path path) throws BaseException {
@@ -94,16 +106,14 @@ public class PathUtils {
 	public static void delete(Path path, boolean deep) throws BaseException {
 		AssertUtils.assertNotNull("delete", path);
 
-		if (Files.isDirectory(path)) {
-			if (deep) {
-				deleteDirectory(path);
-			}
-		} else {
-			try {
-				Files.delete(path);
-			} catch (IOException e) {
-			}
+		if (Files.isDirectory(path) && deep) {
+			deleteDirectory(path);
 		}
+		try {
+			Files.delete(path);
+		} catch (IOException e) {
+		}
+
 	}
 
 	public static Path[] listPaths(Path dir, Predicate<Path> filter, boolean includeDir) throws BaseException {

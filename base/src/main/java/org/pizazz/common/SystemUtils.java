@@ -176,8 +176,8 @@ public class SystemUtils {
 		return getProcessID(ManagementFactory.getRuntimeMXBean());
 	}
 
-	public static Thread addShutdownHook(ICloseable closeable) {
-		Thread _tmp = new Thread(() -> destroy(closeable, Duration.ZERO));
+	public static Thread addShutdownHook(ICloseable closeable, Duration timeout) {
+		Thread _tmp = new Thread(() -> destroy(closeable, timeout));
 		Runtime.getRuntime().addShutdownHook(_tmp);
 		return _tmp;
 	}
@@ -199,7 +199,7 @@ public class SystemUtils {
 
 	public static void destroy(ICloseable target, Duration timeout) {
 		if (target != null) {
-			if (timeout != null && !timeout.isNegative()) {
+			if (timeout != null) {
 				try {
 					target.destroy(timeout);
 				} catch (BaseException e) {
