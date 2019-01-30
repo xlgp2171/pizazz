@@ -4,10 +4,13 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.time.Duration;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.pizazz.Constant;
 import org.pizazz.IMessageOutput;
 import org.pizazz.IPlugin;
+import org.pizazz.common.IOUtils;
 import org.pizazz.common.LocaleHelper;
 import org.pizazz.common.StringUtils;
 import org.pizazz.common.SystemUtils;
@@ -22,9 +25,12 @@ import org.pizazz.message.TypeEnum;
  * 维持容器组件
  *
  * @author xlgp2171
- * @version 1.1.190121
+ * @version 1.2.190127
  */
 public class KeepContainer extends AbstractContainer<String> {
+	private DatagramSocket socket;
+	private Thread hook;
+	private final AtomicBoolean closed = new AtomicBoolean(false);
 
 	public KeepContainer(IPlugin plugin, TupleObject config, IMessageOutput<String> output) throws BaseException {
 		super(plugin, output);
@@ -42,12 +48,11 @@ public class KeepContainer extends AbstractContainer<String> {
 
 	@Override
 	public void waitForShutdown() {
-		SystemUtils.addShutdownHook(this);
+		hook = SystemUtils.addShutdownHook(this, null);
 		int _port = TupleObjectHelper.getInt(properties, KEY_CONTAINER_PORT, 10420);
 		String _key = TupleObjectHelper.getString(properties, KEY_CONTAINER_KEY, Constant.NAMING);
-		DatagramSocket _socket;
 		try {
-			_socket = new DatagramSocket(_port);
+			socket = new DatagramSocket(_port);
 		} catch (SocketException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.SOCKET", e.getMessage());
 			throw new BaseError(ErrorCodeEnum.ERR_0003, _msg, e);
@@ -62,18 +67,11 @@ public class KeepContainer extends AbstractContainer<String> {
 		}
 		while (true) {
 			try {
-				_socket.receive(_packet);
+				socket.receive(_packet);
 			} catch (IOException e) {
 				String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.SOCKET.RECEIVE", StringUtils.of(_port),
 						e.getMessage());
-				throw new BaseError(ErrorCodeEnum.ERR_0004, _msg, e);
-			} finally {
-				if (_socket != null) {
-					try {
-						_socket.close();
-					} catch (Exception e) {
-					}
-				}
+				throw new BaseError(ErrorCodeEnum.ERR_0004, _msg);
 			}
 			String _tmp = new String(_packet.getData(), SystemUtils.LOCAL_ENCODING).trim();
 			boolean _valid = _key.equals(_tmp);
@@ -86,6 +84,17 @@ public class KeepContainer extends AbstractContainer<String> {
 			}
 			_packet.setData(new byte[36]);
 		}
-		SystemUtils.destroy(this, null);
+		SystemUtils.destroy(this, Duration.ofMillis(-1));
+	}
+
+	@Override
+	public void destroy(Duration timeout) throws BaseException {
+		if (closed.compareAndSet(false, true)) {
+			if (hook != null) {
+				Runtime.getRuntime().removeShutdownHook(hook);
+			}
+			IOUtils.close(socket);
+			super.destroy(timeout);
+		}
 	}
 }
