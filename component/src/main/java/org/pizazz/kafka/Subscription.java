@@ -4,6 +4,10 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Pattern;
 
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
@@ -50,7 +54,8 @@ import org.slf4j.LoggerFactory;
 public class Subscription<K, V> extends AbstractClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(Subscription.class);
 
-	private boolean loop = true;
+	private final Lock lock = new ReentrantLock();
+	private final AtomicBoolean loop = new AtomicBoolean(true);
 	private KafkaConsumer<K, V> consumer;
 	protected IOffsetProcessor offset;
 	protected DataProcessor<K, V> processor;
@@ -120,19 +125,22 @@ public class Subscription<K, V> extends AbstractClient {
 		if (executor == null) {
 			throw new KafkaException(CodeEnum.KFK_0009, "data executor null");
 		}
-		ConsumerRecords<K, V> _records;
+		ConsumerRecords<K, V> _records = null;
 
-		while (loop) {
+		while (loop.get() && lock.tryLock()) {
 			try {
 				_records = getConsumer().poll(getConvertor().durationValue());
 			} catch (Exception e) {
-				if (getConvertor().consumerIgnoreValue().consumeThrowable()) {
-					throw new KafkaException(CodeEnum.KFK_0010, "poll data:" + getConvertor().durationValue(), e);
+				if (loop.get()) {
+					if (getConvertor().consumerIgnoreValue().consumeThrowable()) {
+						throw new KafkaException(CodeEnum.KFK_0010, "poll data:" + getConvertor().durationValue(), e);
+					}
+					LOGGER.error(loop.get() + " pool data:" + e.getMessage(), e);
 				}
-				LOGGER.error("pool data:" + e.getMessage(), e);
-				continue;
+			} finally {
+				lock.unlock();
 			}
-			if (_records.isEmpty()) {
+			if (_records == null || _records.isEmpty() || !loop.get()) {
 				continue;
 			}
 			processor.consumeReady(getConsumer(), executor);
@@ -158,10 +166,16 @@ public class Subscription<K, V> extends AbstractClient {
 
 	@Override
 	public void destroy(Duration timeout) throws BaseException {
-		if (consumer != null && isInitialize()) {
-			unsubscribe();
-			loop = false;
+		if (consumer != null && isInitialize() && loop.compareAndSet(true, false)) {
+			loop.get();
 			consumer.wakeup();
+			try {
+				lock.tryLock(1000, TimeUnit.MILLISECONDS);
+			} catch (InterruptedException e) {
+			} finally {
+				lock.unlock();
+			}
+			unsubscribe();
 			super.destroy(timeout);
 			SystemUtils.destroy(processor, timeout);
 			unloadPlugin(offset, timeout);
