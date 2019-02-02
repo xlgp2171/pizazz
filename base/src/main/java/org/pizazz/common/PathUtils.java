@@ -26,7 +26,7 @@ import org.pizazz.message.TypeEnum;
  * 文件工具
  * 
  * @author xlgp2171
- * @version 1.3.190130
+ * @version 1.3.190201
  */
 public class PathUtils {
 
@@ -52,18 +52,14 @@ public class PathUtils {
 		} catch (BaseException e) {
 			return uri;
 		}
+		String _target;
 		try {
-			return _uri.resolve(target);
-		} catch (IllegalArgumentException e1) {
-			String _target;
-			try {
-				_target = URLEncoder.encode(target, SystemUtils.LOCAL_ENCODING.name());
-			} catch (UnsupportedEncodingException e2) {
-				return uri;
-			}
-			return _uri.resolve(_target.replaceAll("\\+", "%20").replaceAll("\\%21", "!").replaceAll("\\%27", "'")
-					.replaceAll("\\%28", "(").replaceAll("\\%29", ")").replaceAll("\\%7E", "~"));
+			_target = URLEncoder.encode(target, SystemUtils.LOCAL_ENCODING.name());
+		} catch (UnsupportedEncodingException e2) {
+			return uri;
 		}
+		return _uri.resolve(_target.replaceAll("\\+", "%20").replaceAll("\\%21", "!").replaceAll("\\%27", "'")
+				.replaceAll("\\%28", "(").replaceAll("\\%29", ")").replaceAll("\\%7E", "~"));
 	}
 
 	public static boolean isRegularFile(Path path) {
