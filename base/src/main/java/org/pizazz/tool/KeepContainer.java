@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.pizazz.Constant;
 import org.pizazz.IMessageOutput;
 import org.pizazz.IPlugin;
+import org.pizazz.common.ConfigureHelper;
 import org.pizazz.common.IOUtils;
 import org.pizazz.common.LocaleHelper;
 import org.pizazz.common.StringUtils;
@@ -25,9 +26,12 @@ import org.pizazz.message.TypeEnum;
  * 维持容器组件
  *
  * @author xlgp2171
- * @version 1.2.190127
+ * @version 1.3.190202
  */
 public class KeepContainer extends AbstractContainer<String> {
+	public static final String KEY_CONTAINER_PORT = "$PORT";
+	public static final String KEY_CONTAINER_KEY = "$KEY";
+
 	private DatagramSocket socket;
 	private Thread hook;
 	private final AtomicBoolean closed = new AtomicBoolean(false);
@@ -37,8 +41,23 @@ public class KeepContainer extends AbstractContainer<String> {
 		try {
 			initialize(config);
 		} catch (BaseException e) {
-			this.output.throwException(e);
+			this.output_.throwException(e);
 		}
+	}
+
+	@Override
+	public void initialize(TupleObject config) throws BaseException {
+		super.initialize(config);
+		int _port = TupleObjectHelper.getInt(config, "port", -1);
+		String _key = TupleObjectHelper.getString(config, "key", StringUtils.EMPTY);
+		properties_
+				.append(KEY_CONTAINER_PORT,
+						_port == -1 ? ConfigureHelper.getConfig(TypeEnum.BASIC, Constant.NAMING_SHORT + ".kc.port",
+								"DEF_CONTAINER_PORT", -1) : _port)
+				.append(KEY_CONTAINER_KEY,
+						StringUtils.isTrimEmpty(_key) ? ConfigureHelper.getConfig(TypeEnum.BASIC,
+								Constant.NAMING_SHORT + ".kc.key", "DEF_CONTAINER_KEY", SystemUtils.newUUIDSimple())
+								: _key);
 	}
 
 	@Override
@@ -49,10 +68,20 @@ public class KeepContainer extends AbstractContainer<String> {
 	@Override
 	public void waitForShutdown() {
 		hook = SystemUtils.addShutdownHook(this, null);
-		int _port = TupleObjectHelper.getInt(properties, KEY_CONTAINER_PORT, 10420);
-		String _key = TupleObjectHelper.getString(properties, KEY_CONTAINER_KEY, Constant.NAMING);
+		int _port = TupleObjectHelper.getInt(properties_, KEY_CONTAINER_PORT, -1);
+		// port为0也可以super.waitForShutdown
+		if (_port <= 0) {
+			super.waitForShutdown();
+		} else {
+			socketWaiting(_port);
+			SystemUtils.destroy(this, Duration.ofMillis(-1));
+		}
+	}
+
+	protected void socketWaiting(int port) {
+		String _key = TupleObjectHelper.getString(properties_, KEY_CONTAINER_KEY, Constant.NAMING);
 		try {
-			socket = new DatagramSocket(_port);
+			socket = new DatagramSocket(port);
 		} catch (SocketException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.SOCKET", e.getMessage());
 			throw new BaseError(ErrorCodeEnum.ERR_0003, _msg, e);
@@ -61,30 +90,29 @@ public class KeepContainer extends AbstractContainer<String> {
 		byte[] _data = new byte[36];
 		DatagramPacket _packet = new DatagramPacket(_data, _data.length);
 
-		if (output.isEnable()) {
-			output.write(LocaleHelper.toLocaleText(TypeEnum.BASIC, "CONTAINER.PORT", StringUtils.of(_port)));
-			output.write(LocaleHelper.toLocaleText(TypeEnum.BASIC, "CONTAINER.KEY", _key));
+		if (output_.isEnable()) {
+			output_.write(LocaleHelper.toLocaleText(TypeEnum.BASIC, "CONTAINER.PORT", StringUtils.of(port)));
+			output_.write(LocaleHelper.toLocaleText(TypeEnum.BASIC, "CONTAINER.KEY", _key));
 		}
 		while (true) {
 			try {
 				socket.receive(_packet);
 			} catch (IOException e) {
-				String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.SOCKET.RECEIVE", StringUtils.of(_port),
+				String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.SOCKET.RECEIVE", StringUtils.of(port),
 						e.getMessage());
 				throw new BaseError(ErrorCodeEnum.ERR_0004, _msg);
 			}
 			String _tmp = new String(_packet.getData(), SystemUtils.LOCAL_ENCODING).trim();
 			boolean _valid = _key.equals(_tmp);
 
-			if (output.isEnable()) {
-				output.write(LocaleHelper.toLocaleText(TypeEnum.BASIC, "CONTAINER.VALID", _tmp, _valid));
+			if (output_.isEnable()) {
+				output_.write(LocaleHelper.toLocaleText(TypeEnum.BASIC, "CONTAINER.VALID", _tmp, _valid));
 			}
 			if (_valid) {
 				break;
 			}
 			_packet.setData(new byte[36]);
 		}
-		SystemUtils.destroy(this, Duration.ofMillis(-1));
 	}
 
 	@Override
