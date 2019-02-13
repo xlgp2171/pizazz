@@ -29,7 +29,7 @@ import org.pizazz.tool.ref.IShellFactory;
  * SHELL工厂组件
  * 
  * @author xlgp2171
- * @version 1.1.181220
+ * @version 1.2.190213
  */
 public final class PShellFactory implements IShellFactory, ICloseable {
 
@@ -48,7 +48,7 @@ public final class PShellFactory implements IShellFactory, ICloseable {
 	}
 
 	@Override
-	public Process newProcess(ProcessBuilder builder, int timeout) throws BaseException {
+	public Process newProcess(ProcessBuilder builder, Duration timeout) throws BaseException {
 		Process _process;
 		try {
 			_process = builder.start();
@@ -57,10 +57,10 @@ public final class PShellFactory implements IShellFactory, ICloseable {
 			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
 		}
 		try {
-			if (timeout == 0) {
+			if (timeout.isZero()) {
 				_process.waitFor();
-			} else if (timeout > 0) {
-				_process.waitFor(timeout, TimeUnit.MILLISECONDS);
+			} else if (!timeout.isNegative()) {
+				_process.waitFor(timeout.toMillis(), TimeUnit.MILLISECONDS);
 			}
 		} catch (InterruptedException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PROCESS.WAIT", e.getMessage());

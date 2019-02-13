@@ -20,14 +20,14 @@ import org.pizazz.tool.ref.IShellFactory;
  * SHELL运行组件
  * 
  * @author xlgp2171
- * @version 1.1.181219
+ * @version 1.2.190213
  */
 public class PShellBuilder implements ICloseable, IObject {
 
 	private IShellFactory factory;
 	private final ProcessBuilder builder;
 	private Charset charset = StandardCharsets.UTF_8;
-	private int timeout = 0;
+	private Duration timeout = Duration.ZERO;
 	private Process tmpProcess;
 	private String id = "";
 
@@ -63,8 +63,10 @@ public class PShellBuilder implements ICloseable, IObject {
 	 * @param timeout
 	 * @return
 	 */
-	public PShellBuilder waitFor(int timeout) {
-		this.timeout = timeout;
+	public PShellBuilder waitFor(Duration timeout) {
+		if (timeout != null) {
+			this.timeout = timeout;
+		}
 		return this;
 	}
 
@@ -76,7 +78,7 @@ public class PShellBuilder implements ICloseable, IObject {
 		if (!this.id.equals(id)) {
 			return;
 		}
-		if (tmpProcess != null && process.isAlive()) {
+		if (tmpProcess != null && tmpProcess.isAlive()) {
 			if (force) {
 				tmpProcess.destroyForcibly();
 			} else {
