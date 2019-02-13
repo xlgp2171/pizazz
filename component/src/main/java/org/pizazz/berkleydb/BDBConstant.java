@@ -1,4 +1,4 @@
-package org.pizazz.berkley;
+package org.pizazz.berkleydb;
 
 public class BDBConstant {
 
