@@ -53,11 +53,19 @@ public class CryptoUtils {
 		return Base64.getDecoder().decode(target);
 	}
 
-	public static String encodeBase32(byte[] target) {
+	public static String encodeBase32String(byte[] target) {
 		return new org.apache.commons.codec.binary.Base32().encodeAsString(target);
 	}
 
+	public static byte[] encodeBase32(byte[] target) {
+		return new org.apache.commons.codec.binary.Base32().encode(target);
+	}
+
 	public static byte[] decodeBase32(String target) {
+		return new org.apache.commons.codec.binary.Base32().decode(target);
+	}
+
+	public static byte[] decodeBase32(byte[] target) {
 		return new org.apache.commons.codec.binary.Base32().decode(target);
 	}
 
