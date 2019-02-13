@@ -11,8 +11,9 @@ import org.pizazz.exception.BaseException;
  * @param <T> 根据输出内容注册泛型
  * 
  * @author xlgp2171
- * @version 1.1.181219
+ * @version 1.2.190213
  */
+@FunctionalInterface
 public interface IMessageOutput<T> extends ICloseable {
 
 	public default boolean isEnable() {
