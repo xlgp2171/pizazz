@@ -1,5 +1,5 @@
 # pizazz
-一些自行设计和参考的 代码
+一些自行设计和参考整合的 代码
 
 简单工具：
 org.pizazz.tool.KeepContainer: 维持进程的容器，采用SOCKET和THREAD方式
