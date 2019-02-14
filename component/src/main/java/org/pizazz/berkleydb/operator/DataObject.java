@@ -1,4 +1,4 @@
-package org.pizazz.berkley.operator;
+package org.pizazz.berkleydb.operator;
 
 import org.pizazz.common.AssertUtils;
 import org.pizazz.exception.BaseException;

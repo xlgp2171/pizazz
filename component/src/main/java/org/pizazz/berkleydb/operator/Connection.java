@@ -1,4 +1,4 @@
-package org.pizazz.berkley.operator;
+package org.pizazz.berkleydb.operator;
 
 import java.time.Duration;
 

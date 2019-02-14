@@ -1,4 +1,4 @@
-package org.pizazz.berkley.exception;
+package org.pizazz.berkleydb.exception;
 
 import org.pizazz.exception.AbstractException;
 import org.pizazz.message.ref.IMessageCode;

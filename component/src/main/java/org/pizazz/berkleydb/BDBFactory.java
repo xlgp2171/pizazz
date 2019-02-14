@@ -1,11 +1,11 @@
-package org.pizazz.berkley;
+package org.pizazz.berkleydb;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.time.Duration;
 
 import org.pizazz.IPlugin;
-import org.pizazz.berkley.operator.Connection;
+import org.pizazz.berkleydb.operator.Connection;
 import org.pizazz.common.IOUtils;
 import org.pizazz.common.ResourceUtils;
 import org.pizazz.common.StringUtils;
