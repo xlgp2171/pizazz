@@ -11,7 +11,10 @@ import org.pizazz.common.SystemUtils;
 import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.context.PluginContext;
 import org.pizazz.data.TupleObject;
+import org.pizazz.exception.AssertException;
 import org.pizazz.exception.BaseException;
+import org.pizazz.exception.ToolException;
+import org.pizazz.exception.UtilityException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.message.TypeEnum;
 
@@ -19,7 +22,7 @@ import org.pizazz.message.TypeEnum;
  * 通用加载器组件
  * 
  * @author xlgp2171
- * @version 1.0.181220
+ * @version 1.1.190219
  */
 public abstract class AbstractClassPlugin implements IPlugin {
 	private final TupleObject configure = TupleObjectHelper.newObject();
@@ -55,9 +58,10 @@ public abstract class AbstractClassPlugin implements IPlugin {
 	 * @param plugin 插件类
 	 * @param clazz 需要转换的类型,需实现org.pizazz.IPlugin接口
 	 * @return
-	 * @throws BaseException 若参数任意为null时
+	 * @throws UtilityException 类型转换失败
+	 * @throws AssertException 若参数任意为null时
 	 */
-	public <T extends IPlugin> T cast(IPlugin plugin, Class<T> clazz) throws BaseException {
+	public <T extends IPlugin> T cast(IPlugin plugin, Class<T> clazz) throws AssertException, UtilityException {
 		AssertUtils.assertNotNull("cast", plugin, clazz);
 		return ClassUtils.cast(plugin, clazz);
 	}
@@ -95,7 +99,7 @@ public abstract class AbstractClassPlugin implements IPlugin {
 			}
 			if (StringUtils.isTrimEmpty(defClass)) {
 				String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PLUGIN.LOAD", "");
-				throw new BaseException(BasicCodeEnum.MSG_0014, _msg, e);
+				throw new ToolException(BasicCodeEnum.MSG_0014, _msg, e);
 			}
 			classpath = defClass;
 		}

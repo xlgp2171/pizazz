@@ -26,8 +26,11 @@ import org.pizazz.common.IOUtils;
 import org.pizazz.common.LocaleHelper;
 import org.pizazz.common.PathUtils;
 import org.pizazz.common.SystemUtils;
+import org.pizazz.exception.AssertException;
 import org.pizazz.exception.BaseError;
 import org.pizazz.exception.BaseException;
+import org.pizazz.exception.ToolException;
+import org.pizazz.exception.UtilityException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.message.ErrorCodeEnum;
 import org.pizazz.message.TypeEnum;
@@ -36,7 +39,7 @@ import org.pizazz.message.TypeEnum;
  * 类加载组件
  * 
  * @author xlgp2171
- * @version 1.1.191014
+ * @version 1.2.190219
  */
 public class PClassLoader extends URLClassLoader implements IObject {
 	/**
@@ -109,7 +112,7 @@ public class PClassLoader extends URLClassLoader implements IObject {
 		return _in;
 	}
 
-	public synchronized PClassLoader extractJAR(Path path) throws BaseException {
+	public synchronized PClassLoader extractJAR(Path path) throws AssertException, UtilityException, ToolException {
 		AssertUtils.assertNotNull("extractJAR", path);
 
 		try (JarFile _item = new JarFile(path.toFile())) {
@@ -139,7 +142,7 @@ public class PClassLoader extends URLClassLoader implements IObject {
 			isDirUpdate = false;
 		} catch (IOException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.REGULAR", path.toAbsolutePath());
-			throw new BaseException(BasicCodeEnum.MSG_0005, _msg, e);
+			throw new ToolException(BasicCodeEnum.MSG_0005, _msg, e);
 		}
 		URL _url;
 		try {
@@ -147,7 +150,7 @@ public class PClassLoader extends URLClassLoader implements IObject {
 		} catch (MalformedURLException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.REGULAR",
 					getDirectory().toAbsolutePath());
-			throw new BaseException(BasicCodeEnum.MSG_0005, _msg, e);
+			throw new ToolException(BasicCodeEnum.MSG_0005, _msg, e);
 		}
 		if (!ArrayUtils.contains(super.getURLs(), _url)) {
 			super.addURL(_url);
@@ -160,14 +163,16 @@ public class PClassLoader extends URLClassLoader implements IObject {
 	 * Paths.get("C:/lib/tools.jar");
 	 * 
 	 * @param path
-	 * @throws BaseException
+	 * @throws ToolException
+	 * @throws UtilityException
+	 * @throws AssertException
 	 */
-	public synchronized PClassLoader linkJAR(Path path) throws BaseException {
+	public synchronized PClassLoader linkJAR(Path path) throws AssertException, ToolException, UtilityException {
 		AssertUtils.assertNotNull("linkJAR", path);
 
 		if (!Files.isReadable(path) || !Files.isRegularFile(path)) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.REGULAR", path.toAbsolutePath());
-			throw new BaseException(BasicCodeEnum.MSG_0005, _msg);
+			throw new ToolException(BasicCodeEnum.MSG_0005, _msg);
 		}
 		String _name = "jar:" + path.toUri() + "!/";
 		URL _url = null;
@@ -175,7 +180,7 @@ public class PClassLoader extends URLClassLoader implements IObject {
 			_url = new URL(_name);
 		} catch (MalformedURLException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.JAR.NAME", _name, e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0005, _msg, e);
+			throw new ToolException(BasicCodeEnum.MSG_0005, _msg, e);
 		}
 		return linkJAR(_url);
 	}
@@ -185,14 +190,16 @@ public class PClassLoader extends URLClassLoader implements IObject {
 	 * new URL("jar:file:/C:/lib/tools.jar!/");
 	 * 
 	 * @param url
-	 * @throws BaseException
+	 * @throws ToolException
+	 * @throws AssertException
+	 * @throws UtilityException
 	 */
-	public synchronized PClassLoader linkJAR(URL url) throws BaseException {
+	public synchronized PClassLoader linkJAR(URL url) throws AssertException, ToolException, UtilityException {
 		AssertUtils.assertNotNull("linkJAR", url);
 
 		if (ArrayUtils.contains(super.getURLs(), url)) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.JAR.EXIST", url);
-			throw new BaseException(BasicCodeEnum.MSG_0005, _msg);
+			throw new ToolException(BasicCodeEnum.MSG_0005, _msg);
 		}
 		JarFile _file;
 		// FIXME xlgp2171:是否会造成打开文件过多?
@@ -203,7 +210,7 @@ public class PClassLoader extends URLClassLoader implements IObject {
 			_file = _connection.getJarFile();
 		} catch (IOException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.JAR.IN", url, e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
+			throw new ToolException(BasicCodeEnum.MSG_0003, _msg, e);
 		}
 		synchronized (closeables) {
 			super.addURL(url);

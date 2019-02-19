@@ -1,12 +1,12 @@
 package org.pizazz.common;
 
-import org.pizazz.exception.BaseException;
+import org.pizazz.exception.AssertException;
 
 /**
  * 字符工具
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.1.190219
  */
 public class CharUtils {
 	public static final char[] HEX_DIGITS = "0123456789abcdef".toCharArray();
@@ -25,7 +25,7 @@ public class CharUtils {
 		return (char) _tmp;
 	}
 
-	public static String fromUnicode(String first, String... more) throws BaseException {
+	public static String fromUnicode(String first, String... more) throws AssertException {
 		AssertUtils.assertLength("fromUnicode", 1, first, 4);
 		StringBuilder _tmp = new StringBuilder().append(toChar(first, 16));
 

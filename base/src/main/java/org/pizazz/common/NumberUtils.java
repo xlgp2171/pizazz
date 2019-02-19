@@ -2,13 +2,13 @@ package org.pizazz.common;
 
 import java.math.BigDecimal;
 
-import org.pizazz.exception.BaseException;
+import org.pizazz.exception.AssertException;
 
 /**
  * 数值工具
  * 
  * @author xlgp2171
- * @version 1.0.181227
+ * @version 1.1.190219
  */
 public class NumberUtils {
 	/** int判断最大位数 */
@@ -58,7 +58,7 @@ public class NumberUtils {
 		}
 	}
 
-	public static Number valueOf(BigDecimal target) throws BaseException {
+	public static Number valueOf(BigDecimal target) throws AssertException {
 		AssertUtils.assertNotNull("valueOf", target);
 
 		if (target.scale() == 0) {

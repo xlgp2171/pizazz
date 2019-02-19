@@ -4,7 +4,8 @@ import java.io.IOException;
 
 import org.pizazz.common.ref.IJacksonConfig;
 import org.pizazz.common.ref.IKryoConfig;
-import org.pizazz.exception.BaseException;
+import org.pizazz.exception.AssertException;
+import org.pizazz.exception.UtilityException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.message.TypeEnum;
 
@@ -12,10 +13,10 @@ import org.pizazz.message.TypeEnum;
  * 对象序列化工具
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.1.190219
  */
 public class SerializationUtils {
-	public static byte[] serialize(Object target, IKryoConfig config) throws BaseException {
+	public static byte[] serialize(Object target, IKryoConfig config) throws AssertException, UtilityException {
 		AssertUtils.assertNotNull("serialize", target);
 
 		if (config == null) {
@@ -32,11 +33,12 @@ public class SerializationUtils {
 			return _output.toBytes();
 		} catch (Exception e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.KRYO.PROCESS", e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0013, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0013, _msg, e);
 		}
 	}
 
-	public static <T> T deserialize(byte[] target, Class<T> type, IKryoConfig config) throws BaseException {
+	public static <T> T deserialize(byte[] target, Class<T> type, IKryoConfig config)
+			throws AssertException, UtilityException {
 		AssertUtils.assertNotNull("deserialize", target, type);
 		com.esotericsoftware.kryo.Kryo _kryo = new com.esotericsoftware.kryo.Kryo();
 
@@ -48,13 +50,13 @@ public class SerializationUtils {
 			return _kryo.readObject(_input, type);
 		} catch (Exception e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.KRYO.PROCESS", e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0013, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0013, _msg, e);
 		} finally {
 			_input.close();
 		}
 	}
 
-	public static byte[] serialize(Object target, IJacksonConfig config) throws BaseException {
+	public static byte[] serialize(Object target, IJacksonConfig config) throws AssertException, UtilityException {
 		AssertUtils.assertNotNull("serialize", target);
 
 		if (config == null) {
@@ -68,11 +70,12 @@ public class SerializationUtils {
 			return _mapper.writeValueAsBytes(target);
 		} catch (com.fasterxml.jackson.core.JsonProcessingException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.JACKSON.PROCESS", e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0013, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0013, _msg, e);
 		}
 	}
 
-	public static <T> T deserialize(byte[] target, Class<T> type, IJacksonConfig config) throws BaseException {
+	public static <T> T deserialize(byte[] target, Class<T> type, IJacksonConfig config)
+			throws AssertException, UtilityException {
 		AssertUtils.assertNotNull("deserialize", target, type);
 
 		if (config == null) {
@@ -86,7 +89,7 @@ public class SerializationUtils {
 			return _mapper.readValue(target, type);
 		} catch (IOException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.JACKSON.PROCESS", e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0013, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0013, _msg, e);
 		}
 	}
 }

@@ -10,13 +10,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.pizazz.exception.AssertException;
 import org.pizazz.exception.BaseException;
 
 /**
  * 集合工具
  * 
  * @author xlgp2171
- * @version 1.0.181220
+ * @version 1.1.190219
  */
 public class CollectionUtils {
 
@@ -56,7 +57,7 @@ public class CollectionUtils {
 		return _tmp;
 	}
 
-	public static <E> void merge(Set<E> target, E[] element) throws BaseException {
+	public static <E> void merge(Set<E> target, E[] element) throws AssertException {
 		if (ArrayUtils.isEmpty(element)) {
 			return;
 		}
@@ -74,7 +75,7 @@ public class CollectionUtils {
 	 * @return
 	 * @throws BaseException
 	 */
-	public static <K, V> Map<V, K> flip(Map<K, V> target) throws BaseException {
+	public static <K, V> Map<V, K> flip(Map<K, V> target) throws AssertException {
 		AssertUtils.assertNotNull("flip", target);
 		Map<V, K> _tmp = new HashMap<V, K>();
 

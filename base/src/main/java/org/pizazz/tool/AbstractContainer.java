@@ -15,6 +15,7 @@ import org.pizazz.common.LocaleHelper;
 import org.pizazz.common.SystemUtils;
 import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.data.TupleObject;
+import org.pizazz.exception.AssertException;
 import org.pizazz.exception.BaseException;
 import org.pizazz.message.TypeEnum;
 
@@ -24,7 +25,7 @@ import org.pizazz.message.TypeEnum;
  * @param <T> 输出类型
  *
  * @author xlgp2171
- * @version 1.1.190202
+ * @version 1.1.190219
  */
 public abstract class AbstractContainer<T> implements IPlugin {
 	public static final String KEY_CONTAINER_TIMEOUT = "$TIMEOUT";
@@ -46,7 +47,7 @@ public abstract class AbstractContainer<T> implements IPlugin {
 		}
 	};
 
-	public AbstractContainer(IPlugin plugin, IMessageOutput<T> output) throws BaseException {
+	public AbstractContainer(IPlugin plugin, IMessageOutput<T> output) throws AssertException {
 		AssertUtils.assertNotNull("AbstractContainer", plugin, output);
 		properties_ = TupleObjectHelper.newObject(4);
 		this.plugin_ = plugin;

@@ -4,7 +4,9 @@ import org.pizazz.common.AssertUtils;
 import org.pizazz.common.ClassUtils;
 import org.pizazz.common.LocaleHelper;
 import org.pizazz.common.StringUtils;
+import org.pizazz.exception.AssertException;
 import org.pizazz.exception.BaseException;
+import org.pizazz.exception.ToolException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.message.TypeEnum;
 
@@ -13,10 +15,10 @@ import org.pizazz.message.TypeEnum;
  * 参考com.alibaba.dubbo.common.compiler.support.AbstractCompiler
  * 
  * @author xlgp2171
- * @version 1.0.191014
+ * @version 1.1.190219
  */
 public abstract class AbstractCompiler {
-	public Class<?> compile(String source, ClassLoader loader) throws BaseException {
+	public Class<?> compile(String source, ClassLoader loader) throws AssertException, ToolException {
 		AssertUtils.assertNotNull("compile", source);
 		String _package;
 		try {
@@ -35,7 +37,7 @@ public abstract class AbstractCompiler {
 			} catch (Throwable t) {
 				String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "BASIC.ERR.CLASS.COMPILE", _classpath,
 						t.getMessage());
-				throw new BaseException(BasicCodeEnum.MSG_0006, _msg, t);
+				throw new ToolException(BasicCodeEnum.MSG_0006, _msg, t);
 			}
 		}
 	}

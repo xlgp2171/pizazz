@@ -8,7 +8,8 @@ import java.nio.file.Path;
 import org.pizazz.Constant;
 import org.pizazz.common.ref.IJacksonConfig;
 import org.pizazz.data.TupleObject;
-import org.pizazz.exception.BaseException;
+import org.pizazz.exception.AssertException;
+import org.pizazz.exception.UtilityException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.message.TypeEnum;
 
@@ -17,11 +18,12 @@ import org.pizazz.message.TypeEnum;
  * 使用jackson组件
  * 
  * @author xlgp2171
- * @version 1.1.191016
+ * @version 1.2.190219
  */
 public class YAMLUtils {
 
-	public static <T> T fromYAML(InputStream target, Class<T> type, IJacksonConfig config) throws BaseException {
+	public static <T> T fromYAML(InputStream target, Class<T> type, IJacksonConfig config)
+			throws AssertException, UtilityException {
 		AssertUtils.assertNotNull("fromYAML", target, type);
 
 		if (config == null) {
@@ -35,11 +37,11 @@ public class YAMLUtils {
 			return _mapper.readValue(target, type);
 		} catch (IOException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.JACKSON.PROCESS", e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0013, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0013, _msg, e);
 		}
 	}
 
-	public static TupleObject fromYAML(InputStream target) throws BaseException {
+	public static TupleObject fromYAML(InputStream target) throws AssertException, UtilityException {
 		AssertUtils.assertNotNull("fromYAML", target);
 		try {
 			return fromYAML(target, TupleObject.class, null);
@@ -48,7 +50,7 @@ public class YAMLUtils {
 		}
 	}
 
-	public static TupleObject fromYAML(String resource) throws BaseException {
+	public static TupleObject fromYAML(String resource) throws AssertException, UtilityException {
 		try (InputStream _tmp = IOUtils.getResourceAsStream(resource, Constant.class, null)) {
 			return fromYAML(_tmp, TupleObject.class, null);
 		} catch (IOException e) {
@@ -56,7 +58,8 @@ public class YAMLUtils {
 		}
 	}
 
-	public static <T> void toYAML(OutputStream target, T data, IJacksonConfig config) throws BaseException {
+	public static <T> void toYAML(OutputStream target, T data, IJacksonConfig config)
+			throws AssertException, UtilityException {
 		AssertUtils.assertNotNull("toYAML", target, data);
 
 		if (config == null) {
@@ -70,11 +73,11 @@ public class YAMLUtils {
 			_mapper.writeValue(target, data);
 		} catch (IOException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.JACKSON.PROCESS", e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0013, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0013, _msg, e);
 		}
 	}
 
-	public static void toYAML(OutputStream target, TupleObject data) throws BaseException {
+	public static void toYAML(OutputStream target, TupleObject data) throws AssertException, UtilityException {
 		AssertUtils.assertNotNull("toYAML", target, data);
 		try {
 			toYAML(target, data, null);
@@ -83,7 +86,7 @@ public class YAMLUtils {
 		}
 	}
 
-	public static void toYAML(Path path, TupleObject data) throws BaseException {
+	public static void toYAML(Path path, TupleObject data) throws AssertException, UtilityException {
 		toYAML(PathUtils.getOutputStream(path), data);
 	}
 }

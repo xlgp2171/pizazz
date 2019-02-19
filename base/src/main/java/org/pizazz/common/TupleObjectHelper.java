@@ -6,13 +6,15 @@ import java.util.Properties;
 
 import org.pizazz.common.ref.IKryoConfig;
 import org.pizazz.data.TupleObject;
+import org.pizazz.exception.AssertException;
 import org.pizazz.exception.BaseException;
+import org.pizazz.exception.UtilityException;
 
 /**
  * 通用对象工具
  * 
  * @author xlgp2171
- * @version 1.4.191022
+ * @version 1.5.190219
  */
 public class TupleObjectHelper {
 
@@ -40,12 +42,12 @@ public class TupleObjectHelper {
 		return target == null || target.isEmpty();
 	}
 
-	public static byte[] serialize(TupleObject target) throws BaseException {
+	public static byte[] serialize(TupleObject target) throws AssertException, UtilityException {
 		return SerializationUtils.serialize(target, new IKryoConfig() {
 		});
 	}
 
-	public static TupleObject deserialize(byte[] target) throws BaseException {
+	public static TupleObject deserialize(byte[] target) throws AssertException, UtilityException {
 		return SerializationUtils.deserialize(target, TupleObject.class, new IKryoConfig() {
 		});
 	}

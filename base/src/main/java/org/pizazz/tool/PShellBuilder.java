@@ -13,6 +13,7 @@ import org.pizazz.IObject;
 import org.pizazz.common.ArrayUtils;
 import org.pizazz.common.AssertUtils;
 import org.pizazz.common.SystemUtils;
+import org.pizazz.exception.AssertException;
 import org.pizazz.exception.BaseException;
 import org.pizazz.tool.ref.IShellFactory;
 
@@ -31,7 +32,7 @@ public class PShellBuilder implements ICloseable, IObject {
 	private Process tmpProcess;
 	private String id = "";
 
-	public PShellBuilder(IShellFactory factory, String[] command) throws BaseException {
+	public PShellBuilder(IShellFactory factory, String[] command) throws AssertException {
 		AssertUtils.assertNotNull("PShellBuilder", factory);
 		this.factory = factory;
 		builder = new ProcessBuilder();

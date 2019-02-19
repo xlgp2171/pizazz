@@ -7,7 +7,9 @@ import java.util.regex.Pattern;
 
 import org.pizazz.Constant;
 import org.pizazz.data.TupleObject;
+import org.pizazz.exception.AssertException;
 import org.pizazz.exception.BaseException;
+import org.pizazz.exception.UtilityException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.message.ExpressionConstant;
 import org.pizazz.message.TypeEnum;
@@ -17,7 +19,7 @@ import org.pizazz.message.TypeEnum;
  * 参考org.apache.commons.beanutils.BeanUtilsBean
  * 
  * @author xlgp2171
- * @version 1.1.191013
+ * @version 1.2.190219
  */
 public class ClassUtils {
 	// 包装类型对应包装类
@@ -42,7 +44,7 @@ public class ClassUtils {
 		//
 		try {
 			_tmpClass = CollectionUtils.flip(PRIMITIVE_WRAPPER);
-		} catch (BaseException e) {
+		} catch (AssertException e) {
 			// 忽略空值检查
 		}
 		WRAPPER_PRIMITIVE = CollectionUtils.unmodifiableMap(_tmpClass);
@@ -65,9 +67,9 @@ public class ClassUtils {
 	 * 
 	 * @param code 代码
 	 * @return
-	 * @throws BaseException
+	 * @throws AssertException
 	 */
-	public static String getPackageName(String code) throws BaseException {
+	public static String getPackageName(String code) throws AssertException {
 		return StringUtils.match(Pattern.compile(ExpressionConstant.PACKAGE_NAME), code, 1);
 	}
 
@@ -77,9 +79,9 @@ public class ClassUtils {
 	 * 
 	 * @param code 代码
 	 * @return
-	 * @throws BaseException
+	 * @throws AssertException
 	 */
-	public static String getClassName(String code) throws BaseException {
+	public static String getClassName(String code) throws AssertException {
 		return StringUtils.match(Pattern.compile(ExpressionConstant.CLASS_NAME), code, 1);
 	}
 
@@ -89,9 +91,10 @@ public class ClassUtils {
 	 * @param classpath 类路径
 	 * @param type 返回类型
 	 * @return 类实例
-	 * @throws BaseException
+	 * @throws UtilityException
+	 * @throws AssertException
 	 */
-	public static <T> T newClass(String classpath, Class<T> type) throws BaseException {
+	public static <T> T newClass(String classpath, Class<T> type) throws AssertException, UtilityException {
 		return newClass(classpath, null, type);
 	}
 
@@ -102,9 +105,11 @@ public class ClassUtils {
 	 * @param loader 类加载器
 	 * @param type 返回类型
 	 * @return 类实例
-	 * @throws BaseException
+	 * @throws UtilityException
+	 * @throws AssertException
 	 */
-	public static <T> T newClass(String classpath, ClassLoader loader, Class<T> type) throws BaseException {
+	public static <T> T newClass(String classpath, ClassLoader loader, Class<T> type)
+			throws AssertException, UtilityException {
 		Class<?> _clazz = loadClass(classpath, loader, true);
 		return newAndCast(_clazz, type);
 	}
@@ -116,12 +121,14 @@ public class ClassUtils {
 	 * @param loader 类加载器
 	 * @param initialize 是否初始化类
 	 * @return
-	 * @throws BaseException
+	 * @throws UtilityException
+	 * @throws AssertException
 	 */
-	public static Class<?> loadClass(String classpath, ClassLoader loader, boolean initialize) throws BaseException {
+	public static Class<?> loadClass(String classpath, ClassLoader loader, boolean initialize)
+			throws AssertException, UtilityException {
 		if (StringUtils.isTrimEmpty(classpath)) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", "loadClass", 1);
-			throw new BaseException(BasicCodeEnum.MSG_0001, _msg);
+			throw new AssertException(BasicCodeEnum.MSG_0001, _msg);
 		}
 		if (loader == null) {
 			loader = getClassLoader(Constant.class, Thread.currentThread());
@@ -133,7 +140,7 @@ public class ClassUtils {
 			return Class.forName(classpath, initialize, loader);
 		} catch (ClassNotFoundException e) {//
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CLASS.FOUND", classpath);
-			throw new BaseException(BasicCodeEnum.MSG_0009, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0009, _msg, e);
 		}
 	}
 
@@ -193,7 +200,7 @@ public class ClassUtils {
 			} else if (primitive) {
 				try {
 					_classtypes[_i] = toPrimitiveClass(arguments[_i]);
-				} catch (BaseException e) {
+				} catch (AssertException e) {
 					_classtypes[_i] = null;
 				}
 			} else {
@@ -208,9 +215,9 @@ public class ClassUtils {
 	 * 
 	 * @param target
 	 * @return
-	 * @throws BaseException
+	 * @throws AssertException
 	 */
-	public static Class<?> toPrimitiveClass(Object target) throws BaseException {
+	public static Class<?> toPrimitiveClass(Object target) throws AssertException {
 		AssertUtils.assertNotNull("toPrimitiveClass", target);
 		Class<?> _tmp = target.getClass();
 
@@ -225,9 +232,9 @@ public class ClassUtils {
 	 * 
 	 * @param argument
 	 * @return
-	 * @throws BaseException
+	 * @throws AssertException
 	 */
-	public static Class<?> toWrapperClass(Object target) throws BaseException {
+	public static Class<?> toWrapperClass(Object target) throws AssertException {
 		AssertUtils.assertNotNull("toWrapperClass", target);
 		Class<?> _tmp = target.getClass();
 
@@ -250,7 +257,7 @@ public class ClassUtils {
 		HashSet<Class<?>> _tmp = new HashSet<Class<?>>();
 		try {
 			getInterfaces(clazz, _tmp);
-		} catch (BaseException e) {
+		} catch (AssertException e) {
 			// 忽略空值异常
 		}
 		return _tmp.toArray(ArrayUtils.EMPTY_CLASS);
@@ -261,9 +268,9 @@ public class ClassUtils {
 	 * 
 	 * @param clazz
 	 * @param cache 用于缓存接口对象
-	 * @throws BaseException
+	 * @throws AssertException
 	 */
-	public static void getInterfaces(Class<?> clazz, HashSet<Class<?>> cache) throws BaseException {
+	public static void getInterfaces(Class<?> clazz, HashSet<Class<?>> cache) throws AssertException {
 		AssertUtils.assertNotNull("getInterfaces", 0, cache);
 		while (clazz != null) {
 			Class<?>[] _interfaces = clazz.getInterfaces();
@@ -277,7 +284,7 @@ public class ClassUtils {
 		}
 	}
 
-	public static <T> T cast(Object target, Class<T> type) throws BaseException {
+	public static <T> T cast(Object target, Class<T> type) throws AssertException, UtilityException {
 		if (type == null) {
 			return null;
 		}
@@ -287,11 +294,11 @@ public class ClassUtils {
 		} catch (ClassCastException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CLASS.CAST", target.getClass().getName(),
 					type.getName());
-			throw new BaseException(BasicCodeEnum.MSG_0004, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0004, _msg, e);
 		}
 	}
 
-	public static <T> T newAndCast(Class<?> target, Class<T> type) throws BaseException {
+	public static <T> T newAndCast(Class<?> target, Class<T> type) throws AssertException, UtilityException {
 		if (type == null) {
 			return null;
 		}
@@ -300,14 +307,14 @@ public class ClassUtils {
 			return type.cast(target.newInstance());
 		} catch (ClassCastException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CLASS.CAST", target.getName(), type.getName());
-			throw new BaseException(BasicCodeEnum.MSG_0004, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0004, _msg, e);
 		} catch (InstantiationException | IllegalAccessException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CLASS.INIT", target.getName(), e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0001, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0001, _msg, e);
 		}
 	}
 
-	public static void simplePopulate(Object target, TupleObject properties) throws BaseException {
+	public static void simplePopulate(Object target, TupleObject properties) throws AssertException {
 		AssertUtils.assertNotNull("populate", target);
 
 		if (properties != null) {

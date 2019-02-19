@@ -6,7 +6,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import org.pizazz.exception.BaseException;
+import org.pizazz.exception.AssertException;
+import org.pizazz.exception.UtilityException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.message.TypeEnum;
 
@@ -14,26 +15,26 @@ import org.pizazz.message.TypeEnum;
  * 时间日期工具
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.1.190219
  */
 public class DateUtils {
 
-	public static Date parse(String time, String pattern) throws BaseException {
+	public static Date parse(String time, String pattern) throws AssertException, UtilityException {
 		AssertUtils.assertNotNull("parse", time, pattern);
 		try {
 			return new SimpleDateFormat(pattern).parse(time);
 		} catch (ParseException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.DATE.PARSE", time, pattern);
-			throw new BaseException(BasicCodeEnum.MSG_0017, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0017, _msg, e);
 		}
 	}
 
-	public static String format(Date date, String pattern) throws BaseException {
+	public static String format(Date date, String pattern) throws AssertException {
 		AssertUtils.assertNotNull("format", date, pattern);
 		return format(date, pattern, SystemUtils.LOCAL_LOCALE);
 	}
 
-	public static String format(Date date, String pattern, Locale locale) throws BaseException {
+	public static String format(Date date, String pattern, Locale locale) throws AssertException {
 		AssertUtils.assertNotNull("format", date, pattern, locale);
 		return new SimpleDateFormat(pattern, locale).format(date);
 	}

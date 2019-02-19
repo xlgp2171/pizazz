@@ -26,7 +26,8 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 
 import org.pizazz.common.ref.KeySpecEnum;
-import org.pizazz.exception.BaseException;
+import org.pizazz.exception.AssertException;
+import org.pizazz.exception.UtilityException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.message.TypeEnum;
 
@@ -34,7 +35,7 @@ import org.pizazz.message.TypeEnum;
  * 加密解密工具
  *
  * @author xlgp2171
- * @version 1.0.181224
+ * @version 1.1.190219
  */
 public class CryptoUtils {
 	public static String encodeBase64String(byte[] target) {
@@ -69,7 +70,7 @@ public class CryptoUtils {
 		return new org.apache.commons.codec.binary.Base32().decode(target);
 	}
 
-	public static SecretKey newSecretKey(String algorithm, KeySpec keySpec) throws BaseException {
+	public static SecretKey newSecretKey(String algorithm, KeySpec keySpec) throws AssertException, UtilityException {
 		AssertUtils.assertNotNull("newSecretKey", algorithm, keySpec);
 		// 创建一个密钥工厂
 		try {
@@ -77,11 +78,12 @@ public class CryptoUtils {
 		} catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CRYPTO.SECRETKEY.NEW", algorithm,
 					e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0015, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0015, _msg, e);
 		}
 	}
 
-	public static byte[] newCipher(String algorithm, Key key, int opmode, byte[] data) throws BaseException {
+	public static byte[] newCipher(String algorithm, Key key, int opmode, byte[] data)
+			throws AssertException, UtilityException {
 		AssertUtils.assertNotNull("newCipher", algorithm, key, 0, data);
 		Cipher _cipher;
 		try {
@@ -92,17 +94,17 @@ public class CryptoUtils {
 		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CRYPTO.SECRETKEY.NEW", algorithm,
 					e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0015, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0015, _msg, e);
 		}
 		try {
 			return _cipher.doFinal(data);
 		} catch (IllegalBlockSizeException | BadPaddingException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CRYPTO.CIPHER.NEW", algorithm, e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0015, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0015, _msg, e);
 		}
 	}
 
-	public static Key[] newKey(String algorithm, int size) throws BaseException {
+	public static Key[] newKey(String algorithm, int size) throws AssertException, UtilityException {
 		AssertUtils.assertNotNull("newKey", algorithm);
 		KeyPairGenerator _generator;
 		try {
@@ -110,7 +112,7 @@ public class CryptoUtils {
 		} catch (NoSuchAlgorithmException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CRYPTO.SECRETKEY.NEW", algorithm,
 					e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0015, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0015, _msg, e);
 		}
 		_generator.initialize(size);
 		KeyPair _key = _generator.generateKeyPair();
@@ -122,47 +124,49 @@ public class CryptoUtils {
 		return _tmp;
 	}
 
-	public static DESKeySpec newDESKeySpec(byte[] key) throws BaseException {
+	public static DESKeySpec newDESKeySpec(byte[] key) throws AssertException, UtilityException {
 		AssertUtils.assertLength("newDESKeySpec", 1, key, 8);
 		try {
 			return new DESKeySpec(key);
 		} catch (InvalidKeyException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CRYPTO.SECRETKEY.NEW", "DES", e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0015, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0015, _msg, e);
 		}
 	}
 
-	public static KeyFactory newKeyFactory(String algorithm) throws BaseException {
+	public static KeyFactory newKeyFactory(String algorithm) throws AssertException, UtilityException {
 		AssertUtils.assertNotNull("newKeyFactory", algorithm);
 		try {
 			return KeyFactory.getInstance(algorithm);
 		} catch (NoSuchAlgorithmException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CRYPTO.SECRETKEY.NEW", "DES", e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0015, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0015, _msg, e);
 		}
 	}
 
-	public static PrivateKey toPrivateKey(KeyFactory factory, byte[] encodedKey) throws BaseException {
+	public static PrivateKey toPrivateKey(KeyFactory factory, byte[] encodedKey)
+			throws AssertException, UtilityException {
 		AssertUtils.assertNotNull("toPrivateKey", factory, encodedKey);
 		try {
 			return factory.generatePrivate(KeySpecEnum.PKCS8.create(encodedKey));
 		} catch (InvalidKeySpecException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CRYPTO.SECRETKEY.VALID", e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0015, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0015, _msg, e);
 		}
 	}
 
-	public static PublicKey toPublicKey(KeyFactory factory, byte[] encodedKey) throws BaseException {
+	public static PublicKey toPublicKey(KeyFactory factory, byte[] encodedKey)
+			throws AssertException, UtilityException {
 		AssertUtils.assertNotNull("toPrivateKey", factory, encodedKey);
 		try {
 			return factory.generatePublic(KeySpecEnum.X509.create(encodedKey));
 		} catch (InvalidKeySpecException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CRYPTO.SECRETKEY.VALID", e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0015, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0015, _msg, e);
 		}
 	}
 
-	public static byte[] digest(String algorithm, ByteBuffer target) throws BaseException {
+	public static byte[] digest(String algorithm, ByteBuffer target) throws AssertException, UtilityException {
 		AssertUtils.assertNotNull("digest", algorithm, target);
 		MessageDigest _digest;
 		try {
@@ -171,7 +175,7 @@ public class CryptoUtils {
 		} catch (NoSuchAlgorithmException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CRYPTO.SECRETKEY.NEW", algorithm,
 					e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0015, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0015, _msg, e);
 		}
 		// 使用指定的字节更新摘要
 		_digest.update(target);
@@ -186,9 +190,10 @@ public class CryptoUtils {
 	 * @param target 源数据
 	 * @param key
 	 * @return
-	 * @throws BaseException
+	 * @throws AssertException
+	 * @throws UtilityException
 	 */
-	public static byte[] encrypt(String algorithm, byte[] target, Key key) throws BaseException {
+	public static byte[] encrypt(String algorithm, byte[] target, Key key) throws AssertException, UtilityException {
 		return newCipher(algorithm, key, Cipher.ENCRYPT_MODE, target);
 	}
 
@@ -199,9 +204,10 @@ public class CryptoUtils {
 	 * @param target 加密数据
 	 * @param key
 	 * @return
-	 * @throws BaseException
+	 * @throws UtilityException
+	 * @throws AssertException
 	 */
-	public static byte[] decrypt(String algorithm, byte[] target, Key key) throws BaseException {
+	public static byte[] decrypt(String algorithm, byte[] target, Key key) throws AssertException, UtilityException {
 		return newCipher(algorithm, key, Cipher.DECRYPT_MODE, target);
 	}
 
@@ -234,9 +240,11 @@ public class CryptoUtils {
 	 * @param key 私钥
 	 * @param data 需要数字签名的数据
 	 * @return
-	 * @throws BaseException
+	 * @throws UtilityException
+	 * @throws AssertException
 	 */
-	public static byte[] sign(String signature, PrivateKey key, ByteBuffer data) throws BaseException {
+	public static byte[] sign(String signature, PrivateKey key, ByteBuffer data)
+			throws AssertException, UtilityException {
 		AssertUtils.assertNotNull("sign", signature, key, data);
 		Signature _signature;
 		try {
@@ -244,18 +252,19 @@ public class CryptoUtils {
 			_signature.initSign(key);
 		} catch (NoSuchAlgorithmException | InvalidKeyException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CRYPTO.SIGNATURE.NEW", e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0015, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0015, _msg, e);
 		}
 		try {
 			_signature.update(data);
 			return _signature.sign();
 		} catch (SignatureException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CRYPTO.SIGNATURE.NEW", e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0015, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0015, _msg, e);
 		}
 	}
 
-	public static boolean verify(String signature, PublicKey key, ByteBuffer data, byte[] sign) throws BaseException {
+	public static boolean verify(String signature, PublicKey key, ByteBuffer data, byte[] sign)
+			throws AssertException, UtilityException {
 		AssertUtils.assertNotNull("verify", signature, key, data, sign);
 		Signature _signature;
 		try {
@@ -263,7 +272,7 @@ public class CryptoUtils {
 			_signature.initVerify(key);
 		} catch (NoSuchAlgorithmException | InvalidKeyException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CRYPTO.SIGNATURE.VALID", e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0015, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0015, _msg, e);
 		}
 		try {
 			_signature.update(data);
@@ -271,7 +280,7 @@ public class CryptoUtils {
 			return _signature.verify(sign);
 		} catch (SignatureException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CRYPTO.SIGNATURE.VALID", e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0015, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0015, _msg, e);
 		}
 	}
 }

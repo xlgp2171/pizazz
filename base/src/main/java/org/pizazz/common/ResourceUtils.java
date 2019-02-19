@@ -5,7 +5,8 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.pizazz.Constant;
-import org.pizazz.exception.BaseException;
+import org.pizazz.exception.AssertException;
+import org.pizazz.exception.UtilityException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.message.TypeEnum;
 
@@ -13,16 +14,16 @@ import org.pizazz.message.TypeEnum;
  * 资源工具
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.1.190219
  */
 public class ResourceUtils {
 
-	public static Properties loadProperties(String resource) throws BaseException {
+	public static Properties loadProperties(String resource) throws AssertException, UtilityException {
 		return loadProperties(resource, Constant.class, null, true);
 	}
 
 	public static Properties loadProperties(String resource, Class<?> clazz, Thread current, boolean close)
-			throws BaseException {
+			throws AssertException, UtilityException {
 		InputStream _stream = IOUtils.getResourceAsStream(resource, clazz, current);
 		return loadProperties(_stream, close);
 	}
@@ -31,9 +32,11 @@ public class ResourceUtils {
 	 * @param target
 	 * @param resource
 	 * @return
-	 * @throws BaseException
+	 * @throws UtilityException
+	 * @throws AssertException
 	 */
-	public static Properties mergeProperties(Properties target, String resource) throws BaseException {
+	public static Properties mergeProperties(Properties target, String resource)
+			throws AssertException, UtilityException {
 		InputStream _stream = IOUtils.getResourceAsStream(resource, Constant.class, null);
 		return mergeProperties(_stream, target, true);
 	}
@@ -42,21 +45,23 @@ public class ResourceUtils {
 	 * @param stream
 	 * @param close
 	 * @return
-	 * @throws BaseException
+	 * @throws UtilityException
+	 * @throws AssertException
 	 */
-	public static Properties loadProperties(InputStream stream, boolean close) throws BaseException {
+	public static Properties loadProperties(InputStream stream, boolean close)
+			throws AssertException, UtilityException {
 		return mergeProperties(stream, null, close);
 	}
 
 	public static Properties mergeProperties(InputStream stream, Properties target, boolean close)
-			throws BaseException {
+			throws AssertException, UtilityException {
 		AssertUtils.assertNotNull("mergeProperties", stream);
 		Properties _properties = new Properties();
 		try {
 			_properties.load(stream);
 		} catch (IOException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "BASIC.ERR.IO.IN", e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0003, _msg, e);
 		}
 		if (target != null) {
 			target.putAll(_properties);

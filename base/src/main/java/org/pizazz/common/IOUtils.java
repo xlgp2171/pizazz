@@ -18,7 +18,8 @@ import java.util.List;
 
 import org.pizazz.Constant;
 import org.pizazz.IMessageOutput;
-import org.pizazz.exception.BaseException;
+import org.pizazz.exception.AssertException;
+import org.pizazz.exception.UtilityException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.message.TypeEnum;
 
@@ -26,11 +27,11 @@ import org.pizazz.message.TypeEnum;
  * 输入输出工具
  * 
  * @author xlgp2171
- * @version 1.0.191015
+ * @version 1.1.190219
  */
 public class IOUtils {
 
-	public static String readInputStream(InputStream is) throws BaseException {
+	public static String readInputStream(InputStream is) throws AssertException, UtilityException {
 		byte[] _data = toByteArray(is);
 		return new String(_data, StandardCharsets.UTF_8);
 	}
@@ -51,7 +52,7 @@ public class IOUtils {
 
 		if (in == null) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", "readLine", 1);
-			call.throwException(new BaseException(BasicCodeEnum.MSG_0001, _msg));
+			call.throwException(new AssertException(BasicCodeEnum.MSG_0001, _msg));
 		}
 		charset = charset == null ? StandardCharsets.UTF_8 : charset;
 
@@ -70,15 +71,15 @@ public class IOUtils {
 		}
 	}
 
-	public static InputStream getResourceAsStream(String resource) throws BaseException {
+	public static InputStream getResourceAsStream(String resource) throws AssertException, UtilityException {
 		return getResourceAsStream(resource, null, null);
 	}
 
 	public static InputStream getResourceAsStream(String resource, Class<?> clazz, Thread current)
-			throws BaseException {
+			throws AssertException, UtilityException {
 		if (StringUtils.isTrimEmpty(resource)) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", "getResourceAsStream", 1);
-			throw new BaseException(BasicCodeEnum.MSG_0001, _msg);
+			throw new AssertException(BasicCodeEnum.MSG_0001, _msg);
 		}
 		InputStream _stream = null;
 		ClassLoader _loader = ClassUtils.getClassLoader(clazz, current);
@@ -101,13 +102,14 @@ public class IOUtils {
 				_stream = Files.newInputStream(Paths.get(resource));
 			} catch (IOException e) {
 				String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO.PATH", resource, e.getMessage());
-				throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
+				throw new UtilityException(BasicCodeEnum.MSG_0003, _msg, e);
 			}
 		}
 		return _stream;
 	}
 
-	public static long copyLarge(InputStream input, OutputStream output, int buffer) throws BaseException {
+	public static long copyLarge(InputStream input, OutputStream output, int buffer)
+			throws AssertException, UtilityException {
 		if (buffer <= 0) {
 			buffer = 4096;
 		}
@@ -122,7 +124,7 @@ public class IOUtils {
 			}
 		} catch (IOException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO", e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0003, _msg, e);
 		} finally {
 			close(input);
 			close(output);
@@ -130,7 +132,7 @@ public class IOUtils {
 		return _count;
 	}
 
-	public static long copyLarge(Reader input, Writer output, int buffer) throws BaseException {
+	public static long copyLarge(Reader input, Writer output, int buffer) throws AssertException, UtilityException {
 		if (buffer <= 0) {
 			buffer = 4096;
 		}
@@ -145,39 +147,39 @@ public class IOUtils {
 			}
 		} catch (IOException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO", e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0003, _msg, e);
 		}
 		return _count;
 	}
 
-	public static int copy(InputStream input, OutputStream output) throws BaseException {
+	public static int copy(InputStream input, OutputStream output) throws AssertException, UtilityException {
 		long _count = copyLarge(input, output, 4096);
 		return _count > Integer.MAX_VALUE ? -1 : new Long(_count).intValue();
 	}
 
-	public static int copy(Reader input, Writer output) throws BaseException {
+	public static int copy(Reader input, Writer output) throws AssertException, UtilityException {
 		long _count = copyLarge(input, output, 4096);
 		return _count > Integer.MAX_VALUE ? -1 : new Long(_count).intValue();
 	}
 
-	public static byte[] toByteArray(InputStream input) throws BaseException {
+	public static byte[] toByteArray(InputStream input) throws AssertException, UtilityException {
 		try (ByteArrayOutputStream _output = new ByteArrayOutputStream()) {
 			copy(input, _output);
 			return _output.toByteArray();
 		} catch (IOException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO.OUT", e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0003, _msg, e);
 		}
 	}
 
-	public static byte[] toByteArray(Reader input, boolean close) throws BaseException {
+	public static byte[] toByteArray(Reader input, boolean close) throws AssertException, UtilityException {
 		try (ByteArrayOutputStream _output = new ByteArrayOutputStream();
 				OutputStreamWriter _writer = new OutputStreamWriter(_output)) {
 			copy(input, _writer);
 			return _output.toByteArray();
 		} catch (IOException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO.OUT", e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0003, _msg, e);
 		} finally {
 			if (close) {
 				close(input);

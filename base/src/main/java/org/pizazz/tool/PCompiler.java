@@ -22,10 +22,19 @@ import org.pizazz.common.CollectionUtils;
 import org.pizazz.common.IOUtils;
 import org.pizazz.common.LocaleHelper;
 import org.pizazz.common.PathUtils;
+import org.pizazz.exception.AssertException;
 import org.pizazz.exception.BaseException;
+import org.pizazz.exception.ToolException;
+import org.pizazz.exception.UtilityException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.message.TypeEnum;
 
+/**
+ * 类动态编译组件
+ * 
+ * @author xlgp2171
+ * @version 1.1.190219
+ */
 public class PCompiler implements ICloseable {
 	private final JavaCompiler compiler;
 	/** 诊断信息 */
@@ -35,7 +44,7 @@ public class PCompiler implements ICloseable {
 	private final List<String> paths = new LinkedList<String>();
 	private final PClassLoader loader;
 
-	public PCompiler(PClassLoader loader) throws BaseException {
+	public PCompiler(PClassLoader loader) throws AssertException {
 		AssertUtils.assertNotNull("PCompiler", loader);
 		compiler = ToolProvider.getSystemJavaCompiler();
 		collector = new DiagnosticCollector<JavaFileObject>();
@@ -51,7 +60,7 @@ public class PCompiler implements ICloseable {
 		return this;
 	}
 
-	public PCompiler addResource(Path dir, Path name) throws BaseException {
+	public PCompiler addResource(Path dir, Path name) throws AssertException, UtilityException {
 		AssertUtils.assertNotNull("addResource", dir, name);
 		Path _source = dir.resolve(name);
 
@@ -61,19 +70,19 @@ public class PCompiler implements ICloseable {
 		return this;
 	}
 
-	public PCompiler addFile(Path path) throws BaseException {
+	public PCompiler addFile(Path path) throws AssertException, ToolException {
 		AssertUtils.assertNotNull("addFile", path);
 
 		if (PathUtils.isRegularFile(path) && path.toString().endsWith(JavaFileObject.Kind.SOURCE.extension)) {
 			paths.add(path.toString());
 		} else {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.REGULAR", path);
-			throw new BaseException(BasicCodeEnum.MSG_0005, _msg);
+			throw new ToolException(BasicCodeEnum.MSG_0005, _msg);
 		}
 		return this;
 	}
 
-	public PClassLoader compile() throws BaseException {
+	public PClassLoader compile() throws ToolException {
 		options.addAll(Arrays.asList("-d", loader.getDirectory().toString(), "-Xlint:unchecked"));
 		Iterable<? extends JavaFileObject> _files = manager.getJavaFileObjectsFromStrings(paths);
 		JavaCompiler.CompilationTask task = compiler.getTask(null, manager, collector, options, null, _files);
@@ -83,7 +92,7 @@ public class PCompiler implements ICloseable {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.COMPILE",
 					CollectionUtils.toString(options), CollectionUtils.toString(paths),
 					CollectionUtils.toString(collector.getDiagnostics()));
-			throw new BaseException(BasicCodeEnum.MSG_0022, _msg);
+			throw new ToolException(BasicCodeEnum.MSG_0022, _msg);
 		}
 		return loader;
 	}

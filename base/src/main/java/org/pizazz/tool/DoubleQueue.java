@@ -13,6 +13,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.pizazz.ICloseable;
 import org.pizazz.common.AssertUtils;
 import org.pizazz.common.StringUtils;
+import org.pizazz.exception.AssertException;
 import org.pizazz.exception.BaseException;
 
 /**
@@ -20,7 +21,7 @@ import org.pizazz.exception.BaseException;
  * 代码参考DataX
  * 
  * @author xlgp2171
- * @version 1.0.181219
+ * @version 1.1.190219
  */
 public class DoubleQueue<E> extends AbstractQueue<E> implements BlockingQueue<E>, Serializable, ICloseable {
 	private static final long serialVersionUID = 8209223542093795745L;
@@ -48,7 +49,7 @@ public class DoubleQueue<E> extends AbstractQueue<E> implements BlockingQueue<E>
 	// 队列长度
 	private final int capacity;
 
-	public DoubleQueue(int capacity, boolean isInfinite) throws BaseException {
+	public DoubleQueue(int capacity, boolean isInfinite) throws AssertException {
 		AssertUtils.assertLimit("DoubleQueue", 1, capacity, 1, null);
 		this.capacity = capacity;
 		// 初始双重队列

@@ -20,7 +20,9 @@ import org.pizazz.common.ConfigureHelper;
 import org.pizazz.common.IOUtils;
 import org.pizazz.common.LocaleHelper;
 import org.pizazz.common.MessageOutputHelper;
+import org.pizazz.exception.AssertException;
 import org.pizazz.exception.BaseException;
+import org.pizazz.exception.ToolException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.message.TypeEnum;
 import org.pizazz.tool.ref.IShellFactory;
@@ -29,7 +31,7 @@ import org.pizazz.tool.ref.IShellFactory;
  * SHELL工厂组件
  * 
  * @author xlgp2171
- * @version 1.2.190213
+ * @version 1.3.190219
  */
 public final class PShellFactory implements IShellFactory, ICloseable {
 
@@ -43,7 +45,7 @@ public final class PShellFactory implements IShellFactory, ICloseable {
 				new LinkedBlockingQueue<Runnable>(), new PThreadFactory(Constant.NAMING_SHORT + "-shell", true));
 	}
 
-	public static PShellBuilder newInstance(String... command) throws BaseException {
+	public static PShellBuilder newInstance(String... command) throws AssertException {
 		return new PShellBuilder(Singleton.INSTANCE.get(), command);
 	}
 
@@ -54,7 +56,7 @@ public final class PShellFactory implements IShellFactory, ICloseable {
 			_process = builder.start();
 		} catch (IOException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PROCESS.START", e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
+			throw new ToolException(BasicCodeEnum.MSG_0003, _msg, e);
 		}
 		try {
 			if (timeout.isZero()) {
@@ -64,7 +66,7 @@ public final class PShellFactory implements IShellFactory, ICloseable {
 			}
 		} catch (InterruptedException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PROCESS.WAIT", e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0003, _msg, e);
+			throw new ToolException(BasicCodeEnum.MSG_0003, _msg, e);
 		}
 		return _process;
 	}

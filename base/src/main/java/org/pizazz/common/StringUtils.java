@@ -4,14 +4,14 @@ import java.text.MessageFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.pizazz.exception.BaseException;
+import org.pizazz.exception.AssertException;
 
 /**
  * 字符串对象工具<br>
  * 部分参考org.apache.commons.lang3.StringUtils
  * 
  * @author xlgp2171
- * @version 1.0.181210
+ * @version 1.1.190219
  */
 public class StringUtils {
 
@@ -136,7 +136,7 @@ public class StringUtils {
 		return relatively ? _path.substring(1) : _path.toString();
 	}
 
-	public static String match(Pattern pattern, String input, int group) throws BaseException {
+	public static String match(Pattern pattern, String input, int group) throws AssertException {
 		AssertUtils.assertNotNull("match", pattern, input);
 		Matcher _matcher = pattern.matcher(input);
 
@@ -149,7 +149,7 @@ public class StringUtils {
 		return "";
 	}
 
-	public static String match(String regex, String input, int group) throws BaseException {
+	public static String match(String regex, String input, int group) throws AssertException {
 		AssertUtils.assertNotNull("match", regex);
 		return match(Pattern.compile(regex), input, group);
 	}

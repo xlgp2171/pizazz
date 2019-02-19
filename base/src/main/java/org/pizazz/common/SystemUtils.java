@@ -25,8 +25,10 @@ import org.pizazz.Constant;
 import org.pizazz.ICloseable;
 import org.pizazz.common.ref.IMXBean;
 import org.pizazz.common.ref.OSTypeEnum;
+import org.pizazz.exception.AssertException;
 import org.pizazz.exception.BaseError;
 import org.pizazz.exception.BaseException;
+import org.pizazz.exception.UtilityException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.message.ErrorCodeEnum;
 import org.pizazz.message.TypeEnum;
@@ -125,14 +127,14 @@ public class SystemUtils {
 		return ManagementFactory.getRuntimeMXBean().getName();
 	}
 
-	public static String getComputerName(RuntimeMXBean runtime) throws BaseException {
+	public static String getComputerName(RuntimeMXBean runtime) throws AssertException {
 		AssertUtils.assertNotNull("getComputerName", runtime);
 		String _name = runtime.getName();
 		int _index = _name.indexOf("@");
 		return _index != -1 ? _name.substring(_index + 1) : _name;
 	}
 
-	public static String getComputerName() throws BaseException {
+	public static String getComputerName() throws AssertException {
 		return getComputerName(ManagementFactory.getRuntimeMXBean());
 	}
 
@@ -142,9 +144,10 @@ public class SystemUtils {
 	 * 
 	 * @param target
 	 * @return
-	 * @throws BaseException
+	 * @throws AssertException
+	 * @throws UtilityException
 	 */
-	public static ObjectInstance registerMBean(IMXBean target) throws BaseException {
+	public static ObjectInstance registerMBean(IMXBean target) throws AssertException, UtilityException {
 		AssertUtils.assertNotNull("registerMBean", target);
 		// org.pizazz.package:type=Name
 		String _objectId = new StringBuilder(ReflectUtils.getPackageName(target.getClass())).append(":type=")
@@ -155,14 +158,14 @@ public class SystemUtils {
 			_name = new ObjectName(_objectId);
 		} catch (MalformedObjectNameException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.MBEAN.NAME", _objectId, e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0005, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0005, _msg, e);
 		}
 		try {
 			return _server.registerMBean(target, _name);
 		} catch (InstanceAlreadyExistsException | MBeanRegistrationException | NotCompliantMBeanException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.MBEAN.REGISTRY", target.getClass().getName(),
 					_name, e.getMessage());
-			throw new BaseException(BasicCodeEnum.MSG_0011, _msg, e);
+			throw new UtilityException(BasicCodeEnum.MSG_0011, _msg, e);
 		}
 	}
 
