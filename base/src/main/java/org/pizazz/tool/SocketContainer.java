@@ -26,9 +26,9 @@ import org.pizazz.message.TypeEnum;
  * 维持容器组件
  *
  * @author xlgp2171
- * @version 1.3.190202
+ * @version 1.4.190219
  */
-public class KeepContainer extends AbstractContainer<String> {
+public class SocketContainer extends AbstractContainer<String> {
 	public static final String KEY_CONTAINER_PORT = "$PORT";
 	public static final String KEY_CONTAINER_KEY = "$KEY";
 
@@ -36,7 +36,7 @@ public class KeepContainer extends AbstractContainer<String> {
 	private Thread hook;
 	private final AtomicBoolean closed = new AtomicBoolean(false);
 
-	public KeepContainer(IPlugin plugin, TupleObject config, IMessageOutput<String> output) throws BaseException {
+	public SocketContainer(IPlugin plugin, TupleObject config, IMessageOutput<String> output) throws BaseException {
 		super(plugin, output);
 		try {
 			initialize(config);
@@ -71,6 +71,9 @@ public class KeepContainer extends AbstractContainer<String> {
 		int _port = TupleObjectHelper.getInt(properties_, KEY_CONTAINER_PORT, -1);
 		// port为0也可以super.waitForShutdown
 		if (_port <= 0) {
+			if (output_.isEnable()) {
+				output_.write(LocaleHelper.toLocaleText(TypeEnum.BASIC, "CONTAINER.ALIVE"));
+			}
 			super.waitForShutdown();
 		} else {
 			socketWaiting(_port);
@@ -93,6 +96,7 @@ public class KeepContainer extends AbstractContainer<String> {
 		if (output_.isEnable()) {
 			output_.write(LocaleHelper.toLocaleText(TypeEnum.BASIC, "CONTAINER.PORT", StringUtils.of(port)));
 			output_.write(LocaleHelper.toLocaleText(TypeEnum.BASIC, "CONTAINER.KEY", _key));
+			output_.write(LocaleHelper.toLocaleText(TypeEnum.BASIC, "CONTAINER.ALIVE"));
 		}
 		while (true) {
 			try {
