@@ -5,8 +5,8 @@ import java.util.Iterator;
 
 import org.pizazz.ICloseable;
 import org.pizazz.common.IOUtils;
+import org.pizazz.exception.AssertException;
 import org.pizazz.exception.BaseError;
-import org.pizazz.exception.BaseException;
 import org.pizazz.message.ErrorCodeEnum;
 
 import com.sleepycat.bind.EntryBinding;
@@ -39,7 +39,7 @@ public class Looper<E> implements Iterator<DataObject<E>>, ICloseable {
 	public DataObject<E> next() {
 		try {
 			return new DataObject<E>(key.getData(), binding.entryToObject(data));
-		} catch (BaseException e) {
+		} catch (AssertException e) {
 			throw new BaseError(ErrorCodeEnum.ERR_0002, e);
 		}
 	}
@@ -50,7 +50,7 @@ public class Looper<E> implements Iterator<DataObject<E>>, ICloseable {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		IOUtils.close(cursor);
 	}
 }

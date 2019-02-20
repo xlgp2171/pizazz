@@ -10,7 +10,6 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.pizazz.IPlugin;
 import org.pizazz.data.TupleObject;
-import org.pizazz.exception.BaseException;
 import org.pizazz.kafka.exception.CodeEnum;
 import org.pizazz.kafka.exception.KafkaException;
 import org.slf4j.Logger;
@@ -25,7 +24,7 @@ public class SenderProcessor<K, V> implements IPlugin {
 	}
 
 	@Override
-	public void initialize(TupleObject config) throws BaseException {
+	public void initialize(TupleObject config) throws KafkaException {
 	}
 
 	public Future<RecordMetadata> sentData(KafkaProducer<K, V> producer, ProducerRecord<K, V> record, Callback callback)
@@ -47,7 +46,7 @@ public class SenderProcessor<K, V> implements IPlugin {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 	}
 
 	private static class ProxyCallback implements Callback {

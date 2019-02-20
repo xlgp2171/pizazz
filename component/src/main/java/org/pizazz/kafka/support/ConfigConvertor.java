@@ -16,7 +16,8 @@ import org.pizazz.common.NumberUtils;
 import org.pizazz.common.StringUtils;
 import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.data.TupleObject;
-import org.pizazz.exception.BaseException;
+import org.pizazz.exception.AssertException;
+import org.pizazz.exception.UtilityException;
 import org.pizazz.kafka.KafkaConstant;
 import org.pizazz.kafka.consumer.ConsumerIgnoreEnum;
 import org.pizazz.kafka.consumer.ConsumerModeEnum;
@@ -32,12 +33,12 @@ public class ConfigConvertor implements ICloseable {
 	private final TupleObject config = TupleObjectHelper.newObject(2);
 	private String template;
 
-	public ConfigConvertor(TupleObject config) throws BaseException {
+	public ConfigConvertor(TupleObject config) throws AssertException, UtilityException  {
 		AssertUtils.assertNotNull("ConfigConvertor", config);
 		parse(config);
 	}
 
-	private void parse(TupleObject config) throws BaseException {
+	private void parse(TupleObject config) throws AssertException, UtilityException {
 		if (config.isEmpty()) {
 			throw new KafkaError(ErrorCodeEnum.ERR_0005, "base config null");
 		}
@@ -48,14 +49,14 @@ public class ConfigConvertor implements ICloseable {
 		this.config.append(KafkaConstant.KEY_CLIENT, _clientC).append(KafkaConstant.KEY_CONFIG, _configC);
 	}
 
-	private void tryUseTemplate(TupleObject clientC, TupleObject configC) throws BaseException {
+	private void tryUseTemplate(TupleObject clientC, TupleObject configC) throws AssertException, UtilityException {
 		if (!StringUtils.isEmpty(template)) {
 			ProducerTemplateEnum.from(template).fill(clientC, configC);
 			ConsumerTemplateEnum.from(template).fill(clientC, configC);
 		}
 	}
 
-	public String configFromKeys(String... keys) throws BaseException {
+	public String configFromKeys(String... keys) throws AssertException  {
 		AssertUtils.assertNotNull("configFromKeys", keys, 0);
 		return TupleObjectHelper.getNestedString(config, null, keys);
 	}
@@ -71,7 +72,8 @@ public class ConfigConvertor implements ICloseable {
 	}
 
 	public TupleObject dataProcessorConfig() {
-		return TupleObjectHelper.getNestedTupleObject(config, KafkaConstant.KEY_CONFIG, KafkaConstant.KEY_DATA_PROCESSOR);
+		return TupleObjectHelper.getNestedTupleObject(config, KafkaConstant.KEY_CONFIG,
+				KafkaConstant.KEY_DATA_PROCESSOR);
 	}
 
 	public TupleObject senderProcessorConfig() {
@@ -86,13 +88,13 @@ public class ConfigConvertor implements ICloseable {
 				? KafkaConstant.DEF_DURATION : _duration);
 	}
 
-	public ConsumerModeEnum consumerModeValue() throws BaseException {
+	public ConsumerModeEnum consumerModeValue() throws AssertException, KafkaException  {
 		String _value = TupleObjectHelper.getNestedString(config, StringUtils.EMPTY, KafkaConstant.KEY_CONFIG,
 				KafkaConstant.KEY_MODE);
 		return ConsumerModeEnum.from(_value);
 	}
 
-	public ProducerModeEnum producerModeValue() throws BaseException {
+	public ProducerModeEnum producerModeValue() throws AssertException, KafkaException {
 		String _value = TupleObjectHelper.getNestedString(config, StringUtils.EMPTY, KafkaConstant.KEY_CONFIG,
 				KafkaConstant.KEY_MODE);
 		return ProducerModeEnum.from(_value);
@@ -105,7 +107,7 @@ public class ConfigConvertor implements ICloseable {
 		if (!StringUtils.isEmpty(_value)) {
 			try {
 				return ConsumerIgnoreEnum.from(_value);
-			} catch (BaseException e) {
+			} catch (AssertException | KafkaException e) {
 			}
 		}
 		return ConsumerIgnoreEnum.NODE;
@@ -158,7 +160,8 @@ public class ConfigConvertor implements ICloseable {
 	}
 
 	public List<String> topicConfig() throws KafkaException {
-		List<Object> _config = TupleObjectHelper.getNestedList(config, KafkaConstant.KEY_CONFIG, KafkaConstant.KEY_TOPIC);
+		List<Object> _config = TupleObjectHelper.getNestedList(config, KafkaConstant.KEY_CONFIG,
+				KafkaConstant.KEY_TOPIC);
 
 		if (CollectionUtils.isEmpty(_config)) {
 			throw new KafkaException(CodeEnum.KFK_0005, "config 'topic' null");
@@ -167,7 +170,7 @@ public class ConfigConvertor implements ICloseable {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		config.clear();
 	}
 }

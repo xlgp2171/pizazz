@@ -7,7 +7,6 @@ import java.util.concurrent.ForkJoinTask;
 import org.pizazz.common.JSONUtils;
 import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.data.TupleObject;
-import org.pizazz.exception.BaseException;
 import org.pizazz.kafka.KafkaConstant;
 import org.pizazz.kafka.consumer.ConsumerIgnoreEnum;
 import org.pizazz.kafka.consumer.ConsumerModeEnum;
@@ -22,7 +21,7 @@ public class ForkPoolAdapter implements IProcessAdapter {
 	private ConsumerModeEnum mode;
 
 	@Override
-	public void initialize(TupleObject config) throws BaseException {
+	public void initialize(TupleObject config) throws KafkaException {
 		pool = new ForkJoinPool(TupleObjectHelper.getInt(config, KafkaConstant.KEY_THREADS,
 				Runtime.getRuntime().availableProcessors()));
 		LOGGER.info("adapter ForkPoolAdapter initialized,config=" + config);
@@ -80,7 +79,7 @@ public class ForkPoolAdapter implements IProcessAdapter {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		if (timeout == null || timeout.isNegative() || timeout.isZero()) {
 			pool.shutdownNow();
 		} else {

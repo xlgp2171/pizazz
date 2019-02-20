@@ -17,7 +17,6 @@ import org.pizazz.common.BooleanUtils;
 import org.pizazz.common.CollectionUtils;
 import org.pizazz.common.StringUtils;
 import org.pizazz.data.TupleObject;
-import org.pizazz.exception.BaseException;
 import org.pizazz.kafka.exception.CodeEnum;
 import org.pizazz.kafka.exception.KafkaException;
 import org.slf4j.Logger;
@@ -47,7 +46,7 @@ public class OffsetProcessor implements IOffsetProcessor {
 	}
 
 	@Override
-	public void initialize(TupleObject config) throws BaseException {
+	public void initialize(TupleObject config) throws KafkaException {
 	}
 
 	private <K, V> void offsetCommit(KafkaConsumer<K, V> consumer, boolean force) throws KafkaException {
@@ -220,7 +219,7 @@ public class OffsetProcessor implements IOffsetProcessor {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		restOffsetCommitted();
 		offsetCache.clear();
 		LOGGER.info("subscription offset processor destroyed,timeout=" + timeout);

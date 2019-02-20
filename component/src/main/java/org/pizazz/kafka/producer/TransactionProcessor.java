@@ -10,7 +10,6 @@ import org.apache.kafka.common.TopicPartition;
 import org.pizazz.Constant;
 import org.pizazz.common.StringUtils;
 import org.pizazz.data.TupleObject;
-import org.pizazz.exception.BaseException;
 import org.pizazz.kafka.exception.CodeEnum;
 import org.pizazz.kafka.exception.KafkaException;
 import org.slf4j.Logger;
@@ -21,7 +20,7 @@ public class TransactionProcessor implements ITransactionProcessor {
 	private ProducerModeEnum mode;
 
 	@Override
-	public void initialize(TupleObject config) throws BaseException {
+	public void initialize(TupleObject config) throws KafkaException {
 	}
 
 	@Override
@@ -107,6 +106,6 @@ public class TransactionProcessor implements ITransactionProcessor {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 	}
 }

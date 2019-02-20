@@ -4,7 +4,8 @@ import org.pizazz.common.StringUtils;
 import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.common.YAMLUtils;
 import org.pizazz.data.TupleObject;
-import org.pizazz.exception.BaseException;
+import org.pizazz.exception.AssertException;
+import org.pizazz.exception.UtilityException;
 import org.pizazz.kafka.KafkaConstant;
 
 public enum ProducerTemplateEnum {
@@ -17,7 +18,7 @@ public enum ProducerTemplateEnum {
 	/** 无 */
 	NONE;
 
-	public void fill(TupleObject clientC, TupleObject configC) throws BaseException {
+	public void fill(TupleObject clientC, TupleObject configC) throws AssertException, UtilityException {
 		if (this != ProducerTemplateEnum.NONE) {
 			TupleObject _tmp = YAMLUtils.fromYAML(name().toLowerCase() + ".yml");
 			TupleObjectHelper.merge(clientC, TupleObjectHelper.getTupleObject(_tmp, KafkaConstant.KEY_CLIENT));

@@ -6,13 +6,15 @@ import java.util.Map;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.pizazz.data.TupleObject;
+import org.pizazz.exception.AssertException;
 import org.pizazz.exception.BaseException;
+import org.pizazz.exception.ToolException;
+import org.pizazz.exception.UtilityException;
 import org.pizazz.kafka.KafkaConstant;
 import org.pizazz.kafka.consumer.adapter.Bridge;
 import org.pizazz.kafka.consumer.adapter.IProcessAdapter;
 import org.pizazz.kafka.consumer.adapter.SequenceAdapter;
 import org.pizazz.kafka.exception.KafkaException;
-import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.tool.AbstractClassPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,14 +34,10 @@ public class DataProcessor<K, V> extends AbstractClassPlugin {
 	}
 
 	@Override
-	public void initialize(TupleObject config) throws BaseException {
+	public void initialize(TupleObject config) throws KafkaException, AssertException, UtilityException, ToolException {
 		setConfig(config);
 		adapter = cast(loadPlugin("classpath", new SequenceAdapter(), null, true), IProcessAdapter.class);
-		try {
-			adapter.set(mode);
-		} catch (KafkaException e) {
-			throw new BaseException(BasicCodeEnum.MSG_0005, e.getMessage(), e);
-		}
+		adapter.set(mode);
 		LOGGER.info("subscription data processor initialized,config=" + config);
 	}
 
@@ -93,7 +91,7 @@ public class DataProcessor<K, V> extends AbstractClassPlugin {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		unloadPlugin(adapter, timeout);
 		LOGGER.info("subscription data processor destroyed,timeout=" + timeout);
 	}

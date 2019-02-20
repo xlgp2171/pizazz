@@ -5,7 +5,6 @@ import java.time.Duration;
 import org.pizazz.ICloseable;
 import org.pizazz.common.ArrayUtils;
 import org.pizazz.common.IOUtils;
-import org.pizazz.exception.BaseException;
 
 import com.sleepycat.bind.serial.SerialBinding;
 import com.sleepycat.bind.serial.StoredClassCatalog;
@@ -101,7 +100,7 @@ public class Connection<E> implements Iterable<DataObject<E>>, ICloseable {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		IOUtils.close(data);
 		IOUtils.close(clazz);
 		IOUtils.close(log);

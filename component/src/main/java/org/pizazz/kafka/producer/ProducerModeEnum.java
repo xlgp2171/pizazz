@@ -1,8 +1,9 @@
 package org.pizazz.kafka.producer;
 
 import org.pizazz.common.AssertUtils;
-import org.pizazz.exception.BaseException;
+import org.pizazz.exception.AssertException;
 import org.pizazz.kafka.exception.CodeEnum;
+import org.pizazz.kafka.exception.KafkaException;
 
 public enum ProducerModeEnum {
 	/** 异步事务发送 */
@@ -30,7 +31,7 @@ public enum ProducerModeEnum {
 		return isTransaction;
 	}
 
-	public static ProducerModeEnum from(String mode) throws BaseException {
+	public static ProducerModeEnum from(String mode) throws AssertException, KafkaException {
 		AssertUtils.assertNotNull("from", mode);
 		mode = mode.trim().toUpperCase();
 
@@ -39,6 +40,6 @@ public enum ProducerModeEnum {
 				return _item;
 			}
 		}
-		throw new BaseException(CodeEnum.KFK_0011, mode);
+		throw new KafkaException(CodeEnum.KFK_0011, mode);
 	}
 }

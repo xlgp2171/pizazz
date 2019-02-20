@@ -3,7 +3,11 @@ package org.pizazz.redis;
 import java.time.Duration;
 
 import org.pizazz.data.TupleObject;
+import org.pizazz.exception.AssertException;
 import org.pizazz.exception.BaseException;
+import org.pizazz.exception.ToolException;
+import org.pizazz.exception.UtilityException;
+import org.pizazz.redis.exception.RedisException;
 import org.pizazz.redis.redisson.RedissonAdapter;
 import org.pizazz.tool.AbstractClassPlugin;
 import org.slf4j.Logger;
@@ -14,7 +18,7 @@ public class RedisClient extends AbstractClassPlugin {
 	private IRedisAdapter adapter;
 
 	@Override
-	public void initialize(TupleObject config) throws BaseException {
+	public void initialize(TupleObject config) throws RedisException, AssertException, UtilityException, ToolException {
 		updateConfig(config);
 		adapter = cast(loadPlugin("classpath", new RedissonAdapter(), null, true), IRedisAdapter.class);
 		LOGGER.info("redis initialized,config=" + config);
@@ -34,7 +38,7 @@ public class RedisClient extends AbstractClassPlugin {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		unloadPlugin(adapter, timeout);
 		LOGGER.info("redis destroyed,timeout=" + timeout);
 	}

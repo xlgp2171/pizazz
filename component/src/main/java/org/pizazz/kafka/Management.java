@@ -22,7 +22,9 @@ import org.apache.kafka.common.KafkaFuture;
 import org.apache.kafka.common.TopicPartition;
 import org.pizazz.common.IOUtils;
 import org.pizazz.data.TupleObject;
-import org.pizazz.exception.BaseException;
+import org.pizazz.exception.AssertException;
+import org.pizazz.exception.ToolException;
+import org.pizazz.exception.UtilityException;
 import org.pizazz.kafka.exception.CodeEnum;
 import org.pizazz.kafka.exception.KafkaException;
 import org.pizazz.kafka.support.AbstractClient;
@@ -32,7 +34,7 @@ public class Management<K, V> extends AbstractClient {
 	private KafkaConsumer<K, V> consumer;
 
 	@Override
-	public void initialize(TupleObject config) throws BaseException {
+	public void initialize(TupleObject config) throws KafkaException, AssertException, UtilityException, ToolException {
 		super.initialize(config);
 		admin = KafkaAdminClient.create(getConvertor().kafkaConfig());
 		consumer = new KafkaConsumer<K, V>(getConvertor().kafkaConfig());
@@ -102,7 +104,7 @@ public class Management<K, V> extends AbstractClient {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		super.destroy(timeout);
 		consumer.wakeup();
 		IOUtils.close(consumer);

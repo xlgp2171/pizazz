@@ -7,24 +7,25 @@ import java.util.concurrent.TimeUnit;
 import org.pizazz.common.JSONUtils;
 import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.data.TupleObject;
-import org.pizazz.exception.BaseException;
+import org.pizazz.exception.UtilityException;
 import org.pizazz.redis.IRedisAdapter;
 import org.pizazz.redis.IRedisProcessor;
 import org.pizazz.redis.RedisConstant;
 import org.pizazz.redis.exception.CodeEnum;
+import org.pizazz.redis.exception.RedisException;
 import org.redisson.config.Config;
 
 public class RedissonAdapter implements IRedisAdapter {
 	private RedissonInstance instance;
 
 	@Override
-	public void initialize(TupleObject config) throws BaseException {
+	public void initialize(TupleObject config) throws RedisException, UtilityException {
 		TupleObject _config = TupleObjectHelper.getTupleObject(config, RedisConstant.KEY_CLIENT);
 		String _tmp = JSONUtils.toJSON(_config);
 		try {
 			instance = new RedissonInstance(Config.fromJSON(_tmp));
 		} catch (IOException e) {
-			throw new BaseException(CodeEnum.RDS_0001, "config:" + _config, e);
+			throw new RedisException(CodeEnum.RDS_0001, "config:" + _config, e);
 		}
 	}
 
@@ -34,7 +35,7 @@ public class RedissonAdapter implements IRedisAdapter {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		if (timeout == null || timeout.isNegative() || timeout.isZero()) {
 			instance.shutdown();
 		} else {

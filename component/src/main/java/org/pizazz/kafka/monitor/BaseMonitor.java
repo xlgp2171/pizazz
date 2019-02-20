@@ -21,9 +21,12 @@ import org.pizazz.common.ArrayUtils;
 import org.pizazz.common.CollectionUtils;
 import org.pizazz.common.SystemUtils;
 import org.pizazz.data.TupleObject;
-import org.pizazz.exception.BaseException;
+import org.pizazz.exception.AssertException;
+import org.pizazz.exception.ToolException;
+import org.pizazz.exception.UtilityException;
 import org.pizazz.kafka.KafkaConstant;
 import org.pizazz.kafka.Management;
+import org.pizazz.kafka.exception.KafkaException;
 import org.pizazz.tool.PThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +44,7 @@ public class BaseMonitor<K, V> implements IPlugin {
 	}
 
 	@Override
-	public void initialize(TupleObject config) throws BaseException {
+	public void initialize(TupleObject config) throws KafkaException, AssertException, UtilityException, ToolException {
 		management_.initialize(config);
 		scheduled = Executors.newScheduledThreadPool(2, new PThreadFactory(KafkaConstant.KEY_KAFKA, true));
 		LOGGER.info("BaseMonitor initialized,config=" + config);
@@ -202,7 +205,7 @@ public class BaseMonitor<K, V> implements IPlugin {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		if (timeout == null || timeout.isZero() || timeout.isNegative()) {
 			scheduled.shutdownNow();
 		} else {

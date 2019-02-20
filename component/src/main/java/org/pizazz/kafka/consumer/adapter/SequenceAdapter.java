@@ -5,7 +5,6 @@ import java.time.Duration;
 import org.pizazz.common.JSONUtils;
 import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.data.TupleObject;
-import org.pizazz.exception.BaseException;
 import org.pizazz.kafka.consumer.ConsumerIgnoreEnum;
 import org.pizazz.kafka.consumer.ConsumerModeEnum;
 import org.pizazz.kafka.exception.CodeEnum;
@@ -18,7 +17,7 @@ public class SequenceAdapter implements IProcessAdapter {
 	private ConsumerModeEnum mode;
 
 	@Override
-	public void initialize(TupleObject config) throws BaseException {
+	public void initialize(TupleObject config) throws KafkaException {
 		LOGGER.info("adapter SequenceAdapter initialized,config=" + config);
 	}
 
@@ -69,7 +68,7 @@ public class SequenceAdapter implements IProcessAdapter {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		LOGGER.info("adapter SequenceAdapter destroyed,timeout=" + timeout);
 	}
 }

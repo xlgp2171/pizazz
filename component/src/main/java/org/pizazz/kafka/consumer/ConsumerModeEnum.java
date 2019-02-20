@@ -1,8 +1,9 @@
 package org.pizazz.kafka.consumer;
 
 import org.pizazz.common.AssertUtils;
-import org.pizazz.exception.BaseException;
+import org.pizazz.exception.AssertException;
 import org.pizazz.kafka.exception.CodeEnum;
+import org.pizazz.kafka.exception.KafkaException;
 
 public enum ConsumerModeEnum {
 	/** 自动异步一轮 */
@@ -40,7 +41,7 @@ public enum ConsumerModeEnum {
 		return isEach;
 	}
 
-	public static ConsumerModeEnum from(String mode) throws BaseException {
+	public static ConsumerModeEnum from(String mode) throws AssertException, KafkaException {
 		AssertUtils.assertNotNull("from", mode);
 		mode = mode.trim().toUpperCase();
 
@@ -49,6 +50,6 @@ public enum ConsumerModeEnum {
 				return _item;
 			}
 		}
-		throw new BaseException(CodeEnum.KFK_0007, mode);
+		throw new KafkaException(CodeEnum.KFK_0007, mode);
 	}
 }

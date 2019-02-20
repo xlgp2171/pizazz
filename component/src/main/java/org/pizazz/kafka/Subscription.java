@@ -21,7 +21,9 @@ import org.pizazz.common.IOUtils;
 import org.pizazz.common.StringUtils;
 import org.pizazz.common.SystemUtils;
 import org.pizazz.data.TupleObject;
-import org.pizazz.exception.BaseException;
+import org.pizazz.exception.AssertException;
+import org.pizazz.exception.ToolException;
+import org.pizazz.exception.UtilityException;
 import org.pizazz.kafka.consumer.DataProcessor;
 import org.pizazz.kafka.consumer.IDataExecutor;
 import org.pizazz.kafka.consumer.IOffsetProcessor;
@@ -61,7 +63,7 @@ public class Subscription<K, V> extends AbstractClient {
 	protected DataProcessor<K, V> processor;
 
 	@Override
-	public void initialize(TupleObject config) throws BaseException {
+	public void initialize(TupleObject config) throws AssertException, UtilityException, ToolException, KafkaException  {
 		super.initialize(config);
 		// 创建Offset处理类
 		updateConfig(getConvertor().offsetProcessorConfig());
@@ -165,7 +167,7 @@ public class Subscription<K, V> extends AbstractClient {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		if (consumer != null && isInitialize() && loop.compareAndSet(true, false)) {
 			loop.get();
 			consumer.wakeup();

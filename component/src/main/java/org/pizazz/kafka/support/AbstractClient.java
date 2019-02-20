@@ -5,7 +5,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.pizazz.common.SystemUtils;
 import org.pizazz.data.TupleObject;
+import org.pizazz.exception.AssertException;
 import org.pizazz.exception.BaseException;
+import org.pizazz.exception.ToolException;
+import org.pizazz.exception.UtilityException;
+import org.pizazz.kafka.exception.KafkaException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.tool.AbstractClassPlugin;
 import org.slf4j.Logger;
@@ -18,9 +22,9 @@ public abstract class AbstractClient extends AbstractClassPlugin {
 	private ConfigConvertor convertor;
 
 	@Override
-	public void initialize(TupleObject config) throws BaseException {
+	public void initialize(TupleObject config) throws KafkaException, AssertException, UtilityException, ToolException {
 		if (!initialized.compareAndSet(false, true)) {
-			throw new BaseException(BasicCodeEnum.MSG_0020, "client initialized");
+			throw new KafkaException(BasicCodeEnum.MSG_0020, "client initialized");
 		}
 		// 创建配置类
 		convertor = new ConfigConvertor(config);
@@ -44,7 +48,7 @@ public abstract class AbstractClient extends AbstractClassPlugin {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		if (isInitialize()) {
 			SystemUtils.destroy(convertor, timeout);
 		}

@@ -1,8 +1,9 @@
 package org.pizazz.kafka.consumer;
 
 import org.pizazz.common.AssertUtils;
-import org.pizazz.exception.BaseException;
+import org.pizazz.exception.AssertException;
 import org.pizazz.kafka.exception.CodeEnum;
+import org.pizazz.kafka.exception.KafkaException;
 
 public enum ConsumerIgnoreEnum {
 	/** 忽略offset和consume异常 */
@@ -30,7 +31,7 @@ public enum ConsumerIgnoreEnum {
 		return consume;
 	}
 
-	public static ConsumerIgnoreEnum from(String mode) throws BaseException {
+	public static ConsumerIgnoreEnum from(String mode) throws AssertException, KafkaException {
 		AssertUtils.assertNotNull("from", mode);
 		mode = mode.trim().toUpperCase();
 
@@ -39,6 +40,6 @@ public enum ConsumerIgnoreEnum {
 				return _item;
 			}
 		}
-		throw new BaseException(CodeEnum.KFK_0008, mode);
+		throw new KafkaException(CodeEnum.KFK_0008, mode);
 	}
 }

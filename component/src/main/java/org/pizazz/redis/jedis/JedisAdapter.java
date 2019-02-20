@@ -9,10 +9,12 @@ import org.pizazz.common.PathUtils;
 import org.pizazz.common.StringUtils;
 import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.data.TupleObject;
-import org.pizazz.exception.BaseException;
+import org.pizazz.exception.AssertException;
+import org.pizazz.exception.UtilityException;
 import org.pizazz.redis.IRedisAdapter;
 import org.pizazz.redis.IRedisProcessor;
 import org.pizazz.redis.RedisConstant;
+import org.pizazz.redis.exception.RedisException;
 
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -21,7 +23,7 @@ public class JedisAdapter implements IRedisAdapter {
 	private JedisPool pool;
 
 	@Override
-	public void initialize(TupleObject config) throws BaseException {
+	public void initialize(TupleObject config) throws RedisException, AssertException, UtilityException {
 		TupleObject _config = TupleObjectHelper.getTupleObject(config, RedisConstant.KEY_CLIENT);
 		JedisPoolConfig _poolConfig = new JedisPoolConfig();
 		ClassUtils.simplePopulate(_poolConfig, _config);
@@ -37,7 +39,7 @@ public class JedisAdapter implements IRedisAdapter {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		IOUtils.close(pool);
 	}
 }

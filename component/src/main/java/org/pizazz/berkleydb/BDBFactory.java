@@ -5,13 +5,15 @@ import java.io.FileNotFoundException;
 import java.time.Duration;
 
 import org.pizazz.IPlugin;
+import org.pizazz.berkleydb.exception.BDBException;
 import org.pizazz.berkleydb.operator.Connection;
 import org.pizazz.common.IOUtils;
 import org.pizazz.common.ResourceUtils;
 import org.pizazz.common.StringUtils;
 import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.data.TupleObject;
-import org.pizazz.exception.BaseException;
+import org.pizazz.exception.AssertException;
+import org.pizazz.exception.UtilityException;
 import org.pizazz.message.BasicCodeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,12 +33,16 @@ public class BDBFactory implements IPlugin {
 	}
 
 	@Override
-	public void initialize(TupleObject config) throws BaseException {
+	public void initialize(TupleObject config) throws BDBException {
 		String _configPath = TupleObjectHelper.getString(config, BDBConstant.KEY_CONFIG_PATH, "");
 		EnvironmentConfig _config = null;
 
 		if (!StringUtils.isEmpty(_configPath)) {
-			_config = new EnvironmentConfig(ResourceUtils.loadProperties(_configPath));
+			try {
+				_config = new EnvironmentConfig(ResourceUtils.loadProperties(_configPath));
+			} catch (AssertException | UtilityException | IllegalArgumentException e) {
+				throw new BDBException(BasicCodeEnum.MSG_0005, _configPath, e);
+			}
 		} else {
 			_config = new EnvironmentConfig();
 		}
@@ -46,12 +52,12 @@ public class BDBFactory implements IPlugin {
 		File _envHome = new File(TupleObjectHelper.getString(config, BDBConstant.KEY_HOME_PATH, ""));
 
 		if (!_envHome.isDirectory() || !_envHome.exists()) {
-			throw new BaseException(BasicCodeEnum.MSG_0003, new FileNotFoundException(_envHome.getAbsolutePath()));
+			throw new BDBException(BasicCodeEnum.MSG_0003, new FileNotFoundException(_envHome.getAbsolutePath()));
 		}
 		try {
 			environment = new Environment(_envHome, _config);
 		} catch (Exception e) {
-			throw new BaseException(BasicCodeEnum.MSG_0021, e.getMessage(), e);
+			throw new BDBException(BasicCodeEnum.MSG_0021, e.getMessage(), e);
 		}
 		LOGGER.info("bdb initialized,config=" + config.toString());
 	}

@@ -10,6 +10,10 @@ public class BDBException extends AbstractException {
 		super(code, message);
 	}
 
+	public BDBException(IMessageCode code, Throwable cause) {
+		super(code, cause);
+	}
+
 	public BDBException(IMessageCode code, String message, Throwable cause) {
 		super(code.append(message).toString(), cause);
 	}
