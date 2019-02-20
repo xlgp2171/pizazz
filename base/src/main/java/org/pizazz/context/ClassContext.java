@@ -10,14 +10,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.pizazz.ICloseable;
-import org.pizazz.exception.BaseException;
 import org.pizazz.tool.PClassLoader;
 
 /**
  * 类环境组件
  * 
  * @author xlgp2171
- * @version 1.0.181219
+ * @version 1.0.181220
  */
 public final class ClassContext implements ICloseable {
 	private final ConcurrentMap<String, WeakReference<PClassLoader>> loaders;
@@ -124,7 +123,7 @@ public final class ClassContext implements ICloseable {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		synchronized (lock) {
 			String[] _tmp = new String[loaders.size()];
 			_tmp = loaders.keySet().toArray(_tmp);

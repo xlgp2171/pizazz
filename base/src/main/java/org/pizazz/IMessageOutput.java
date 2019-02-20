@@ -2,8 +2,6 @@ package org.pizazz;
 
 import java.time.Duration;
 
-import org.pizazz.exception.BaseException;
-
 /**
  * 消息输出接口<br>
  * 提供自定义消息输出接口，包括消息输出、异常输出等
@@ -11,7 +9,7 @@ import org.pizazz.exception.BaseException;
  * @param <T> 根据输出内容注册泛型
  * 
  * @author xlgp2171
- * @version 1.2.190213
+ * @version 1.3.190220
  */
 @FunctionalInterface
 public interface IMessageOutput<T> extends ICloseable {
@@ -26,6 +24,6 @@ public interface IMessageOutput<T> extends ICloseable {
 	};
 
 	@Override
-	public default void destroy(Duration timeout) throws BaseException {
+	public default void destroy(Duration timeout) {
 	}
 }

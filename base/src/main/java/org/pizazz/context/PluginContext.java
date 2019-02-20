@@ -11,13 +11,12 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.pizazz.ICloseable;
 import org.pizazz.IPlugin;
-import org.pizazz.exception.BaseException;
 
 /**
  * 插件环境组件
  * 
  * @author xlgp2171
- * @version 1.0.181224
+ * @version 1.1.190220
  */
 public final class PluginContext implements ICloseable {
 	private final ConcurrentMap<Class<?>, Set<WeakReference<IPlugin>>> tree;
@@ -83,7 +82,7 @@ public final class PluginContext implements ICloseable {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		synchronized (lock) {
 			tree.values().stream().forEach(_item -> _item.clear());
 			tree.clear();

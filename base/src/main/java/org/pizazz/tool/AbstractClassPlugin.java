@@ -11,6 +11,7 @@ import org.pizazz.common.SystemUtils;
 import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.context.PluginContext;
 import org.pizazz.data.TupleObject;
+import org.pizazz.exception.AbstractException;
 import org.pizazz.exception.AssertException;
 import org.pizazz.exception.BaseException;
 import org.pizazz.exception.ToolException;
@@ -22,7 +23,7 @@ import org.pizazz.message.TypeEnum;
  * 通用加载器组件
  * 
  * @author xlgp2171
- * @version 1.1.190219
+ * @version 1.1.190220
  */
 public abstract class AbstractClassPlugin implements IPlugin {
 	private final TupleObject configure = TupleObjectHelper.newObject();
@@ -74,10 +75,10 @@ public abstract class AbstractClassPlugin implements IPlugin {
 	 * @param loader 采用的类加载器,null为默认加载器
 	 * @param initialize 是否加载后调用初始化方法
 	 * @return 加载后的实现类,可用cast方法转换类型
-	 * @throws BaseException
+	 * @throws AbstractException
 	 */
 	public IPlugin loadPlugin(String key, IPlugin defPlugin, ClassLoader loader, boolean initialize)
-			throws BaseException {
+			throws AbstractException {
 		String _classpath = TupleObjectHelper.getString(configure, key, "");
 		try {
 			return load(_classpath, key, defPlugin, loader, initialize, null);
@@ -91,7 +92,7 @@ public abstract class AbstractClassPlugin implements IPlugin {
 	}
 
 	protected IPlugin load(String classpath, String defClass, IPlugin defPlugin, ClassLoader loader, boolean initialize,
-			BaseException e) throws BaseException {
+			BaseException e) throws AbstractException {
 		if (StringUtils.isTrimEmpty(classpath)) {
 			if (defPlugin != null) {
 				log(LocaleHelper.toLocaleText(TypeEnum.BASIC, "PLUGIN.LOAD", defPlugin.getId()), null);
@@ -107,13 +108,13 @@ public abstract class AbstractClassPlugin implements IPlugin {
 		return switchPlugin(_tmp, initialize);
 	}
 
-	protected IPlugin switchPlugin(IPlugin instance, boolean initialize) throws BaseException {
+	protected IPlugin switchPlugin(IPlugin instance, boolean initialize) throws AbstractException {
 		PluginContext.getInstance().register(getClass(), instance);
 		log(LocaleHelper.toLocaleText(TypeEnum.BASIC, "PLUGIN.REGISTER", instance.getId()), null);
 		return initialize ? initPlugin(instance) : instance;
 	}
 
-	protected IPlugin initPlugin(IPlugin instance) throws BaseException {
+	protected IPlugin initPlugin(IPlugin instance) throws AbstractException {
 		instance.initialize(copyConfig());
 		log(LocaleHelper.toLocaleText(TypeEnum.BASIC, "PLUGIN.INIT", instance.getId()), null);
 		return instance;

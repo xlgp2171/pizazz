@@ -16,7 +16,7 @@ import org.pizazz.common.SystemUtils;
 import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.data.TupleObject;
 import org.pizazz.exception.AssertException;
-import org.pizazz.exception.BaseException;
+import org.pizazz.exception.ToolException;
 import org.pizazz.message.TypeEnum;
 
 /**
@@ -25,7 +25,7 @@ import org.pizazz.message.TypeEnum;
  * @param <T> 输出类型
  *
  * @author xlgp2171
- * @version 1.1.190219
+ * @version 1.1.190220
  */
 public abstract class AbstractContainer<T> implements IPlugin {
 	public static final String KEY_CONTAINER_TIMEOUT = "$TIMEOUT";
@@ -63,13 +63,13 @@ public abstract class AbstractContainer<T> implements IPlugin {
 	}
 
 	@Override
-	public void initialize(TupleObject config) throws BaseException {
+	public void initialize(TupleObject config) throws ToolException {
 		properties_.append(KEY_CONTAINER_TIMEOUT, ConfigureHelper.getConfig(TypeEnum.BASIC,
 				Constant.NAMING_SHORT + ".kc.timeout", "DEF_CONTAINER_TIMEOUT", "30000"));
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		int _status = 0;
 
 		if (timeout == null || timeout.isNegative()) {

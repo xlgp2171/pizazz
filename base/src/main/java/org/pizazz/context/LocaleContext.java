@@ -11,7 +11,6 @@ import java.util.concurrent.ConcurrentMap;
 import org.pizazz.Constant;
 import org.pizazz.ICloseable;
 import org.pizazz.common.SystemUtils;
-import org.pizazz.exception.BaseException;
 import org.pizazz.message.TypeEnum;
 import org.pizazz.message.ref.IType;
 
@@ -19,7 +18,7 @@ import org.pizazz.message.ref.IType;
  * 国际化消息环境组件
  * 
  * @author xlgp2171
- * @version 1.0.181219
+ * @version 1.1.190220
  */
 public final class LocaleContext implements ICloseable {
 	private final ConcurrentMap<IType, Map<Locale, Properties>> tree;
@@ -95,7 +94,7 @@ public final class LocaleContext implements ICloseable {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		tree.values().stream().forEach(_item -> _item.clear());
 		tree.clear();
 	}

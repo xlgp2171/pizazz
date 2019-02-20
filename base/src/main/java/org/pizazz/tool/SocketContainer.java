@@ -17,8 +17,10 @@ import org.pizazz.common.StringUtils;
 import org.pizazz.common.SystemUtils;
 import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.data.TupleObject;
+import org.pizazz.exception.AssertException;
 import org.pizazz.exception.BaseError;
 import org.pizazz.exception.BaseException;
+import org.pizazz.exception.ToolException;
 import org.pizazz.message.ErrorCodeEnum;
 import org.pizazz.message.TypeEnum;
 
@@ -26,7 +28,7 @@ import org.pizazz.message.TypeEnum;
  * 维持容器组件
  *
  * @author xlgp2171
- * @version 1.4.190219
+ * @version 1.4.190220
  */
 public class SocketContainer extends AbstractContainer<String> {
 	public static final String KEY_CONTAINER_PORT = "$PORT";
@@ -36,7 +38,7 @@ public class SocketContainer extends AbstractContainer<String> {
 	private Thread hook;
 	private final AtomicBoolean closed = new AtomicBoolean(false);
 
-	public SocketContainer(IPlugin plugin, TupleObject config, IMessageOutput<String> output) throws BaseException {
+	public SocketContainer(IPlugin plugin, TupleObject config, IMessageOutput<String> output) throws AssertException {
 		super(plugin, output);
 		try {
 			initialize(config);
@@ -46,7 +48,7 @@ public class SocketContainer extends AbstractContainer<String> {
 	}
 
 	@Override
-	public void initialize(TupleObject config) throws BaseException {
+	public void initialize(TupleObject config) throws ToolException {
 		super.initialize(config);
 		int _port = TupleObjectHelper.getInt(config, "port", -1);
 		String _key = TupleObjectHelper.getString(config, "key", StringUtils.EMPTY);
@@ -120,7 +122,7 @@ public class SocketContainer extends AbstractContainer<String> {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		if (closed.compareAndSet(false, true)) {
 			if (hook != null) {
 				Runtime.getRuntime().removeShutdownHook(hook);

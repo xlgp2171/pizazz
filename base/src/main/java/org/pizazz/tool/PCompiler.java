@@ -23,7 +23,6 @@ import org.pizazz.common.IOUtils;
 import org.pizazz.common.LocaleHelper;
 import org.pizazz.common.PathUtils;
 import org.pizazz.exception.AssertException;
-import org.pizazz.exception.BaseException;
 import org.pizazz.exception.ToolException;
 import org.pizazz.exception.UtilityException;
 import org.pizazz.message.BasicCodeEnum;
@@ -33,7 +32,7 @@ import org.pizazz.message.TypeEnum;
  * 类动态编译组件
  * 
  * @author xlgp2171
- * @version 1.1.190219
+ * @version 1.1.190220
  */
 public class PCompiler implements ICloseable {
 	private final JavaCompiler compiler;
@@ -98,7 +97,7 @@ public class PCompiler implements ICloseable {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		IOUtils.close(manager);
 		options.clear();
 		paths.clear();

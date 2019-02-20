@@ -18,7 +18,7 @@ import org.pizazz.message.ref.IType;
  * 内部配置环境组件
  * 
  * @author xlgp2171
- * @version 1.0.181216
+ * @version 1.1.190220
  */
 public final class ConfigureContext implements ICloseable {
 	private final ConcurrentMap<IType, Properties> tree = new ConcurrentHashMap<IType, Properties>();
@@ -72,7 +72,7 @@ public final class ConfigureContext implements ICloseable {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		tree.values().stream().forEach(_item -> _item.clear());
 		tree.clear();
 	}

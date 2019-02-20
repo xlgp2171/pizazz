@@ -21,7 +21,7 @@ import org.pizazz.tool.ref.IShellFactory;
  * SHELL运行组件
  * 
  * @author xlgp2171
- * @version 1.2.190213
+ * @version 1.2.190220
  */
 public class PShellBuilder implements ICloseable, IObject {
 
@@ -114,7 +114,7 @@ public class PShellBuilder implements ICloseable, IObject {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		turn(id, null, true);
 		id = "";
 	}

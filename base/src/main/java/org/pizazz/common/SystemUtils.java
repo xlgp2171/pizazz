@@ -27,7 +27,6 @@ import org.pizazz.common.ref.IMXBean;
 import org.pizazz.common.ref.OSTypeEnum;
 import org.pizazz.exception.AssertException;
 import org.pizazz.exception.BaseError;
-import org.pizazz.exception.BaseException;
 import org.pizazz.exception.UtilityException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.message.ErrorCodeEnum;
@@ -37,7 +36,7 @@ import org.pizazz.message.TypeEnum;
  * 系统工具
  * 
  * @author xlgp2171
- * @version 1.1.190122
+ * @version 1.2.190220
  */
 public class SystemUtils {
 	/**
@@ -205,7 +204,7 @@ public class SystemUtils {
 			if (timeout != null) {
 				try {
 					target.destroy(timeout);
-				} catch (BaseException e) {
+				} catch (Exception e) {
 				}
 			} else {
 				IOUtils.close(target);

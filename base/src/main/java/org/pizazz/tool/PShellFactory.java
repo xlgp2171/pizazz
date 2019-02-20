@@ -31,7 +31,7 @@ import org.pizazz.tool.ref.IShellFactory;
  * SHELL工厂组件
  * 
  * @author xlgp2171
- * @version 1.3.190219
+ * @version 1.3.190220
  */
 public final class PShellFactory implements IShellFactory, ICloseable {
 
@@ -84,7 +84,7 @@ public final class PShellFactory implements IShellFactory, ICloseable {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		if (timeout.isNegative() || timeout.isZero()) {
 			threadPool.shutdownNow();
 		} else {

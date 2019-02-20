@@ -14,14 +14,13 @@ import org.pizazz.ICloseable;
 import org.pizazz.common.AssertUtils;
 import org.pizazz.common.StringUtils;
 import org.pizazz.exception.AssertException;
-import org.pizazz.exception.BaseException;
 
 /**
  * 双端队列组件<br>
  * 代码参考DataX
  * 
  * @author xlgp2171
- * @version 1.1.190219
+ * @version 1.1.190220
  */
 public class DoubleQueue<E> extends AbstractQueue<E> implements BlockingQueue<E>, Serializable, ICloseable {
 	private static final long serialVersionUID = 8209223542093795745L;
@@ -226,7 +225,7 @@ public class DoubleQueue<E> extends AbstractQueue<E> implements BlockingQueue<E>
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		awake.signalAll();
 		notFull.signalAll();
 
