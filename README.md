@@ -2,7 +2,7 @@
 一些自行设计和参考整合的 代码
 
 简单工具：
-org.pizazz.tool.KeepContainer: 维持进程的容器，采用SOCKET和THREAD方式
+org.pizazz.tool.SocketContainer: 维持进程的容器，采用SOCKET和THREAD方式
 
 org.pizazz.tool.CryptoFactory: 加密解密用的工具
 
