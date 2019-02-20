@@ -13,6 +13,7 @@ import org.pizazz.context.PluginContext;
 import org.pizazz.data.TupleObject;
 import org.pizazz.exception.AbstractException;
 import org.pizazz.exception.AssertException;
+import org.pizazz.exception.BaseException;
 import org.pizazz.exception.ToolException;
 import org.pizazz.exception.UtilityException;
 import org.pizazz.message.BasicCodeEnum;
@@ -22,12 +23,12 @@ import org.pizazz.message.TypeEnum;
  * 通用加载器组件
  * 
  * @author xlgp2171
- * @version 1.1.190220
+ * @version 1.2.190220
  */
 public abstract class AbstractClassPlugin implements IPlugin {
 	private final TupleObject configure = TupleObjectHelper.newObject();
 
-	protected abstract void log(String msg, AbstractException e);
+	protected abstract void log(String msg, BaseException e);
 
 	protected final TupleObject setConfig(TupleObject config) {
 		if (config != null) {
@@ -74,24 +75,25 @@ public abstract class AbstractClassPlugin implements IPlugin {
 	 * @param loader 采用的类加载器,null为默认加载器
 	 * @param initialize 是否加载后调用初始化方法
 	 * @return 加载后的实现类,可用cast方法转换类型
-	 * @throws AbstractException
+	 * @throws UtilityException 插件类型转换异常
+	 * @throws AssertException 参数验证异常
+	 * @throws ToolException 插件不存在或插件初始化异常
 	 */
 	public IPlugin loadPlugin(String key, IPlugin defPlugin, ClassLoader loader, boolean initialize)
-			throws AbstractException {
+			throws ToolException, AssertException, UtilityException {
 		String _classpath = TupleObjectHelper.getString(configure, key, "");
 		try {
 			return load(_classpath, key, defPlugin, loader, initialize, null);
-		} catch (AbstractException e) {
-			if (e.getMessage().startsWith(BasicCodeEnum.MSG_0014.getCode())) {
-				throw e;
-			}
+		} catch (ToolException e) {
+			throw e;
+		} catch (AssertException | UtilityException e) {
 			log(e.getMessage(), e);
 			return load("", key, defPlugin, loader, initialize, e);
 		}
 	}
 
 	protected IPlugin load(String classpath, String defClass, IPlugin defPlugin, ClassLoader loader, boolean initialize,
-			AbstractException e) throws AbstractException {
+			BaseException e) throws ToolException, AssertException, UtilityException {
 		if (StringUtils.isTrimEmpty(classpath)) {
 			if (defPlugin != null) {
 				log(LocaleHelper.toLocaleText(TypeEnum.BASIC, "PLUGIN.LOAD", defPlugin.getId()), null);
@@ -107,14 +109,18 @@ public abstract class AbstractClassPlugin implements IPlugin {
 		return switchPlugin(_tmp, initialize);
 	}
 
-	protected IPlugin switchPlugin(IPlugin instance, boolean initialize) throws AbstractException {
+	protected IPlugin switchPlugin(IPlugin instance, boolean initialize) throws ToolException {
 		PluginContext.getInstance().register(getClass(), instance);
 		log(LocaleHelper.toLocaleText(TypeEnum.BASIC, "PLUGIN.REGISTER", instance.getId()), null);
 		return initialize ? initPlugin(instance) : instance;
 	}
 
-	protected IPlugin initPlugin(IPlugin instance) throws AbstractException {
-		instance.initialize(copyConfig());
+	protected IPlugin initPlugin(IPlugin instance) throws ToolException {
+		try {
+			instance.initialize(copyConfig());
+		} catch (AbstractException e) {
+			throw new ToolException(BasicCodeEnum.MSG_0020, e.getMessage(), e);
+		}
 		log(LocaleHelper.toLocaleText(TypeEnum.BASIC, "PLUGIN.INIT", instance.getId()), null);
 		return instance;
 	}
