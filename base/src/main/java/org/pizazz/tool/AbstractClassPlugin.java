@@ -13,7 +13,6 @@ import org.pizazz.context.PluginContext;
 import org.pizazz.data.TupleObject;
 import org.pizazz.exception.AbstractException;
 import org.pizazz.exception.AssertException;
-import org.pizazz.exception.BaseException;
 import org.pizazz.exception.ToolException;
 import org.pizazz.exception.UtilityException;
 import org.pizazz.message.BasicCodeEnum;
@@ -28,7 +27,7 @@ import org.pizazz.message.TypeEnum;
 public abstract class AbstractClassPlugin implements IPlugin {
 	private final TupleObject configure = TupleObjectHelper.newObject();
 
-	protected abstract void log(String msg, BaseException e);
+	protected abstract void log(String msg, AbstractException e);
 
 	protected final TupleObject setConfig(TupleObject config) {
 		if (config != null) {
@@ -82,7 +81,7 @@ public abstract class AbstractClassPlugin implements IPlugin {
 		String _classpath = TupleObjectHelper.getString(configure, key, "");
 		try {
 			return load(_classpath, key, defPlugin, loader, initialize, null);
-		} catch (BaseException e) {
+		} catch (AbstractException e) {
 			if (e.getMessage().startsWith(BasicCodeEnum.MSG_0014.getCode())) {
 				throw e;
 			}
@@ -92,7 +91,7 @@ public abstract class AbstractClassPlugin implements IPlugin {
 	}
 
 	protected IPlugin load(String classpath, String defClass, IPlugin defPlugin, ClassLoader loader, boolean initialize,
-			BaseException e) throws AbstractException {
+			AbstractException e) throws AbstractException {
 		if (StringUtils.isTrimEmpty(classpath)) {
 			if (defPlugin != null) {
 				log(LocaleHelper.toLocaleText(TypeEnum.BASIC, "PLUGIN.LOAD", defPlugin.getId()), null);
