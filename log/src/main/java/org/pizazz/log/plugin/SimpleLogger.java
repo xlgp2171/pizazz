@@ -15,7 +15,7 @@ import org.pizazz.log.ref.LogEnum;
  * 简单日志实现组件
  * 
  * @author xlgp2171
- * @version 1.0.181219
+ * @version 1.0.190220
  */
 public class SimpleLogger extends AbstractLogger implements Logger {
 
@@ -109,6 +109,6 @@ public class SimpleLogger extends AbstractLogger implements Logger {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 	}
 }

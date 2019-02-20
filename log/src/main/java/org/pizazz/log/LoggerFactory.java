@@ -13,6 +13,7 @@ import org.pizazz.common.StringUtils;
 import org.pizazz.common.SystemUtils;
 import org.pizazz.common.TupleObjectHelper;
 import org.pizazz.data.TupleObject;
+import org.pizazz.exception.AbstractException;
 import org.pizazz.exception.BaseException;
 import org.pizazz.log.exception.LogError;
 import org.pizazz.log.record.RecordRunnable;
@@ -20,13 +21,14 @@ import org.pizazz.log.ref.ILoggerAdapter;
 import org.pizazz.log.ref.LogEnum;
 import org.pizazz.log.ref.TypeEnum;
 import org.pizazz.message.BasicCodeEnum;
+import org.pizazz.message.ErrorCodeEnum;
 import org.pizazz.tool.AbstractClassPlugin;
 
 /**
  * 日志输出器工厂
  * 
  * @author xlgp2171
- * @version 1.0.181220
+ * @version 1.1.190220
  */
 public class LoggerFactory {
 	// 日志适配器
@@ -88,7 +90,7 @@ public class LoggerFactory {
 		TupleObject _config = TupleObjectHelper.newObject(2).append("$CLASS", _clazz).append("$RESOURCE", _resource);
 		try {
 			factory.initialize(_config);
-		} catch (BaseException e) {
+		} catch (AbstractException e) {
 			SystemUtils.destroy(RECORD, Duration.ZERO);
 			throw new LogError(BasicCodeEnum.MSG_0019, e.getMessage(), e);
 		}
@@ -187,7 +189,7 @@ public class LoggerFactory {
 		}
 
 		@Override
-		public void initialize(TupleObject config) throws BaseException {
+		public void initialize(TupleObject config) throws AbstractException {
 			setConfig(config);
 			// 首先加载simple logger
 			// "org.pizazz.log.plugin.simple.SimpleAdapter"
@@ -195,13 +197,13 @@ public class LoggerFactory {
 			try {
 				ADAPTER = ILoggerAdapter.class.cast(_tmp);
 			} catch (ClassCastException e) {
-				throw new BaseException(BasicCodeEnum.MSG_0004,
-						LocaleHelper.toLocaleText(TypeEnum.LOG, "PLUGIN.CAST", ILoggerAdapter.class.getName()));
+				throw new LogError(ErrorCodeEnum.ERR_0002,
+						LocaleHelper.toLocaleText(TypeEnum.LOG, "PLUGIN.CAST", ILoggerAdapter.class.getName()), e);
 			}
 		}
 
 		@Override
-		public void destroy(Duration timeout) throws BaseException {
+		public void destroy(Duration timeout) {
 			unloadPlugin(ADAPTER, timeout);
 		}
 

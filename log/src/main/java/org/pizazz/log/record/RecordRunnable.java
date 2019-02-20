@@ -23,7 +23,7 @@ import org.pizazz.tool.PThreadFactory;
  * 日志监控线程
  * 
  * @author xlgp2171
- * @version 1.0.181220
+ * @version 1.1.190220
  */
 public class RecordRunnable extends AbstractClassPlugin implements IPlugin, IRunnable {
 	// 日志信息缓存
@@ -124,7 +124,7 @@ public class RecordRunnable extends AbstractClassPlugin implements IPlugin, IRun
 	 * @param timeout 销毁等待时间
 	 */
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 		loop.set(false);
 
 		if (record != null) {

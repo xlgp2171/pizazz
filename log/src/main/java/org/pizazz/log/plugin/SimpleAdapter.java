@@ -15,7 +15,7 @@ import org.pizazz.log.ref.LogEnum;
  * 简单日志适配器组件
  * 
  * @author xlgp2171
- * @version 1.0.181219
+ * @version 1.0.190220
  */
 public class SimpleAdapter implements ILoggerAdapter {
 	@Override
@@ -52,6 +52,6 @@ public class SimpleAdapter implements ILoggerAdapter {
 	}
 
 	@Override
-	public void destroy(Duration timeout) throws BaseException {
+	public void destroy(Duration timeout) {
 	}
 }
