@@ -28,14 +28,16 @@ import org.pizazz.message.TypeEnum;
  * 维持容器组件
  *
  * @author xlgp2171
- * @version 1.4.190220
+ * @version 1.5.190222
  */
 public class SocketContainer extends AbstractContainer<String> {
-	public static final String KEY_CONTAINER_PORT = "$PORT";
-	public static final String KEY_CONTAINER_KEY = "$KEY";
+	public static final String CONTAINER_PORT = "port";
+	public static final String CONTAINER_KEY = "key";
+	public static final String COMMAND_LENGTH = "cmd.len";
 
 	private DatagramSocket socket;
 	private Thread hook;
+	private IMessageOutput<byte[]> command;
 	private final AtomicBoolean closed = new AtomicBoolean(false);
 
 	public SocketContainer(IPlugin plugin, TupleObject config, IMessageOutput<String> output) throws AssertException {
@@ -50,16 +52,27 @@ public class SocketContainer extends AbstractContainer<String> {
 	@Override
 	public void initialize(TupleObject config) throws ToolException {
 		super.initialize(config);
-		int _port = TupleObjectHelper.getInt(config, "port", -1);
-		String _key = TupleObjectHelper.getString(config, "key", StringUtils.EMPTY);
+		// -Dpiz.sc.port
+		int _port = TupleObjectHelper.getInt(config, CONTAINER_PORT, -1);
+		// －Dpiz.sc.key
+		String _key = TupleObjectHelper.getString(config, CONTAINER_KEY, StringUtils.EMPTY);
+		// -Dpiz.sc.cmd.len
+		int _cmdLen = TupleObjectHelper.getInt(config, COMMAND_LENGTH, -1);
 		properties_
-				.append(KEY_CONTAINER_PORT,
-						_port == -1 ? ConfigureHelper.getConfig(TypeEnum.BASIC, Constant.NAMING_SHORT + ".kc.port",
-								"DEF_CONTAINER_PORT", -1) : _port)
-				.append(KEY_CONTAINER_KEY,
+				.append(Constant.ATTRIBUTE_PREFIX + CONTAINER_PORT,
+						_port == -1
+								? ConfigureHelper.getConfig(TypeEnum.BASIC,
+										Constant.NAMING_SHORT + ".sc." + CONTAINER_PORT, "DEF_CONTAINER_PORT", -1)
+								: _port)
+				.append(Constant.ATTRIBUTE_PREFIX + CONTAINER_KEY,
 						StringUtils.isTrimEmpty(_key) ? ConfigureHelper.getConfig(TypeEnum.BASIC,
-								Constant.NAMING_SHORT + ".kc.key", "DEF_CONTAINER_KEY", SystemUtils.newUUIDSimple())
-								: _key);
+								Constant.NAMING_SHORT + ".sc." + CONTAINER_KEY, "DEF_CONTAINER_KEY",
+								SystemUtils.newUUIDSimple()) : _key)
+				.append(Constant.ATTRIBUTE_PREFIX + COMMAND_LENGTH,
+						_cmdLen == -1
+								? ConfigureHelper.getConfig(TypeEnum.BASIC,
+										Constant.NAMING_SHORT + ".sc." + COMMAND_LENGTH, "DEF_COMMAND_LENGTH", -1)
+								: _cmdLen);
 	}
 
 	@Override
@@ -70,7 +83,7 @@ public class SocketContainer extends AbstractContainer<String> {
 	@Override
 	public void waitForShutdown() {
 		hook = SystemUtils.addShutdownHook(this, null);
-		int _port = TupleObjectHelper.getInt(properties_, KEY_CONTAINER_PORT, -1);
+		int _port = TupleObjectHelper.getInt(properties_, Constant.ATTRIBUTE_PREFIX + CONTAINER_PORT, -1);
 		// port为0也可以super.waitForShutdown
 		if (_port <= 0) {
 			if (output_.isEnable()) {
@@ -84,7 +97,12 @@ public class SocketContainer extends AbstractContainer<String> {
 	}
 
 	protected void socketWaiting(int port) {
-		String _key = TupleObjectHelper.getString(properties_, KEY_CONTAINER_KEY, Constant.NAMING);
+		String _key = TupleObjectHelper.getString(properties_, Constant.ATTRIBUTE_PREFIX + CONTAINER_KEY,
+				StringUtils.EMPTY);
+		_key = StringUtils.isEmpty(_key) ? Constant.NAMING : _key;
+		int _lenMax = ConfigureHelper.getInt(TypeEnum.BASIC, "DEF_COMMAND_LENGTH_MAX", 1024);
+		int _cmdLen = TupleObjectHelper.getInt(properties_, Constant.ATTRIBUTE_PREFIX + COMMAND_LENGTH, _key.length());
+		_cmdLen = (_cmdLen < _key.length() || _cmdLen > _lenMax) ? _key.length() : _cmdLen;
 		try {
 			socket = new DatagramSocket(port);
 		} catch (SocketException e) {
@@ -92,7 +110,7 @@ public class SocketContainer extends AbstractContainer<String> {
 			throw new BaseError(ErrorCodeEnum.ERR_0003, _msg, e);
 		}
 		// FIXME xlgp2171:若需要DatagramPacket工具，将此处代码移出
-		byte[] _data = new byte[36];
+		byte[] _data = new byte[_cmdLen];
 		DatagramPacket _packet = new DatagramPacket(_data, _data.length);
 
 		if (output_.isEnable()) {
@@ -108,7 +126,8 @@ public class SocketContainer extends AbstractContainer<String> {
 						e.getMessage());
 				throw new BaseError(ErrorCodeEnum.ERR_0004, _msg);
 			}
-			String _tmp = new String(_packet.getData(), SystemUtils.LOCAL_ENCODING).trim();
+			_data = command(_packet.getData());
+			String _tmp = new String(_data, SystemUtils.LOCAL_ENCODING).trim();
 			boolean _valid = _key.equals(_tmp);
 
 			if (output_.isEnable()) {
@@ -117,8 +136,24 @@ public class SocketContainer extends AbstractContainer<String> {
 			if (_valid) {
 				break;
 			}
-			_packet.setData(new byte[36]);
+			_packet.setData(new byte[_cmdLen]);
 		}
+	}
+
+	protected byte[] command(byte[] data) {
+		if (command != null) {
+			try {
+				command.write(data);
+			} catch (Exception e) {
+				output_.throwException(e);
+			}
+		}
+		return data;
+	}
+
+	public SocketContainer setCommand(IMessageOutput<byte[]> command) {
+		this.command = command;
+		return this;
 	}
 
 	@Override

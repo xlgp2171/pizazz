@@ -25,10 +25,10 @@ import org.pizazz.message.TypeEnum;
  * @param <T> 输出类型
  *
  * @author xlgp2171
- * @version 1.1.190220
+ * @version 1.2.190222
  */
 public abstract class AbstractContainer<T> implements IPlugin {
-	public static final String KEY_CONTAINER_TIMEOUT = "$TIMEOUT";
+	public static final String CONTAINER_TIMEOUT = "timeout";
 
 	protected final TupleObject properties_;
 	protected final IPlugin plugin_;
@@ -64,8 +64,8 @@ public abstract class AbstractContainer<T> implements IPlugin {
 
 	@Override
 	public void initialize(TupleObject config) throws ToolException {
-		properties_.append(KEY_CONTAINER_TIMEOUT, ConfigureHelper.getConfig(TypeEnum.BASIC,
-				Constant.NAMING_SHORT + ".kc.timeout", "DEF_CONTAINER_TIMEOUT", "30000"));
+		properties_.append(CONTAINER_TIMEOUT, ConfigureHelper.getConfig(TypeEnum.BASIC,
+				Constant.NAMING_SHORT + ".sc." + CONTAINER_TIMEOUT, "DEF_CONTAINER_TIMEOUT", "30000"));
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public abstract class AbstractContainer<T> implements IPlugin {
 
 		if (timeout == null || timeout.isNegative()) {
 			int _maxTimeout = ConfigureHelper.getInt(TypeEnum.BASIC, "DEF_CONTAINER_TIMEOUT_MAX", 60000);
-			int _exitTime = TupleObjectHelper.getInt(properties_, KEY_CONTAINER_TIMEOUT, 20000);
+			int _exitTime = TupleObjectHelper.getInt(properties_, CONTAINER_TIMEOUT, 20000);
 			timeout = Duration.ofMillis((_exitTime > 0 && _exitTime <= _maxTimeout) ? _exitTime : _maxTimeout);
 		}
 		if (timeout.isZero()) {
