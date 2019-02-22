@@ -9,6 +9,7 @@ client:
   request.timeout.ms: 30000
   enable.idempotence: false
   max.in.flight.requests.per.connection: 15
+  partitioner.class=org.pizazz.kafka.support.RandomPartitioner
 config:
   mode: ASYNC
   transactionProcessor:
