@@ -6,7 +6,7 @@ import org.pizazz.message.ref.IMessageCode;
  * 内核错误识别码
  * 
  * @author xlgp2171
- * @version 1.1.190122
+ * @version 1.2.190222
  */
 public enum ErrorCodeEnum implements IMessageCode {
 	/** 未知的异常 */
@@ -20,7 +20,9 @@ public enum ErrorCodeEnum implements IMessageCode {
 	/** 必要对外连接接收数据错误 */
 	ERR_0004("ERR0004#"),
 	/** 必要实例为空值 */
-	ERR_0005("ERR0005#");
+	ERR_0005("ERR0005#"),
+	/** 理论认为不会发生的异常 */
+	ERR_0006("ERR0006#");
 
 	private String code;
 
