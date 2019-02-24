@@ -70,6 +70,15 @@ public class AssertUtils {
 		}
 	}
 
+	public static void assertEquals(String method, long left, long right) throws AssertException {
+		assertNotNull("assertEquals", left, right);
+
+		if (left != right) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.EQUALS", method, "value");
+			throw new AssertException(BasicCodeEnum.MSG_0005, _msg);
+		}
+	}
+
 	public static void assertLength(String method, int index, String target, int length) throws AssertException {
 		if (target == null || target.length() != length) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.LENGTH", method, index, length);
