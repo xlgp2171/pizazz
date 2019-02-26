@@ -80,4 +80,9 @@ public class RedissonProcessor implements IRedisProcessor {
 	public boolean del(String key) throws RedisException {
 		return tryMethod("del", () -> instance.getBinaryStream(key).delete());
 	}
+
+	@Override
+	public Iterable<String> keys(String pattern) throws RedisException {
+		return tryMethod("del", () -> instance.getKeys().getKeysByPattern(pattern));
+	}
 }

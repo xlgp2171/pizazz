@@ -69,12 +69,16 @@ public class JedisProcessor implements IRedisProcessor {
 
 	@Override
 	public String hdel(String key, String field) throws RedisException {
-		return StringUtils.of(tryMethod("bset", _item -> _item.hdel(key, field)));
+		return StringUtils.of(tryMethod("hdel", _item -> _item.hdel(key, field)));
 	}
 
 	@Override
 	public boolean del(String key) throws RedisException {
-		return tryMethod("bset", _item -> _item.del(key)) > 0;
+		return tryMethod("del", _item -> _item.del(key)) > 0;
 	}
 
+	@Override
+	public Iterable<String> keys(String pattern) throws RedisException {
+		return tryMethod("keys", _item -> _item.keys(pattern));
+	}
 }

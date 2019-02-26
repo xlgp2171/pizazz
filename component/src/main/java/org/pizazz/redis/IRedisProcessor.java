@@ -17,4 +17,6 @@ public interface IRedisProcessor {
 
 	public String hdel(String key, String field) throws RedisException;
 	public boolean del(String key) throws RedisException;
+
+	public Iterable<String> keys(String pattern) throws RedisException;
 }

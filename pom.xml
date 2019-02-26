@@ -12,6 +12,8 @@
 		<module>temp</module>
 		<module>component</module>
 		<module>algorithm</module>
+		<module>tool</module>
+		<module>app</module>
 	</modules>
 
 	<properties>
