@@ -230,7 +230,7 @@ public class ClassUtils {
 	/**
 	 * 识别基本类，将基本类转换为包装类型
 	 * 
-	 * @param argument
+	 * @param target
 	 * @return
 	 * @throws AssertException
 	 */

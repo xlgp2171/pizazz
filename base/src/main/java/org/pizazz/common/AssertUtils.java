@@ -8,19 +8,26 @@ import org.pizazz.message.TypeEnum;
  * 断言工具
  * 
  * @author xlgp2171
- * @version 1.1.190211
+ * @version 1.2.190226
  */
 public class AssertUtils {
 
-	public static void assertNotNull(String method, Object... argument) throws AssertException {
-		if (ArrayUtils.isEmpty(argument)) {
+	public static void assertNotNull(String method, Object... arguments) throws AssertException {
+		if (ArrayUtils.isEmpty(arguments)) {
 			return;
 		}
-		for (int _i = 0; _i < argument.length; _i++) {
-			if (argument[_i] == null) {
+		for (int _i = 0; _i < arguments.length; _i++) {
+			if (arguments[_i] == null) {
 				String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, _i + 1);
 				throw new AssertException(BasicCodeEnum.MSG_0001, _msg);
 			}
+		}
+	}
+
+	public static void assertNotEmpty(String method, int index, String target) throws AssertException {
+		if (StringUtils.isTrimEmpty(target)) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.EMPTY", method, index);
+			throw new AssertException(BasicCodeEnum.MSG_0001, _msg);
 		}
 	}
 
