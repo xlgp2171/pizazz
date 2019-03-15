@@ -23,7 +23,7 @@ import org.pizazz.message.TypeEnum;
  * 通用加载器组件
  * 
  * @author xlgp2171
- * @version 1.2.190220
+ * @version 1.2.190315
  */
 public abstract class AbstractClassPlugin implements IPlugin {
 	private final TupleObject configure = TupleObjectHelper.newObject();
@@ -106,6 +106,7 @@ public abstract class AbstractClassPlugin implements IPlugin {
 			classpath = defClass;
 		}
 		IPlugin _tmp = ClassUtils.newClass(classpath, loader, IPlugin.class);
+		log(LocaleHelper.toLocaleText(TypeEnum.BASIC, "PLUGIN.LOAD", _tmp.getId()), null);
 		return switchPlugin(_tmp, initialize);
 	}
 
