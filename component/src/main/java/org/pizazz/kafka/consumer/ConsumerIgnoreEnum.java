@@ -13,7 +13,7 @@ public enum ConsumerIgnoreEnum {
 	/** 忽略offset异常 */
 	OFFSET(true, false),
 	/** 无任何忽略 */
-	NODE(true, true);
+	NONE(true, true);
 	
 	private final boolean offset;
 	private final boolean consume;

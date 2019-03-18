@@ -56,6 +56,10 @@ public class ConfigConvertor implements ICloseable {
 		}
 	}
 
+	public String getTemplateName() {
+		return template;
+	}
+
 	public String configFromKeys(String... keys) throws AssertException  {
 		AssertUtils.assertNotNull("configFromKeys", keys, 0);
 		return TupleObjectHelper.getNestedString(config, null, keys);
@@ -110,7 +114,7 @@ public class ConfigConvertor implements ICloseable {
 			} catch (AssertException | KafkaException e) {
 			}
 		}
-		return ConsumerIgnoreEnum.NODE;
+		return ConsumerIgnoreEnum.NONE;
 	}
 
 	public Map<String, Object> kafkaConfig() {
