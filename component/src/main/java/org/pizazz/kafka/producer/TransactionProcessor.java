@@ -30,7 +30,7 @@ public class TransactionProcessor implements ITransactionProcessor {
 				producer.initTransactions();
 				LOGGER.info("producer init transactions");
 			} catch (Exception e) {
-				throw new KafkaException(CodeEnum.KFK_0013, "about transaction:" + e.getMessage(), e);
+				throw new KafkaException(CodeEnum.KFK_0013, "init transaction:" + e.getMessage(), e);
 			}
 		}
 	}
