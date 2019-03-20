@@ -37,7 +37,7 @@ public class SequenceAdapter implements IProcessAdapter {
 	}
 
 	@Override
-	public void accept(Bridge bridge, ConsumerIgnoreEnum ignore) throws KafkaException {
+	public void accept(IBridge bridge, ConsumerIgnoreEnum ignore) throws KafkaException {
 		try {
 			bridge.passing();
 

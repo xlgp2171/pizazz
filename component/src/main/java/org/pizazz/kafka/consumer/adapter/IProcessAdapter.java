@@ -9,7 +9,7 @@ public interface IProcessAdapter extends IPlugin {
 
 	public void set(ConsumerModeEnum mode) throws KafkaException;
 
-	public void accept(Bridge bridge, ConsumerIgnoreEnum ignore) throws KafkaException;
+	public void accept(IBridge bridge, ConsumerIgnoreEnum ignore) throws KafkaException;
 
 	public String monitor();
 }

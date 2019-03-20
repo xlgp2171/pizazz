@@ -11,7 +11,7 @@ import org.pizazz.exception.BaseException;
 import org.pizazz.exception.ToolException;
 import org.pizazz.exception.UtilityException;
 import org.pizazz.kafka.KafkaConstant;
-import org.pizazz.kafka.consumer.adapter.Bridge;
+import org.pizazz.kafka.consumer.adapter.IBridge;
 import org.pizazz.kafka.consumer.adapter.IProcessAdapter;
 import org.pizazz.kafka.consumer.adapter.SequenceAdapter;
 import org.pizazz.kafka.exception.KafkaException;
@@ -51,7 +51,7 @@ public class DataProcessor<K, V> extends AbstractClassPlugin {
 
 	public void consume(KafkaConsumer<K, V> consumer, ConsumerRecord<K, V> record, IDataExecutor<K, V> executor)
 			throws KafkaException {
-		adapter.accept(new Bridge() {
+		adapter.accept(new IBridge() {
 			@Override
 			public String getId() {
 				return new StringBuilder(record.topic()).append(KafkaConstant.SEPARATOR).append(record.partition())

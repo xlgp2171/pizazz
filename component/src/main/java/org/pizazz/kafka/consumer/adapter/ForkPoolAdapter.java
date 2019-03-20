@@ -41,7 +41,7 @@ public class ForkPoolAdapter implements IProcessAdapter {
 	}
 
 	@Override
-	public void accept(Bridge bridge, ConsumerIgnoreEnum ignore) throws KafkaException {
+	public void accept(IBridge bridge, ConsumerIgnoreEnum ignore) throws KafkaException {
 		ForkJoinTask<?> _task = ForkJoinTask.adapt(new Runnable() {
 			@Override
 			public void run() {
