@@ -33,7 +33,7 @@ import org.pizazz.message.TypeEnum;
  * 维持容器组件
  *
  * @author xlgp2171
- * @version 1.5.190222
+ * @version 1.6.190326
  */
 public class SocketContainer extends AbstractContainer<String> {
 	public static final String CONTAINER_HOST = "host";
@@ -71,7 +71,7 @@ public class SocketContainer extends AbstractContainer<String> {
 						StringUtils.isTrimEmpty(_host) ? SystemUtils.getSystemProperty(
 								Constant.NAMING_SHORT + ".sc." + CONTAINER_HOST, StringUtils.EMPTY) : _host)
 				.append(Constant.ATTRIBUTE_PREFIX + CONTAINER_PORT,
-						_port == -1
+						_port <= 0
 								? ConfigureHelper.getConfig(TypeEnum.BASIC,
 										Constant.NAMING_SHORT + ".sc." + CONTAINER_PORT, "DEF_CONTAINER_PORT", -1)
 								: _port)
@@ -80,7 +80,7 @@ public class SocketContainer extends AbstractContainer<String> {
 								Constant.NAMING_SHORT + ".sc." + CONTAINER_KEY, "DEF_CONTAINER_KEY",
 								SystemUtils.newUUIDSimple()) : _key)
 				.append(Constant.ATTRIBUTE_PREFIX + COMMAND_LENGTH,
-						_cmdLen == -1
+						_cmdLen <= 0
 								? ConfigureHelper.getConfig(TypeEnum.BASIC,
 										Constant.NAMING_SHORT + ".sc." + COMMAND_LENGTH, "DEF_COMMAND_LENGTH", -1)
 								: _cmdLen);
@@ -191,6 +191,13 @@ public class SocketContainer extends AbstractContainer<String> {
 	public SocketContainer setCommand(IMessageOutput<byte[]> command) {
 		this.command = command;
 		return this;
+	}
+
+	@Override
+	protected void log(String msg, Exception e) {
+		if (output_.isEnable()) {
+			output_.write(msg);
+		}
 	}
 
 	@Override

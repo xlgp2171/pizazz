@@ -25,7 +25,7 @@ import org.pizazz.message.TypeEnum;
  * @param <T> 输出类型
  *
  * @author xlgp2171
- * @version 1.2.190222
+ * @version 1.3.190326
  */
 public abstract class AbstractContainer<T> implements IPlugin {
 	public static final String CONTAINER_TIMEOUT = "timeout";
@@ -46,6 +46,8 @@ public abstract class AbstractContainer<T> implements IPlugin {
 			return 0;
 		}
 	};
+
+	protected abstract void log(String msg, Exception e);
 
 	public AbstractContainer(IPlugin plugin, IMessageOutput<T> output) throws AssertException {
 		AssertUtils.assertNotNull("AbstractContainer", plugin, output);
@@ -80,6 +82,7 @@ public abstract class AbstractContainer<T> implements IPlugin {
 		if (timeout.isZero()) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "CONTAINER.DESTROY");
 			SystemUtils.println(System.out, new StringBuffer(_msg));
+			log(_msg, null);
 			try {
 				_status = callable.call();
 			} catch (Exception e) {
@@ -88,22 +91,26 @@ public abstract class AbstractContainer<T> implements IPlugin {
 		} else {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "CONTAINER.DESTROY.TIMEOUT", timeout.toMillis());
 			SystemUtils.println(System.out, new StringBuffer(_msg));
+			log(_msg, null);
 			try {
 				_status = Executors.newSingleThreadExecutor().submit(callable).get(timeout.toMillis(),
 						TimeUnit.MILLISECONDS);
 			} catch (TimeoutException e) {
 				_msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CONTAINER.TIMEOUT", timeout);
 				SystemUtils.println(System.err, new StringBuffer(_msg));
+				log(_msg, e);
 				_status = -2;
 			} catch (Exception e) {
 				_status = -3;
+				output_.throwException(e);
 				e.printStackTrace();
 				Runtime.getRuntime().halt(_status);
-				return;
 			} finally {
 				SystemUtils.destroy(output_, Duration.ZERO);
 			}
 		}
-		Runtime.getRuntime().exit(_status);
+		if (_status != -3) {
+			Runtime.getRuntime().exit(_status);
+		}
 	}
 }
