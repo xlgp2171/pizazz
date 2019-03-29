@@ -33,7 +33,7 @@ import org.pizazz.message.TypeEnum;
  * 维持容器组件
  *
  * @author xlgp2171
- * @version 1.6.190326
+ * @version 1.6.190328
  */
 public class SocketContainer extends AbstractContainer<String> {
 	public static final String CONTAINER_HOST = "host";
@@ -66,12 +66,13 @@ public class SocketContainer extends AbstractContainer<String> {
 		String _key = TupleObjectHelper.getString(config, CONTAINER_KEY, StringUtils.EMPTY);
 		// -Dpiz.sc.cmd.len
 		int _cmdLen = TupleObjectHelper.getInt(config, COMMAND_LENGTH, -1);
+		// length和port的判断值需要判断==-1
 		properties_
 				.append(Constant.ATTRIBUTE_PREFIX + CONTAINER_HOST,
 						StringUtils.isTrimEmpty(_host) ? SystemUtils.getSystemProperty(
 								Constant.NAMING_SHORT + ".sc." + CONTAINER_HOST, StringUtils.EMPTY) : _host)
 				.append(Constant.ATTRIBUTE_PREFIX + CONTAINER_PORT,
-						_port <= 0
+						_port == -1
 								? ConfigureHelper.getConfig(TypeEnum.BASIC,
 										Constant.NAMING_SHORT + ".sc." + CONTAINER_PORT, "DEF_CONTAINER_PORT", -1)
 								: _port)
@@ -80,7 +81,7 @@ public class SocketContainer extends AbstractContainer<String> {
 								Constant.NAMING_SHORT + ".sc." + CONTAINER_KEY, "DEF_CONTAINER_KEY",
 								SystemUtils.newUUIDSimple()) : _key)
 				.append(Constant.ATTRIBUTE_PREFIX + COMMAND_LENGTH,
-						_cmdLen <= 0
+						_cmdLen == -1
 								? ConfigureHelper.getConfig(TypeEnum.BASIC,
 										Constant.NAMING_SHORT + ".sc." + COMMAND_LENGTH, "DEF_COMMAND_LENGTH", -1)
 								: _cmdLen);
