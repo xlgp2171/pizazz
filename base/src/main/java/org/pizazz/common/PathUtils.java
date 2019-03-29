@@ -28,7 +28,7 @@ import org.pizazz.message.TypeEnum;
  * 文件工具
  * 
  * @author xlgp2171
- * @version 1.4.190219
+ * @version 1.5.190328
  */
 public class PathUtils {
 
@@ -38,11 +38,15 @@ public class PathUtils {
 			return new URI(uri);
 		} catch (URISyntaxException e1) {
 			try {
-				return new URI("string", null, uri, null);
+				return new URI(uri.replaceAll(" ", "%20"));
 			} catch (URISyntaxException e2) {
-				String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "BASIC.ERR.PATH.FORMAT", "URI", uri,
-						e2.getMessage());
-				throw new UtilityException(BasicCodeEnum.MSG_0005, _msg, e2);
+				try {
+					return new URI("string", null, uri, null);
+				} catch (URISyntaxException e3) {
+					String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "BASIC.ERR.PATH.FORMAT", "URI", uri,
+							e3.getMessage());
+					throw new UtilityException(BasicCodeEnum.MSG_0005, _msg, e3);
+				}
 			}
 		}
 	}
@@ -111,10 +115,12 @@ public class PathUtils {
 			Files.delete(path);
 		} catch (IOException e) {
 		}
-
 	}
 
-	public static Path[] listPaths(Path dir, Predicate<Path> filter, boolean includeDir) throws UtilityException {
+	public static Path[] listPaths(Path dir, Predicate<Path> filter, boolean includeDir)
+			throws UtilityException, AssertException {
+		AssertUtils.assertNotNull("listPaths", dir);
+
 		try (Stream<Path> _stream = Files.walk(dir)) {
 			Stream<Path> _tmp = _stream;
 
@@ -209,7 +215,6 @@ public class PathUtils {
 	}
 
 	public static Path copyToTemp(Path path, String prefix) throws AssertException, UtilityException {
-		AssertUtils.assertNotNull("copyToTemp", path);
 		return copyToTemp(toByteArray(path), prefix);
 	}
 
