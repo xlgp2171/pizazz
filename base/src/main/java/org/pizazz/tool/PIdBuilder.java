@@ -24,6 +24,10 @@ public class PIdBuilder {
 	}
 
 	public long generate() throws AssertException {
+		return generate(custom);
+	}
+
+	public long generate(short custom) throws AssertException {
 		IdObject _tmp = factory.create(custom);
 		return factory.generate(_tmp);
 	}
