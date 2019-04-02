@@ -23,7 +23,10 @@ public class RedissonAdapter implements IRedisAdapter {
 		TupleObject _config = TupleObjectHelper.getTupleObject(config, RedisConstant.KEY_CLIENT);
 		String _tmp = JSONUtils.toJSON(_config);
 		try {
-			instance = new RedissonInstance(Config.fromJSON(_tmp));
+			Config _conf = Config.fromJSON(_tmp);
+			// reddisson默认使用jackson编码方式，修改为强制兼容其它
+			_conf.setCodec(new org.redisson.client.codec.StringCodec());
+			instance = new RedissonInstance(_conf);
 		} catch (IOException e) {
 			throw new RedisException(CodeEnum.RDS_0001, "config:" + _config, e);
 		}
