@@ -20,16 +20,20 @@ public class RedissonAdapter implements IRedisAdapter {
 
 	@Override
 	public void initialize(TupleObject config) throws RedisException, UtilityException {
-		TupleObject _config = TupleObjectHelper.getTupleObject(config, RedisConstant.KEY_CLIENT);
-		String _tmp = JSONUtils.toJSON(_config);
+		TupleObject _clientC = TupleObjectHelper.getTupleObject(config, RedisConstant.KEY_CLIENT);
+		TupleObject _configC = TupleObjectHelper.getTupleObject(config, RedisConstant.KEY_CONFIG);
+		String _tmp = JSONUtils.toJSON(_clientC);
+		Config _conf = null;
 		try {
-			Config _conf = Config.fromJSON(_tmp);
+			_conf = Config.fromJSON(_tmp);
+		} catch (IOException e) {
+			throw new RedisException(CodeEnum.RDS_0001, "config:" + config, e);
+		}
+		if (!TupleObjectHelper.getBoolean(_configC, "defCodec", false)) {
 			// reddisson默认使用jackson编码方式，修改为强制兼容其它
 			_conf.setCodec(new org.redisson.client.codec.StringCodec());
-			instance = new RedissonInstance(_conf);
-		} catch (IOException e) {
-			throw new RedisException(CodeEnum.RDS_0001, "config:" + _config, e);
 		}
+		instance = new RedissonInstance(_conf);
 	}
 
 	@Override
