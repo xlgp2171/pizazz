@@ -56,7 +56,9 @@ public enum BasicCodeEnum implements IMessageCode {
 	/** 编译异常：CompileException */
 	MSG_0022("MSG0022#"),
 	/** 参数无法找到异常: ArgumentNotFoundException */
-	MSG_0023("MSG0023#");
+	MSG_0023("MSG0023#"),
+	/** 解析异常: ParseException */
+	MSG_0024("MSG0024#");
 
 	private String code;
 
