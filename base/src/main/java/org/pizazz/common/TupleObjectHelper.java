@@ -14,7 +14,7 @@ import org.pizazz.exception.UtilityException;
  * 通用对象工具
  * 
  * @author xlgp2171
- * @version 1.5.190219
+ * @version 1.6.190617
  */
 public class TupleObjectHelper {
 
@@ -290,5 +290,18 @@ public class TupleObjectHelper {
 		System.arraycopy(keys, 0, _tmp, 0, keys.length - 1);
 		target = getNestedTupleObject(target, _tmp);
 		return getList(target, keys[keys.length - 1]);
+	}
+
+	public static TupleObject copy(TupleObject target, String... keys) {
+		if (target == null || ArrayUtils.isEmpty(keys)) {
+			return target.clone();
+		}
+		TupleObject _result = TupleObjectHelper.newObject(keys.length);
+
+		for (String _item : keys) {
+			Object _v = target.get(_item);
+			_result.put(_item, _v);
+		}
+		return _result;
 	}
 }
