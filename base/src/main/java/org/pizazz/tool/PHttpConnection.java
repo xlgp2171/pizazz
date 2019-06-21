@@ -1,15 +1,19 @@
 package org.pizazz.tool;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.List;
+import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -21,6 +25,8 @@ import javax.net.ssl.X509TrustManager;
 import org.pizazz.common.ArrayUtils;
 import org.pizazz.common.AssertUtils;
 import org.pizazz.common.ClassUtils;
+import org.pizazz.common.ConfigureHelper;
+import org.pizazz.common.IOUtils;
 import org.pizazz.common.LocaleHelper;
 import org.pizazz.common.StringUtils;
 import org.pizazz.common.TupleObjectHelper;
@@ -32,12 +38,13 @@ import org.pizazz.exception.UtilityException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.message.TypeEnum;
 import org.pizazz.tool.ref.IHttpConfig;
+import org.pizazz.tool.ref.ResponseObject;
 
 /**
  * HTTP连接组件
  * 
  * @author xlgp2171
- * @version 1.0.190614
+ * @version 1.1.190617
  */
 public class PHttpConnection {
 	private final URL url;
@@ -94,6 +101,9 @@ public class PHttpConnection {
 		}
 		try {
 			_connection.connect();
+		} catch (SocketTimeoutException e) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.HTTP.TIMEOUT", url, e.getMessage());
+			throw new ToolException(BasicCodeEnum.MSG_0025, _msg, e);
 		} catch (IOException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.HTTP.CONNECTION", url, e.getMessage());
 			throw new ToolException(BasicCodeEnum.MSG_0016, _msg, e);
@@ -101,9 +111,42 @@ public class PHttpConnection {
 		return _connection;
 	}
 
+	public ResponseObject response(HttpURLConnection connection) throws ToolException {
+		int _code = 0;
+		try {
+			_code = connection.getResponseCode();
+		} catch (IOException e) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.HTTP.CONNECTION", url, e.getMessage());
+			throw new ToolException(BasicCodeEnum.MSG_0016, _msg, e);
+		}
+		if (_code == HttpURLConnection.HTTP_OK) {
+			Map<String, List<String>> _properties = connection.getRequestProperties();
+			byte[] _data;
+
+			try (InputStream _stream = connection.getInputStream()) {
+				_data = IOUtils.toByteArray(_stream);
+			} catch (IOException | AssertException | UtilityException e) {
+				String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.HTTP.INPUT", e.getMessage());
+				throw new ToolException(BasicCodeEnum.MSG_0003, _msg, e);
+			}
+			disconnect(connection);
+			return new ResponseObject(_code, _data, _properties);
+		} else {
+			return new ResponseObject(_code, null, null);
+		}
+	}
+
+	public void disconnect(HttpURLConnection connection) {
+		connection.disconnect();
+	}
+
 	protected HttpURLConnection createHttpConnection(String method, IHttpConfig config)
 			throws AssertException, UtilityException, ToolException {
 		config = config == null ? new IHttpConfig() {
+			@Override
+			public void set(URL url, HttpURLConnection connection) {
+				connection.setConnectTimeout(ConfigureHelper.getInt(TypeEnum.BASIC, "DEF_HTTP_TIMEOUT", 30000));
+			}
 		} : config;
 		HttpURLConnection _connection = null;
 

@@ -6,7 +6,7 @@ import org.pizazz.message.ref.IMessageCode;
  * 消息识别码
  * 
  * @author xlgp2171
- * @version 1.1.190122
+ * @version 1.1.190617
  */
 public enum BasicCodeEnum implements IMessageCode {
 	/** 预留 */
@@ -58,7 +58,10 @@ public enum BasicCodeEnum implements IMessageCode {
 	/** 参数无法找到异常: ArgumentNotFoundException */
 	MSG_0023("MSG0023#"),
 	/** 解析异常: ParseException */
-	MSG_0024("MSG0024#");
+	MSG_0024("MSG0024#"),
+	/** 超时异常: TimeoutException */
+	MSG_0025("MSG0025#");
+	
 
 	private String code;
 
