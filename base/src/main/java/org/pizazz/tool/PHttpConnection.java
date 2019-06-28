@@ -112,6 +112,10 @@ public class PHttpConnection {
 	}
 
 	public ResponseObject response(HttpURLConnection connection) throws ToolException {
+		return response(connection, HttpURLConnection.HTTP_OK);
+	}
+
+	public ResponseObject response(HttpURLConnection connection, int httpStatus) throws ToolException {
 		int _code = 0;
 		try {
 			_code = connection.getResponseCode();
@@ -119,8 +123,8 @@ public class PHttpConnection {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.HTTP.CONNECTION", url, e.getMessage());
 			throw new ToolException(BasicCodeEnum.MSG_0016, _msg, e);
 		}
-		if (_code == HttpURLConnection.HTTP_OK) {
-			Map<String, List<String>> _properties = connection.getRequestProperties();
+		if (_code == httpStatus) {
+			Map<String, List<String>> _properties = connection.getHeaderFields();
 			byte[] _data;
 
 			try (InputStream _stream = connection.getInputStream()) {
@@ -218,7 +222,6 @@ public class PHttpConnection {
 		return new HostnameVerifier() {
 			@Override
 			public boolean verify(String s, SSLSession sslsession) {
-				System.err.println(s);
 				return true;
 			}
 		};
