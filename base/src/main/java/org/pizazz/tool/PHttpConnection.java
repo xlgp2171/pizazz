@@ -132,10 +132,12 @@ public class PHttpConnection {
 			} catch (IOException | AssertException | UtilityException e) {
 				String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.HTTP.INPUT", e.getMessage());
 				throw new ToolException(BasicCodeEnum.MSG_0003, _msg, e);
+			} finally {
+				disconnect(connection);
 			}
-			disconnect(connection);
 			return new ResponseObject(_code, _data, _properties);
 		} else {
+			disconnect(connection);
 			return new ResponseObject(_code, null, null);
 		}
 	}
@@ -225,5 +227,9 @@ public class PHttpConnection {
 				return true;
 			}
 		};
+	}
+
+	public URL getUrl() {
+		return url;
 	}
 }
