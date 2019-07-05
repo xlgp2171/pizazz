@@ -152,6 +152,7 @@ public class PHttpConnection {
 			@Override
 			public void set(URL url, HttpURLConnection connection) {
 				connection.setConnectTimeout(ConfigureHelper.getInt(TypeEnum.BASIC, "DEF_HTTP_TIMEOUT", 30000));
+				connection.setReadTimeout(ConfigureHelper.getInt(TypeEnum.BASIC, "DEF_HTTP_TIMEOUT", 30000));
 			}
 		} : config;
 		HttpURLConnection _connection = null;
