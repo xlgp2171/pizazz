@@ -44,7 +44,7 @@ import org.pizazz.tool.ref.ResponseObject;
  * HTTP连接组件
  * 
  * @author xlgp2171
- * @version 1.1.190617
+ * @version 1.2.190718
  */
 public class PHttpConnection {
 	private final URL url;
@@ -64,7 +64,12 @@ public class PHttpConnection {
 	}
 
 	public HttpURLConnection connect() throws BaseException {
-		return connect("GET", TupleObjectHelper.emptyObject(), null, null);
+		return connect("GET", TupleObjectHelper.emptyObject(), null);
+	}
+
+	public HttpURLConnection connect(String method, TupleObject headers, byte[] data)
+			throws AssertException, UtilityException, ToolException {
+		return connect(method, headers, data, null);
 	}
 
 	/**
@@ -148,13 +153,7 @@ public class PHttpConnection {
 
 	protected HttpURLConnection createHttpConnection(String method, IHttpConfig config)
 			throws AssertException, UtilityException, ToolException {
-		config = config == null ? new IHttpConfig() {
-			@Override
-			public void set(URL url, HttpURLConnection connection) {
-				connection.setConnectTimeout(ConfigureHelper.getInt(TypeEnum.BASIC, "DEF_HTTP_TIMEOUT", 30000));
-				connection.setReadTimeout(ConfigureHelper.getInt(TypeEnum.BASIC, "DEF_HTTP_TIMEOUT", 30000));
-			}
-		} : config;
+		config = config == null ? new DefaultHttpConfig() : config;
 		HttpURLConnection _connection = null;
 
 		if ("https".equalsIgnoreCase(url.getProtocol())) {
@@ -232,5 +231,16 @@ public class PHttpConnection {
 
 	public URL getUrl() {
 		return url;
+	}
+
+	/**
+	 * 为方便外部继承使用
+	 */
+	public static class DefaultHttpConfig implements IHttpConfig {
+		@Override
+		public void set(URL url, HttpURLConnection connection) {
+			connection.setConnectTimeout(ConfigureHelper.getInt(TypeEnum.BASIC, "DEF_HTTP_TIMEOUT", 30000));
+			connection.setReadTimeout(ConfigureHelper.getInt(TypeEnum.BASIC, "DEF_HTTP_TIMEOUT", 30000));
+		}
 	}
 }
