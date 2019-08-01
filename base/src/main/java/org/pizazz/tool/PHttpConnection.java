@@ -44,7 +44,7 @@ import org.pizazz.tool.ref.ResponseObject;
  * HTTP连接组件
  * 
  * @author xlgp2171
- * @version 1.2.190718
+ * @version 1.3.190801
  */
 public class PHttpConnection {
 	private final URL url;
@@ -116,16 +116,17 @@ public class PHttpConnection {
 		return _connection;
 	}
 
-	public ResponseObject response(HttpURLConnection connection) throws ToolException {
+	public static ResponseObject response(HttpURLConnection connection) throws ToolException {
 		return response(connection, HttpURLConnection.HTTP_OK);
 	}
 
-	public ResponseObject response(HttpURLConnection connection, int httpStatus) throws ToolException {
+	public static ResponseObject response(HttpURLConnection connection, int httpStatus) throws ToolException {
 		int _code = 0;
 		try {
 			_code = connection.getResponseCode();
 		} catch (IOException e) {
-			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.HTTP.CONNECTION", url, e.getMessage());
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.HTTP.CONNECTION", connection.getURL(),
+					e.getMessage());
 			throw new ToolException(BasicCodeEnum.MSG_0016, _msg, e);
 		}
 		if (_code == httpStatus) {
@@ -147,7 +148,7 @@ public class PHttpConnection {
 		}
 	}
 
-	public void disconnect(HttpURLConnection connection) {
+	public static void disconnect(HttpURLConnection connection) {
 		connection.disconnect();
 	}
 
