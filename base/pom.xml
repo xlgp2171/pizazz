@@ -9,7 +9,7 @@
 	<artifactId>piz-base</artifactId>
 
 	<properties>
-		<jackson.version>2.9.6</jackson.version>
+		<jackson.version>2.10.1</jackson.version>
 		<kryo.version>4.0.2</kryo.version>
 		<codec.version>1.11</codec.version>
 	</properties>
