@@ -33,8 +33,26 @@ public class JedisProcessor implements IRedisProcessor {
 	}
 
 	@Override
+	public String set(String key, String value, int timeToLive) throws RedisException {
+		return tryMethod("setT", _item -> {
+			String _tmp = _item.set(key, value);
+			_item.expire(key, timeToLive);
+			return _tmp;
+		});
+	}
+
+	@Override
 	public String bset(String key, byte[] value) throws RedisException {
 		return tryMethod("bset", _item -> _item.set(RedisHelper.fromString(key), value));
+	}
+
+	@Override
+	public String bset(String key, byte[] value, int timeToLive) throws RedisException {
+		return tryMethod("bsetT", _item -> {
+			String _tmp = _item.set(RedisHelper.fromString(key), value);
+			_item.expire(key, timeToLive);
+			return _tmp;
+		});
 	}
 
 	@Override
@@ -43,8 +61,26 @@ public class JedisProcessor implements IRedisProcessor {
 	}
 
 	@Override
+	public String hmset(String key, Map<String, String> map, int timeToLive) throws RedisException {
+		return tryMethod("hmsetT", _item -> {
+			String _tmp = _item.hmset(key, map);
+			_item.expire(key, timeToLive);
+			return _tmp;
+		});
+	}
+
+	@Override
 	public String hset(String key, String field, String value) throws RedisException {
 		return StringUtils.of(tryMethod("hset", _item -> _item.hset(key, field, value)));
+	}
+
+	@Override
+	public String hset(String key, String field, String value, int timeToLive) throws RedisException {
+		return StringUtils.of(tryMethod("hset", _item -> {
+			long _tmp = _item.hset(key, field, value);
+			_item.expire(key, timeToLive);
+			return _tmp;
+		}));
 	}
 
 	@Override
@@ -80,5 +116,10 @@ public class JedisProcessor implements IRedisProcessor {
 	@Override
 	public Iterable<String> keys(String pattern) throws RedisException {
 		return tryMethod("keys", _item -> _item.keys(pattern));
+	}
+
+	@Override
+	public boolean clearExpire(String key) throws RedisException {
+		return tryMethod("clearExpire", _item -> _item.persist(key)) > 0;
 	}
 }
