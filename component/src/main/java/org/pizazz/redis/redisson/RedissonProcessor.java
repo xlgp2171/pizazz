@@ -1,6 +1,7 @@
 package org.pizazz.redis.redisson;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import org.pizazz.redis.IRedisProcessor;
@@ -8,6 +9,8 @@ import org.pizazz.redis.RedisConstant;
 import org.pizazz.redis.RedisHelper;
 import org.pizazz.redis.exception.CodeEnum;
 import org.pizazz.redis.exception.RedisException;
+import org.redisson.api.RBinaryStream;
+import org.redisson.api.RMap;
 
 public class RedissonProcessor implements IRedisProcessor {
 	private final RedissonInstance instance;
@@ -37,8 +40,22 @@ public class RedissonProcessor implements IRedisProcessor {
 	}
 
 	@Override
+	public String set(String key, String value, int timeToLive) throws RedisException {
+		return bset(key, RedisHelper.fromString(value), timeToLive);
+	}
+
+	@Override
 	public String bset(String key, byte[] value) throws RedisException {
 		return tryMethod("bset", () -> instance.getBinaryStream(key).set(value));
+	}
+
+	@Override
+	public String bset(String key, byte[] value, int timeToLive) throws RedisException {
+		return tryMethod("bsetT", () -> {
+			RBinaryStream _tmp = instance.getBinaryStream(key);
+			_tmp.set(value);
+			_tmp.expire(timeToLive, TimeUnit.SECONDS);
+		});
 	}
 
 	@Override
@@ -47,8 +64,26 @@ public class RedissonProcessor implements IRedisProcessor {
 	}
 
 	@Override
+	public String hmset(String key, Map<String, String> map, int timeToLive) throws RedisException {
+		return tryMethod("hmsetT", () -> {
+			RMap<String, String> _tmp = instance.getSSMap(key);
+			_tmp.putAll(map);
+			_tmp.expire(timeToLive, TimeUnit.SECONDS);
+		});
+	}
+
+	@Override
 	public String hset(String key, String field, String value) throws RedisException {
 		return tryMethod("hset", () -> instance.getSSMap(key).put(field, value));
+	}
+
+	@Override
+	public String hset(String key, String field, String value, int timeToLive) throws RedisException {
+		return tryMethod("hsetT", () -> {
+			RMap<String, String> _tmp = instance.getSSMap(key);
+			_tmp.put(field, value);
+			_tmp.expire(timeToLive, TimeUnit.SECONDS);
+		});
 	}
 
 	@Override
@@ -83,6 +118,11 @@ public class RedissonProcessor implements IRedisProcessor {
 
 	@Override
 	public Iterable<String> keys(String pattern) throws RedisException {
-		return tryMethod("del", () -> instance.getKeys().getKeysByPattern(pattern));
+		return tryMethod("keys", () -> instance.getKeys().getKeysByPattern(pattern));
+	}
+
+	@Override
+	public boolean clearExpire(String key) throws RedisException {
+		return tryMethod("clearExpire", () -> instance.getBinaryStream(key).clearExpire());
 	}
 }
