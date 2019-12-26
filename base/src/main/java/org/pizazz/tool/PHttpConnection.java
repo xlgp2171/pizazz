@@ -44,7 +44,7 @@ import org.pizazz.tool.ref.ResponseObject;
  * HTTP连接组件
  * 
  * @author xlgp2171
- * @version 1.1.190617
+ * @version 1.3.190801
  */
 public class PHttpConnection {
 	private final URL url;
@@ -64,7 +64,12 @@ public class PHttpConnection {
 	}
 
 	public HttpURLConnection connect() throws BaseException {
-		return connect("GET", TupleObjectHelper.emptyObject(), null, null);
+		return connect("GET", TupleObjectHelper.emptyObject(), null);
+	}
+
+	public HttpURLConnection connect(String method, TupleObject headers, byte[] data)
+			throws AssertException, UtilityException, ToolException {
+		return connect(method, headers, data, null);
 	}
 
 	/**
@@ -111,16 +116,17 @@ public class PHttpConnection {
 		return _connection;
 	}
 
-	public ResponseObject response(HttpURLConnection connection) throws ToolException {
+	public static ResponseObject response(HttpURLConnection connection) throws ToolException {
 		return response(connection, HttpURLConnection.HTTP_OK);
 	}
 
-	public ResponseObject response(HttpURLConnection connection, int httpStatus) throws ToolException {
+	public static ResponseObject response(HttpURLConnection connection, int httpStatus) throws ToolException {
 		int _code = 0;
 		try {
 			_code = connection.getResponseCode();
 		} catch (IOException e) {
-			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.HTTP.CONNECTION", url, e.getMessage());
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.HTTP.CONNECTION", connection.getURL(),
+					e.getMessage());
 			throw new ToolException(BasicCodeEnum.MSG_0016, _msg, e);
 		}
 		if (_code == httpStatus) {
@@ -132,26 +138,23 @@ public class PHttpConnection {
 			} catch (IOException | AssertException | UtilityException e) {
 				String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.HTTP.INPUT", e.getMessage());
 				throw new ToolException(BasicCodeEnum.MSG_0003, _msg, e);
+			} finally {
+				disconnect(connection);
 			}
-			disconnect(connection);
 			return new ResponseObject(_code, _data, _properties);
 		} else {
+			disconnect(connection);
 			return new ResponseObject(_code, null, null);
 		}
 	}
 
-	public void disconnect(HttpURLConnection connection) {
+	public static void disconnect(HttpURLConnection connection) {
 		connection.disconnect();
 	}
 
 	protected HttpURLConnection createHttpConnection(String method, IHttpConfig config)
 			throws AssertException, UtilityException, ToolException {
-		config = config == null ? new IHttpConfig() {
-			@Override
-			public void set(URL url, HttpURLConnection connection) {
-				connection.setConnectTimeout(ConfigureHelper.getInt(TypeEnum.BASIC, "DEF_HTTP_TIMEOUT", 30000));
-			}
-		} : config;
+		config = config == null ? new DefaultHttpConfig() : config;
 		HttpURLConnection _connection = null;
 
 		if ("https".equalsIgnoreCase(url.getProtocol())) {
@@ -225,5 +228,20 @@ public class PHttpConnection {
 				return true;
 			}
 		};
+	}
+
+	public URL getUrl() {
+		return url;
+	}
+
+	/**
+	 * 为方便外部继承使用
+	 */
+	public static class DefaultHttpConfig implements IHttpConfig {
+		@Override
+		public void set(URL url, HttpURLConnection connection) {
+			connection.setConnectTimeout(ConfigureHelper.getInt(TypeEnum.BASIC, "DEF_HTTP_TIMEOUT", 30000));
+			connection.setReadTimeout(ConfigureHelper.getInt(TypeEnum.BASIC, "DEF_HTTP_TIMEOUT", 30000));
+		}
 	}
 }
