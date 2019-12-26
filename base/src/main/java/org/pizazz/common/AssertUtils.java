@@ -8,7 +8,7 @@ import org.pizazz.message.TypeEnum;
  * 断言工具
  * 
  * @author xlgp2171
- * @version 1.2.190226
+ * @version 1.2.190624
  */
 public class AssertUtils {
 
@@ -33,7 +33,14 @@ public class AssertUtils {
 
 	public static void assertTrue(String method, boolean target) throws AssertException {
 		if (!target) {
-			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.BOOLEAN", method);
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.BOOLEAN", method, "true");
+			throw new AssertException(BasicCodeEnum.MSG_0005, _msg);
+		}
+	}
+
+	public static void assertFalse(String method, boolean target) throws AssertException {
+		if (target) {
+			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.BOOLEAN", method, "false");
 			throw new AssertException(BasicCodeEnum.MSG_0005, _msg);
 		}
 	}
@@ -46,7 +53,7 @@ public class AssertUtils {
 			throw new AssertException(BasicCodeEnum.MSG_0005, _msg);
 		}
 		for (int _i = 0; _i < left.length; _i++) {
-			if (!left[_i].equals(right[_i])) {
+			if ((left[_i] != null && !left[_i].equals(right[_i])) || (left[_i] == null && right[_i] != null)) {
 				String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.EQUALS", method, "value");
 				throw new AssertException(BasicCodeEnum.MSG_0005, _msg);
 			}

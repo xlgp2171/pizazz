@@ -6,7 +6,7 @@ import org.pizazz.exception.AssertException;
  * 字符工具
  * 
  * @author xlgp2171
- * @version 1.1.190219
+ * @version 1.1.190709
  */
 public class CharUtils {
 	public static final char[] HEX_DIGITS = "0123456789abcdef".toCharArray();
@@ -21,6 +21,9 @@ public class CharUtils {
 	}
 
 	public static char toChar(String target, int radix) {
+		if (target.startsWith("\\u")) {
+			target = target.substring(2);
+		}
 		int _tmp = NumberUtils.toInt(target, radix, 0);
 		return (char) _tmp;
 	}

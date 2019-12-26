@@ -8,11 +8,15 @@ import org.pizazz.exception.AssertException;
  * 数值工具
  * 
  * @author xlgp2171
- * @version 1.1.190219
+ * @version 1.1.190709
  */
 public class NumberUtils {
 	/** int判断最大位数 */
 	public static final int PRECISION_INT = 9;
+	/** 0 */
+	public static final Number ZERO = 0;
+	/** 1 */
+	public static final Number ONE = 1;
 
 	public static int toInt(String target, int defValue) {
 		return toInt(target, 10, defValue);

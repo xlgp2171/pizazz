@@ -98,7 +98,7 @@ public class ArrayUtils {
 			_tmp[_length] = element;
 		} else {
 			System.arraycopy(target, 0, _tmp, 0, index);
-			System.arraycopy(target, index - 1, _tmp, index, _length - index);
+			System.arraycopy(target, index, _tmp, index + 1, _length - index);
 			_tmp[index] = element;
 		}
 		return _tmp;
