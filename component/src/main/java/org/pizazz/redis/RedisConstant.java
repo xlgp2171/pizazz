@@ -2,6 +2,7 @@ package org.pizazz.redis;
 
 public class RedisConstant {
 	public static final String STATUS_OK = "OK";
+	public static final String STATUS_FAILED = "FAILED";
 
 	public static final String KEY_REDIS = "redis";
 	public static final String KEY_CLIENT = "client";

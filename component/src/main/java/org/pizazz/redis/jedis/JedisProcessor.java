@@ -1,10 +1,15 @@
 package org.pizazz.redis.jedis;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.pizazz.common.CollectionUtils;
 import org.pizazz.common.StringUtils;
 import org.pizazz.redis.IRedisProcessor;
+import org.pizazz.redis.RedisConstant;
 import org.pizazz.redis.RedisHelper;
 import org.pizazz.redis.exception.CodeEnum;
 import org.pizazz.redis.exception.RedisException;
@@ -84,6 +89,23 @@ public class JedisProcessor implements IRedisProcessor {
 	}
 
 	@Override
+	public String mset(Map<String, String> ksvs) throws RedisException {
+		if (CollectionUtils.isEmpty(ksvs)) {
+			return RedisConstant.STATUS_FAILED;
+		}
+		return tryMethod("mset", _item1 -> {
+			List<String> _ksvs = new ArrayList<>(ksvs.size());
+
+			for (Map.Entry<String, String> _item2 : ksvs.entrySet()) {
+				_ksvs.add(_item2.getKey());
+				_ksvs.add(_item2.getValue());
+			}
+			String[] _tmp = _ksvs.toArray(new String[ksvs.size()]);
+			return _item1.mset(_tmp);
+		});
+	}
+
+	@Override
 	public String get(String key) throws RedisException {
 		return tryMethod("get", _item -> _item.get(key));
 	}
@@ -104,6 +126,17 @@ public class JedisProcessor implements IRedisProcessor {
 	}
 
 	@Override
+	public Map<String, String> mget(String... keys) throws RedisException {
+		List<String> _values = tryMethod("mget", _item -> _item.mget(keys));
+		Map<String, String> _tmp = new HashMap<>();
+
+		for (int _i = 0; _i < keys.length; _i++) {
+			_tmp.put(keys[_i], _values.get(_i));
+		}
+		return _tmp;
+	}
+
+	@Override
 	public String hdel(String key, String field) throws RedisException {
 		return StringUtils.of(tryMethod("hdel", _item -> _item.hdel(key, field)));
 	}
@@ -111,6 +144,11 @@ public class JedisProcessor implements IRedisProcessor {
 	@Override
 	public boolean del(String key) throws RedisException {
 		return tryMethod("del", _item -> _item.del(key)) > 0;
+	}
+
+	@Override
+	public boolean mdel(String... keys) throws RedisException {
+		return tryMethod("mdel", _item -> _item.del(keys)) > 0;
 	}
 
 	@Override

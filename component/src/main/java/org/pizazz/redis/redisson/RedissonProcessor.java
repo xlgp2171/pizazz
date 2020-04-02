@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+import org.pizazz.common.CollectionUtils;
 import org.pizazz.redis.IRedisProcessor;
 import org.pizazz.redis.RedisConstant;
 import org.pizazz.redis.RedisHelper;
@@ -87,6 +88,14 @@ public class RedissonProcessor implements IRedisProcessor {
 	}
 
 	@Override
+	public String mset(Map<String, String> ksvs) throws RedisException {
+		if (CollectionUtils.isEmpty(ksvs)) {
+			return RedisConstant.STATUS_FAILED;
+		}
+		return tryMethod("mset", () -> instance.getBuckets().set(ksvs));
+	}
+
+	@Override
 	public String get(String key) throws RedisException {
 		return RedisHelper.toString(bget(key));
 	}
@@ -107,6 +116,11 @@ public class RedissonProcessor implements IRedisProcessor {
 	}
 
 	@Override
+	public Map<String, String> mget(String... keys) throws RedisException {
+		return tryMethod("mget", () -> instance.getBuckets().get(keys));
+	}
+
+	@Override
 	public String hdel(String key, String field) throws RedisException {
 		return tryMethod("hdel", () -> instance.getSSMap(key).remove(field));
 	}
@@ -114,6 +128,11 @@ public class RedissonProcessor implements IRedisProcessor {
 	@Override
 	public boolean del(String key) throws RedisException {
 		return tryMethod("del", () -> instance.getBinaryStream(key).delete());
+	}
+
+	@Override
+	public boolean mdel(String... keys) throws RedisException {
+		return tryMethod("mdel", () -> instance.getKeys().delete(keys)) > 0;
 	}
 
 	@Override
