@@ -1,9 +1,7 @@
 package org.pizazz.common;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 
-import org.pizazz.common.ArrayUtils;
 import org.pizazz.exception.AssertException;
 import org.pizazz.message.BasicCodeEnum;
 import org.pizazz.message.TypeEnum;
@@ -12,9 +10,11 @@ import org.pizazz.message.TypeEnum;
  * 字节工具
  * 
  * @author xlgp2171
- * @version 1.1.190219
+ * @version 1.2.190709
  */
 public class BytesUtils {
+	public static final byte[] EMPTY = new byte[0];
+	
 	public static byte[] toBytes(int target) {
 		return ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(target).array();
 	}
@@ -39,39 +39,46 @@ public class BytesUtils {
 		return ByteBuffer.wrap(target).getLong();
 	}
 
-	public static byte[] toByteArray(String target, Charset charset) {
-		return target.getBytes(charset);
+	static void addObject(Object target, ByteBuffer buffer) {
+		if (target instanceof ByteBuffer) {
+			buffer.put((ByteBuffer) target);
+		} else if (target instanceof Integer) {
+			buffer.putInt((int) target);
+		} else if (target instanceof Byte) {
+			buffer.put((byte) target);
+		} else if (target instanceof Short) {
+			buffer.putShort((short) target);
+		} else if (target instanceof byte[]) {
+			buffer.put((byte[]) target);
+		} else if (target instanceof Character) {
+			buffer.putChar((char) target);
+		} else if (target instanceof Double) {
+			buffer.putDouble((double) target);
+		} else if (target instanceof Float) {
+			buffer.putFloat((float) target);
+		} else if (target instanceof Long) {
+			buffer.putLong((long) target);
+		}
 	}
 
-	public static String toString(byte[] target, Charset charset) {
-		return new String(target, charset);
-	}
+	public static byte[] buffer(Object... data) throws AssertException {
+		int _length = 0;
+		data = ArrayUtils.nullToEmpty(data);
 
-	public static byte[] buffer(int length, Object... data) {
-		ByteBuffer _tmp = ByteBuffer.allocate(length > 0 ? length : 0);
+		if (data.length == 0) {
+			return BytesUtils.EMPTY;
+		}
+		for (int _i = 0; _i < data.length; _i++) {
+			if (data[_i] == null) {
+				String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", "buffer", _i);
+				throw new AssertException(BasicCodeEnum.MSG_0001, _msg);
+			}
+			_length += ObjectUtils.getObjectLength(data[_i]);
+		}
+		ByteBuffer _tmp = ByteBuffer.allocate(_length);
 
 		for (Object _item : data) {
-			if (_item instanceof ByteBuffer) {
-				_tmp.put((ByteBuffer) _item);
-			} else if (_item instanceof Integer) {
-				_tmp.putInt((int) _item);
-			} else if (_item instanceof Byte) {
-				_tmp.put((byte) _item);
-			} else if (_item instanceof Short) {
-				_tmp.putShort((short) _item);
-			} else if (_item instanceof byte[]) {
-				_tmp.put((byte[]) _item);
-			} else if (_item instanceof Short) {
-				_tmp.putShort((short) _item);
-			} else if (_item instanceof Character) {
-				_tmp.putChar((char) _item);
-			} else if (_item instanceof Double) {
-				_tmp.putDouble((double) _item);
-			} else if (_item instanceof Float) {
-				_tmp.putFloat((float) _item);
-			} else if (_item instanceof Long) {
-				_tmp.putLong((long) _item);
-			}
+			addObject(_item, _tmp);
 		}
 		return _tmp.array();
 	}
