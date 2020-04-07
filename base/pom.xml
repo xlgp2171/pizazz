@@ -9,9 +9,10 @@
 	<artifactId>piz-base</artifactId>
 
 	<properties>
-		<jackson.version>2.9.6</jackson.version>
+		<fastjson.version>1.2.68</fastjson.version>
+		<jackson.version>2.10.3</jackson.version>
 		<kryo.version>4.0.2</kryo.version>
-		<codec.version>1.11</codec.version>
+		<codec.version>1.14</codec.version>
 	</properties>
 
 	<dependencies>
@@ -24,6 +25,11 @@
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-yaml</artifactId>
 			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>${fastjson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.esotericsoftware</groupId>
