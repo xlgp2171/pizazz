@@ -11,10 +11,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Iterator;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -28,7 +28,7 @@ import org.pizazz.message.TypeEnum;
  * 文件工具
  * 
  * @author xlgp2171
- * @version 1.5.190328
+ * @version 1.6.200407
  */
 public class PathUtils {
 
@@ -145,16 +145,16 @@ public class PathUtils {
 	}
 
 	static void deleteDirectory(Path dir) throws AssertException, UtilityException {
-		DirectoryStream<Path> _tmp;
-		try {
-			_tmp = Files.newDirectoryStream(dir);
+		try (Stream<Path> _tmp = Files.list(dir)) {
+			Iterator<Path> _iterator = _tmp.iterator();
+
+			while (_iterator.hasNext()) {
+				delete(_iterator.next(), true);
+			}
 		} catch (IOException e) {
 			String _msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO.PATH", dir.toAbsolutePath(),
 					e.getMessage());
 			throw new UtilityException(BasicCodeEnum.MSG_0003, _msg, e);
-		}
-		for (Path _item : _tmp) {
-			delete(_item, true);
 		}
 	}
 
