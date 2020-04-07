@@ -13,7 +13,7 @@ import org.pizazz.message.TypeEnum;
  * 使用jackson组件
  * 
  * @author xlgp2171
- * @version 1.1.190219
+ * @version 1.2.200407
  */
 public class JSONUtils {
 
@@ -36,7 +36,9 @@ public class JSONUtils {
 	}
 
 	public static String toJSON(Object target) throws UtilityException {
-		return toJSON(target, null);
+		// return toJSON(target, null);
+		// 默认采用fastjson，支持大对象处理
+		return com.alibaba.fastjson.JSONObject.toJSONString(target);
 	}
 
 	public static <T> T fromJSON(String target, Class<T> type, IJacksonConfig config)
@@ -59,6 +61,8 @@ public class JSONUtils {
 	}
 
 	public static <T> T fromJSON(String target, Class<T> type) throws AssertException, UtilityException {
-		return fromJSON(target, type, null);
+		// return fromJSON(target, type, null);
+		// 默认采用fastjson，支持大对象处理
+		return com.alibaba.fastjson.JSONObject.parseObject(target, type);
 	}
 }
