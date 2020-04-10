@@ -23,7 +23,7 @@ public interface IRedisProcessor {
 
 	public String hdel(String key, String field) throws RedisException;
 	public boolean del(String key) throws RedisException;
-	public boolean mdel(String... keys) throws RedisException;
+	public long mdel(String... keys) throws RedisException;
 
 	public Iterable<String> keys(String pattern) throws RedisException;
 	public boolean clearExpire(String key) throws RedisException;

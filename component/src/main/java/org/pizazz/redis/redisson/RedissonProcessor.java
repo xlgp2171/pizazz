@@ -131,8 +131,8 @@ public class RedissonProcessor implements IRedisProcessor {
 	}
 
 	@Override
-	public boolean mdel(String... keys) throws RedisException {
-		return tryMethod("mdel", () -> instance.getKeys().delete(keys)) > 0;
+	public long mdel(String... keys) throws RedisException {
+		return tryMethod("mdel", () -> instance.getKeys().delete(keys));
 	}
 
 	@Override
