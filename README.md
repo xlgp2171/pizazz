@@ -1,5 +1,6 @@
 # pizazz
 一些自行设计和参考整合的 代码
+版本：1.0.0
 
 简单工具：
 org.pizazz.tool.SocketContainer: 维持进程的容器，采用SOCKET和THREAD方式
