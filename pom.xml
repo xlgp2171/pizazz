@@ -9,7 +9,6 @@
 	<modules>
 		<module>base</module>
 		<module>log</module>
-		<module>temp</module>
 		<module>component</module>
 		<module>algorithm</module>
 	</modules>
