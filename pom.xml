@@ -47,7 +47,7 @@
 					<target>${java.version}</target>
 					<!-- 字符集编码 -->
 					<encoding>UTF-8</encoding>
-					<!-- 跳过测试 -->
+					<!-- 跳过测试 true/false -->
 					<skip>true</skip>
 				</configuration>
 			</plugin>
