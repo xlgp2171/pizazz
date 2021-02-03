@@ -48,7 +48,7 @@
 					<!-- 字符集编码 -->
 					<encoding>UTF-8</encoding>
 					<!-- 跳过测试 -->
-					<skipTests>true</skipTests>
+					<skip>true</skip>
 				</configuration>
 			</plugin>
 			<!-- 源码 -->
