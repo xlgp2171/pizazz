@@ -10,7 +10,7 @@
 
 	<properties>
 		<fastjson.version>1.2.68</fastjson.version>
-		<jackson.version>2.10.3</jackson.version>
+		<jackson.version>2.12.1</jackson.version>
 		<kryo.version>4.0.2</kryo.version>
 		<codec.version>1.14</codec.version>
 	</properties>
