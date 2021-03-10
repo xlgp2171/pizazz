@@ -185,7 +185,7 @@ public class SocketContainer extends AbstractContainer<String> {
 			if (hook != null) {
 				Runtime.getRuntime().removeShutdownHook(hook);
 			}
-			IOUtils.close(socket);
+			SystemUtils.close(socket);
 			super.destroy(timeout);
 		}
 	}

@@ -50,7 +50,7 @@ public class XMLUtils {
 			throw new UtilityException(BasicCodeEnum.MSG_0018, msg, e);
 		} finally {
 			if (close) {
-				IOUtils.close(in);
+				SystemUtils.close(in);
 			}
 		}
 	}

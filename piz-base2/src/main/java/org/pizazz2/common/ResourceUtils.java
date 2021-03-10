@@ -58,7 +58,7 @@ public class ResourceUtils {
 			return properties;
 		} finally {
 			if (close) {
-				IOUtils.close(stream);
+				SystemUtils.close(stream);
 			}
 		}
 	}

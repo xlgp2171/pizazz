@@ -70,7 +70,7 @@ public class FolderWatcher implements IRunnable {
 
 	@Override
 	public void destroy(Duration timeout) {
-		IOUtils.close(service);
+		SystemUtils.close(service);
 		SystemUtils.destroy(watcher, timeout);
 	}
 }

@@ -1,0 +1,20 @@
+package org.pizazz2.test;
+
+import org.pizazz.common.StringUtils;
+
+public final class DynamicObject<E> {
+	private final E element;
+
+	public DynamicObject(E element) {
+		this.element = element;
+	}
+
+	public E get() {
+	    return element;
+	}
+
+	@Override
+	public String toString() {
+		return StringUtils.of(element);
+	}
+}

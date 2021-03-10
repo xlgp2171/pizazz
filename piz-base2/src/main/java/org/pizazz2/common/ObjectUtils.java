@@ -52,6 +52,8 @@ public class ObjectUtils {
 			length = Float.BYTES;
 		} else if (target instanceof Long) {
 			length = Long.BYTES;
+		} else if (target instanceof Boolean) {
+			length = Byte.BYTES;
 		} else if (target instanceof ISerializable) {
 			length = ((ISerializable) target).getLength();
 		}else {

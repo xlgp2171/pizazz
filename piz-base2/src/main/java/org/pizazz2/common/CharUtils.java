@@ -14,12 +14,12 @@ public class CharUtils {
 	public static final char[] HEX_DIGITS = "0123456789abcdef".toCharArray();
 
 	public static String toUnicodeValue(char ch) {
-		return new StringBuilder().append(HEX_DIGITS[(ch >> 12) & 15]).append(HEX_DIGITS[(ch >> 8) & 15])
-				.append(HEX_DIGITS[(ch >> 4) & 15]).append(HEX_DIGITS[(ch) & 15]).toString();
+		return StringUtils.of(HEX_DIGITS[(ch >> 12) & 15]) + HEX_DIGITS[(ch >> 8) & 15] + HEX_DIGITS[(ch >> 4) & 15] +
+				HEX_DIGITS[(ch) & 15];
 	}
 
 	public static char toChar(String target) throws ValidateException {
-		return toChar(target, 16);
+		return CharUtils.toChar(target, 16);
 	}
 
 	public static char toChar(String target, int radix) throws ValidateException {
@@ -33,14 +33,14 @@ public class CharUtils {
 
 	public static String fromUnicode(String first, String... more) throws ValidateException {
 		ValidateUtils.sameLength("fromUnicode", 1, first, 4);
-		StringBuilder tmp = new StringBuilder().append(toChar(first, 16));
+		StringBuilder tmp = new StringBuilder().append(CharUtils.toChar(first, 16));
 
 		if (more == null) {
 			return tmp.toString();
 		}
 		for (int i = 0; i < more.length; i ++) {
 			ValidateUtils.sameLength("fromUnicode", i + 1, more[i], 4);
-			tmp.append(toChar(more[i], 16));
+			tmp.append(CharUtils.toChar(more[i], 16));
 		}
 		return tmp.toString();
 	}

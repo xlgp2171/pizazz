@@ -16,12 +16,8 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
 import org.pizazz2.ICloseable;
-import org.pizazz2.common.ArrayUtils;
-import org.pizazz2.common.ValidateUtils;
-import org.pizazz2.common.CollectionUtils;
-import org.pizazz2.common.IOUtils;
+import org.pizazz2.common.*;
 import org.pizazz2.helper.LocaleHelper;
-import org.pizazz2.common.PathUtils;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.exception.ToolException;
 import org.pizazz2.exception.UtilityException;
@@ -99,7 +95,7 @@ public class PCompiler implements ICloseable {
 
     @Override
     public void destroy(Duration timeout) {
-        IOUtils.close(manager);
+        SystemUtils.close(manager);
         options.clear();
         paths.clear();
     }

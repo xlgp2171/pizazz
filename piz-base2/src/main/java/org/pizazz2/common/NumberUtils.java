@@ -137,6 +137,7 @@ public class NumberUtils {
             return max;
         }
         // TODO
+        System.out.println(Math.random() * (max - min));
         return min + Math.random() * (max - min);
     }
 }

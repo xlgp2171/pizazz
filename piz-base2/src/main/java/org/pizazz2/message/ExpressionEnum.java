@@ -108,7 +108,7 @@ public enum ExpressionEnum {
     /**
      * 匹配包名称
      */
-    PACKAGE_NAME("package\\s+([$_a-zA-Z][$_a-zA-Z0-9\\.]*)),"),
+    PACKAGE_NAME("package\\s+([$_a-zA-Z][$_a-zA-Z0-9\\.]*);"),
     /**
      * 匹配类名称
      */

@@ -51,8 +51,8 @@ public class IOUtils {
 		} catch (IOException e) {
 			call.throwException(e);
 		} finally {
-			IOUtils.close(in);
-			IOUtils.close(call);
+			SystemUtils.close(in);
+			SystemUtils.close(call);
 		}
 	}
 
@@ -105,8 +105,8 @@ public class IOUtils {
 			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO", e.getMessage());
 			throw new UtilityException(BasicCodeEnum.MSG_0003, msg, e);
 		} finally {
-			IOUtils.close(input);
-			IOUtils.close(output);
+			SystemUtils.close(input);
+			SystemUtils.close(output);
 		}
 		return count;
 	}
@@ -125,8 +125,8 @@ public class IOUtils {
 			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO", e.getMessage());
 			throw new UtilityException(BasicCodeEnum.MSG_0003, msg, e);
 		} finally {
-			IOUtils.close(reader);
-			IOUtils.close(writer);
+			SystemUtils.close(reader);
+			SystemUtils.close(writer);
 		}
 		return count;
 	}
@@ -146,8 +146,8 @@ public class IOUtils {
 			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO", e.getMessage());
 			throw new UtilityException(BasicCodeEnum.MSG_0003, msg, e);
 		} finally {
-			IOUtils.close(in);
-			IOUtils.close(out);
+			SystemUtils.close(in);
+			SystemUtils.close(out);
 		}
 	}
 
@@ -166,7 +166,7 @@ public class IOUtils {
 		}
 	}
 
-	public static byte[] toByteArray(Reader reader, boolean close) throws ValidateException, UtilityException {
+	public static byte[] toByteArray(Reader reader) throws ValidateException, UtilityException {
 		try (ByteArrayOutputStream output = new ByteArrayOutputStream();
 				OutputStreamWriter writer = new OutputStreamWriter(output)) {
 			IOUtils.copy(reader, writer);
@@ -174,20 +174,6 @@ public class IOUtils {
 		} catch (IOException e) {
 			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO.OUT", e.getMessage());
 			throw new UtilityException(BasicCodeEnum.MSG_0003, msg, e);
-		} finally {
-			if (close) {
-				IOUtils.close(reader);
-			}
-		}
-	}
-
-	public static void close(AutoCloseable target) {
-		if (target != null) {
-			try {
-				target.close();
-			} catch (Exception e) {
-				// do nothing
-			}
 		}
 	}
 }

@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.pizazz2.exception.UtilityException;
 import org.pizazz2.exception.ValidateException;
-import org.pizazz2.exception.BaseException;
 
 /**
  * 集合工具
@@ -85,13 +85,14 @@ public class CollectionUtils {
 
 	@SuppressWarnings("unchecked")
 	public static List<String> convert(List<Object> target) {
-		if (isEmpty(target)) {
-			return emptyList();
+		if (CollectionUtils.isEmpty(target)) {
+			return CollectionUtils.emptyList();
 		}
 		List<String> tmp;
 		try {
+			// 用于保持输入集合的类型不变
 			tmp = ClassUtils.newAndCast(target.getClass(), List.class);
-		} catch (BaseException e) {
+		} catch (UtilityException e) {
 			tmp = new LinkedList<>();
 		}
 		for (Object item : target) {
@@ -101,7 +102,7 @@ public class CollectionUtils {
 	}
 
 	public static String toString(Collection<?> target) {
-		if (isEmpty(target)) {
+		if (CollectionUtils.isEmpty(target)) {
 			return "[]";
 		}
 		StringBuilder tmp = new StringBuilder("[");

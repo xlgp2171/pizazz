@@ -244,7 +244,7 @@ public class PClassLoader extends URLClassLoader implements IObject {
 		} catch (IOException e) {
 			// do nothing
 		}
-		closeables.keySet().forEach(IOUtils::close);
+		closeables.keySet().forEach(SystemUtils::close);
 		closeables.clear();
 	}
 

@@ -241,7 +241,21 @@ public class SystemUtils {
                     // do nothing
                 }
             } else {
-                IOUtils.close(target);
+                SystemUtils.close(target);
+            }
+        }
+    }
+
+    /**
+     * 安全关闭
+     * @param target 实现AutoCloseable接口的类
+     */
+    public static void close(AutoCloseable target) {
+        if (target != null) {
+            try {
+                target.close();
+            } catch (Exception e) {
+                // do nothing
             }
         }
     }

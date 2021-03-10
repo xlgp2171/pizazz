@@ -17,27 +17,32 @@ import org.pizazz2.message.TypeEnum;
 public class BytesUtils {
 
     public static byte[] toBytes(long target) {
-        return ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(target).array();
+        return ByteBuffer.allocate(Long.BYTES).putLong(target).array();
     }
 
     public static byte[] toBytes(int target) {
-        return ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(target).array();
+        return ByteBuffer.allocate(Integer.BYTES).putInt(target).array();
     }
 
     public static byte[] toBytes(short target) {
-        return ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putShort(target).array();
+        return ByteBuffer.allocate(Short.BYTES).putShort(target).array();
     }
 
     public static byte[] toBytes(double target) {
-        return ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putDouble(target).array();
+        return ByteBuffer.allocate(Double.BYTES).putDouble(target).array();
     }
 
     public static byte[] toBytes(float target) {
-        return ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putFloat(target).array();
+        return ByteBuffer.allocate(Float.BYTES).putFloat(target).array();
     }
 
     public static byte[] toBytes(char target) {
-        return ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putChar(target).array();
+        return ByteBuffer.allocate(Character.BYTES).putChar(target).array();
+    }
+
+    public static byte[] toBytes(boolean target) {
+        return ByteBuffer.allocate(Byte.BYTES).put(target ? NumberUtils.ONE.byteValue() : NumberUtils.ZERO.byteValue())
+                .array();
     }
 
     public static long toLong(byte[] target) throws ValidateException {
@@ -70,6 +75,11 @@ public class BytesUtils {
         return ByteBuffer.wrap(target).getChar();
     }
 
+    public static boolean toBoolean(byte[] target) throws ValidateException {
+        ValidateUtils.notEmpty(target, "toBoolean");
+        return ByteBuffer.wrap(target).get() == NumberUtils.ONE.byteValue();
+    }
+
     static void addObject(Object target, ByteBuffer buffer) throws ValidateException {
         if (target instanceof ByteBuffer) {
             buffer.put((ByteBuffer) target);
@@ -89,6 +99,8 @@ public class BytesUtils {
             buffer.putFloat((float) target);
         } else if (target instanceof Long) {
             buffer.putLong((long) target);
+        } else if (target instanceof Boolean) {
+            buffer.put(((boolean) target) ? NumberUtils.ONE.byteValue() : NumberUtils.ZERO.byteValue());
         } else if (target instanceof ISerializable) {
             buffer.put(((ISerializable)target).serialize());
         } else {
@@ -115,7 +127,7 @@ public class BytesUtils {
         ByteBuffer tmp = ByteBuffer.allocate(length);
 
         for (Object item : data) {
-            addObject(item, tmp);
+            BytesUtils.addObject(item, tmp);
         }
         return tmp.array();
     }

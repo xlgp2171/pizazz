@@ -71,7 +71,6 @@ public class NetworkUtils {
 	}
 
 	public static InetAddress nullToEmpty(String host) throws UtilityException {
-		// FIXME 测试下在没有联网的情况下127.0.0.1的返回结果
 		if (!StringUtils.isEmpty(host)) {
 			try {
 				return InetAddress.getByName(host);

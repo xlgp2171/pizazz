@@ -120,10 +120,11 @@ public class CryptoFactory {
 			return algorithm;
 		}
 
-		public void createKey(int size) throws ValidateException, UtilityException {
+		public AsymmetricCodec createKey(int size) throws ValidateException, UtilityException {
 			Key[] keys = CryptoUtils.newKey(getId(), size);
 			publicKey = ClassUtils.cast(keys[0], PublicKey.class);
 			privateKey = ClassUtils.cast(keys[1], PrivateKey.class);
+			return this;
 		}
 
 		/**

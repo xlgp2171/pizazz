@@ -47,7 +47,7 @@ public class YAMLUtils {
 		try {
 			return YAMLUtils.fromYAML(target, TupleObject.class, null);
 		} finally {
-			IOUtils.close(target);
+			SystemUtils.close(target);
 		}
 	}
 
@@ -89,7 +89,7 @@ public class YAMLUtils {
 		try {
 			YAMLUtils.toYAML(target, data, IJacksonConfig.EMPTY);
 		} finally {
-			IOUtils.close(target);
+			SystemUtils.close(target);
 		}
 	}
 

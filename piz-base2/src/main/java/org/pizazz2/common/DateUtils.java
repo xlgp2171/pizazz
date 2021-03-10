@@ -22,6 +22,23 @@ import org.pizazz2.message.TypeEnum;
  * @version 2.0.210201
  */
 public class DateUtils {
+	public Date toDate(LocalDateTime dateTime, ZoneId zoneId) throws ValidateException {
+		ValidateUtils.notNull("toDate", dateTime);
+
+		if (zoneId == null) {
+			zoneId = ZoneId.systemDefault();
+		}
+		return Date.from(dateTime.atZone(zoneId).toInstant());
+	}
+
+	public LocalDateTime toLocalDateTime(Date date, ZoneId zoneId) throws ValidateException {
+		ValidateUtils.notNull("toLocalDateTime", date);
+
+		if (zoneId == null) {
+			zoneId = ZoneId.systemDefault();
+		}
+		return LocalDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), zoneId);
+	}
 
 	public static Date parse(String time, String pattern) throws ValidateException, UtilityException {
 		ValidateUtils.notNull("parse", time, pattern);
@@ -55,7 +72,7 @@ public class DateUtils {
 
 	public static String format(Date date, String pattern) throws ValidateException {
 		ValidateUtils.notNull("format", date, pattern);
-		return format(date, pattern, SystemUtils.LOCAL_LOCALE);
+		return DateUtils.format(date, pattern, SystemUtils.LOCAL_LOCALE);
 	}
 
 	public static String format(Date date, String pattern, Locale locale) throws ValidateException {
