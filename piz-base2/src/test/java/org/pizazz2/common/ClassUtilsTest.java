@@ -28,9 +28,7 @@ public class ClassUtilsTest {
 
 	@Test
 	public void testGetPackageName() {
-		System.out.println(CODE_TXT);
 		String result = ClassUtils.getPackageName(CODE_TXT);
-		System.out.println(result);
 		Assert.assertEquals(result, "org.pizazz2.test");
 	}
 

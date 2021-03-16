@@ -13,7 +13,6 @@ import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Iterator;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -76,36 +75,32 @@ public class PathUtils {
         }
     }
 
-    public static InputStream getInputStream(Path path) throws ValidateException, UtilityException {
-        ValidateUtils.notNull("getInputStream", path);
-        try {
-            return Files.newInputStream(path);
-        } catch (IOException e) {
-            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO.PATH", path.toAbsolutePath(), e.getMessage());
-            throw new UtilityException(BasicCodeEnum.MSG_0003, msg, e);
+    public static void delete(Path path, boolean deep) throws UtilityException {
+        if (path != null) {
+            if (Files.isDirectory(path) && deep) {
+                PathUtils.deleteDirectory(path);
+            } else {
+                try {
+                    Files.delete(path);
+                } catch (IOException e) {
+                    // do nothing
+                }
+            }
         }
     }
 
-    public static OutputStream getOutputStream(Path path) throws ValidateException, UtilityException {
-        ValidateUtils.notNull("getOutputStream", path);
-        try {
-            return Files.newOutputStream(path);
+    static void deleteDirectory(Path dir) throws UtilityException {
+        try (Stream<Path> tmp = Files.list(dir)) {
+            tmp.forEach(item -> {
+                try {
+                    PathUtils.delete(item, true);
+                } catch (UtilityException e) {
+                    // do nothing
+                }
+            });
         } catch (IOException e) {
-            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO.PATH", path.toAbsolutePath(), e.getMessage());
+            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO.PATH", dir.toAbsolutePath(), e.getMessage());
             throw new UtilityException(BasicCodeEnum.MSG_0003, msg, e);
-        }
-    }
-
-    public static void delete(Path path, boolean deep) throws ValidateException, UtilityException {
-        ValidateUtils.notNull("delete", path);
-
-        if (Files.isDirectory(path) && deep) {
-            deleteDirectory(path);
-        }
-        try {
-            Files.delete(path);
-        } catch (IOException e) {
-            // do nothing
         }
     }
 
@@ -134,21 +129,13 @@ public class PathUtils {
         }
     }
 
-    static void deleteDirectory(Path dir) throws ValidateException, UtilityException {
-        try (Stream<Path> tmp = Files.list(dir)) {
-            Iterator<Path> _iterator = tmp.iterator();
-
-            while (_iterator.hasNext()) {
-                delete(_iterator.next(), true);
-            }
-        } catch (IOException e) {
-            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO.PATH", dir.toAbsolutePath(), e.getMessage());
-            throw new UtilityException(BasicCodeEnum.MSG_0003, msg, e);
-        }
+    public static long copyToPath(byte[] data, Path path) throws ValidateException, UtilityException {
+        ValidateUtils.notNull("copyToPath", data, path);
+        return PathUtils.copyToPath(new ByteArrayInputStream(data), path);
     }
 
-    public static long copyToPath(Path path, InputStream in) throws ValidateException, UtilityException {
-        ValidateUtils.notNull("copyToPath", path, in);
+    public static long copyToPath(InputStream in, Path path) throws ValidateException, UtilityException {
+        ValidateUtils.notNull("copyToPath", in, path);
         try {
             return Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
@@ -192,9 +179,10 @@ public class PathUtils {
         return PathUtils.copyToTemp(PathUtils.toByteArray(path), prefix);
     }
 
-    public static Path copyToTemp(byte[] data, String prefix) throws ValidateException, UtilityException {
-    	// TODO 是否验证data
-        ValidateUtils.notEmpty(data, "copyToTemp");
+    public static Path copyToTemp(byte[] data, String prefix) throws UtilityException {
+        if (data == null) {
+            data = new byte[0];
+        }
         Path tmp;
         try {
             tmp = Files.createTempFile(prefix, ".tmp");
@@ -202,12 +190,13 @@ public class PathUtils {
             String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.TEMP", e.getMessage());
             throw new UtilityException(BasicCodeEnum.MSG_0003, msg, e);
         }
-        try (ByteArrayInputStream in = new ByteArrayInputStream(data)) {
-            Files.copy(in, tmp, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.WRITE", tmp.toAbsolutePath(),
-					e.getMessage());
-            throw new UtilityException(BasicCodeEnum.MSG_0003, msg, e);
+        if (!ArrayUtils.isEmpty(data)) {
+            try (ByteArrayInputStream in = new ByteArrayInputStream(data)) {
+                Files.copy(in, tmp, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.WRITE", tmp.toAbsolutePath(), e.getMessage());
+                throw new UtilityException(BasicCodeEnum.MSG_0003, msg, e);
+            }
         }
         return tmp;
     }

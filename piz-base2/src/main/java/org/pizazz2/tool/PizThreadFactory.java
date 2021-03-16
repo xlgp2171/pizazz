@@ -4,7 +4,7 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.pizazz2.Constant;
+import org.pizazz2.PizContext;
 
 /**
  * 线程工厂类<br>
@@ -13,22 +13,22 @@ import org.pizazz2.Constant;
  * @author xlgp2171
  * @version 2.0.210201
  */
-public class PThreadFactory implements ThreadFactory {
+public class PizThreadFactory implements ThreadFactory {
 	private final AtomicInteger threadNum = new AtomicInteger(1);
 	private final String prefix;
 	private final boolean daemon;
 	private final UncaughtExceptionHandler handler;
 	private final ThreadGroup group;
 
-	public PThreadFactory() {
-		this(Constant.NAMING_SHORT + "-pool", false, null);
+	public PizThreadFactory() {
+		this(PizContext.NAMING_SHORT + "-pool", false, null);
 	}
 
-	public PThreadFactory(String prefix, boolean daemon) {
+	public PizThreadFactory(String prefix, boolean daemon) {
 		this(prefix, daemon, null);
 	}
 
-	public PThreadFactory(String prefix, boolean daemon, UncaughtExceptionHandler handler) {
+	public PizThreadFactory(String prefix, boolean daemon, UncaughtExceptionHandler handler) {
 		this.prefix = prefix + "-thread-";
 		this.daemon = daemon;
 		this.handler = handler;

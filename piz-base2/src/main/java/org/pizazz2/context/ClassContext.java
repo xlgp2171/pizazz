@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.pizazz2.ICloseable;
-import org.pizazz2.tool.PClassLoader;
+import org.pizazz2.tool.PizClassLoader;
 
 /**
  * 类环境组件
@@ -19,7 +19,7 @@ import org.pizazz2.tool.PClassLoader;
  * @version 2.0.210201
  */
 public final class ClassContext implements ICloseable {
-    private final ConcurrentMap<String, WeakReference<PClassLoader>> loaders;
+    private final ConcurrentMap<String, WeakReference<PizClassLoader>> loaders;
     private final ConcurrentMap<URL, Set<String>> tree;
     private final Object lock = new Object();
 
@@ -32,7 +32,7 @@ public final class ClassContext implements ICloseable {
         return Singleton.INSTANCE.get();
     }
 
-    private void createId(PClassLoader loader) {
+    private void addId(PizClassLoader loader) {
         URL[] urls = loader.getURLs();
 
         for (URL item : urls) {
@@ -43,7 +43,7 @@ public final class ClassContext implements ICloseable {
         }
     }
 
-    private void removeId(PClassLoader loader) {
+    private void removeId(PizClassLoader loader) {
         URL[] urls = loader.getURLs();
 
         for (URL item : urls) {
@@ -57,7 +57,7 @@ public final class ClassContext implements ICloseable {
         tree.values().forEach(item -> item.remove(id));
     }
 
-    public PClassLoader register(PClassLoader loader) {
+    public PizClassLoader register(PizClassLoader loader) {
         if (loader == null) {
             return null;
         }
@@ -65,20 +65,20 @@ public final class ClassContext implements ICloseable {
             String id = loader.getId();
 
             if (loaders.containsKey(id)) {
-                PClassLoader tmp = loaders.get(id).get();
+                PizClassLoader tmp = loaders.get(id).get();
 
                 if (tmp != null) {
                     return tmp;
                 }
             }
             loaders.put(id, new WeakReference<>(loader));
-            createId(loader);
+            addId(loader);
         }
         return loader;
     }
 
     public void unregister(String id) {
-        PClassLoader loader = null;
+        PizClassLoader loader = null;
 
         synchronized (lock) {
             if (loaders.containsKey(id)) {
@@ -94,11 +94,11 @@ public final class ClassContext implements ICloseable {
         }
 	}
 
-    public PClassLoader getLoader(String id) {
+    public PizClassLoader getLoader(String id) {
         if (!loaders.containsKey(id)) {
             return null;
         }
-        PClassLoader loader = loaders.get(id).get();
+        PizClassLoader loader = loaders.get(id).get();
 
         if (loader == null) {
             clearId(id);

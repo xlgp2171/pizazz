@@ -17,12 +17,13 @@ import java.util.jar.JarFile;
 
 import javax.tools.JavaFileObject;
 
-import org.pizazz2.Constant;
+import org.pizazz2.PizContext;
 import org.pizazz2.IObject;
 import org.pizazz2.common.ArrayUtils;
 import org.pizazz2.common.ValidateUtils;
 import org.pizazz2.common.ClassUtils;
 import org.pizazz2.common.IOUtils;
+import org.pizazz2.context.ClassContext;
 import org.pizazz2.helper.LocaleHelper;
 import org.pizazz2.common.PathUtils;
 import org.pizazz2.common.SystemUtils;
@@ -39,7 +40,7 @@ import org.pizazz2.message.TypeEnum;
  * @author xlgp2171
  * @version 2.0.210201
  */
-public class PClassLoader extends URLClassLoader implements IObject {
+public class PizClassLoader extends URLClassLoader implements IObject {
 	/**
 	 * 未关闭的JAR文件
 	 */
@@ -52,10 +53,15 @@ public class PClassLoader extends URLClassLoader implements IObject {
 	private boolean isDirUpdate = true;
 	private final Object lock = new Object();
 
-	public PClassLoader(String id, ClassLoader parent) {
+	public PizClassLoader(String id) {
+		this(id, null);
+	}
+
+	public PizClassLoader(String id, ClassLoader parent) {
 		super(new URL[0], parent);
 		this.id = id;
 		closeables = new WeakHashMap<>();
+		ClassContext.getInstance().register(this);
 	}
 
 	@Override
@@ -102,7 +108,7 @@ public class PClassLoader extends URLClassLoader implements IObject {
 
 		if (in == null) {
 			try {
-				in = PathUtils.getInputStream(getDirectory().resolve(name));
+				in = IOUtils.getInputStream(getDirectory().resolve(name));
 			} catch (ValidateException | UtilityException e) {
 				throw new RuntimeException(e.getMessage());
 			}
@@ -110,7 +116,7 @@ public class PClassLoader extends URLClassLoader implements IObject {
 		return in;
 	}
 
-	public synchronized PClassLoader extractJar(Path path) throws ValidateException, UtilityException, ToolException {
+	public synchronized PizClassLoader extractJar(Path path) throws ValidateException, UtilityException, ToolException {
 		ValidateUtils.notNull("extractJar", path);
 
 		try (JarFile item = new JarFile(path.toFile())) {
@@ -133,7 +139,7 @@ public class PClassLoader extends URLClassLoader implements IObject {
 						}
 					}
 					try (InputStream in = item.getInputStream(entry)) {
-						PathUtils.copyToPath(getDirectory().resolve(name), in);
+						PathUtils.copyToPath(in, getDirectory().resolve(name));
 					}
 				}
 			}
@@ -164,7 +170,7 @@ public class PClassLoader extends URLClassLoader implements IObject {
 	 * @throws ToolException 重复加载异常或链接加载异常
 	 * @throws ValidateException 参数验证异常
 	 */
-	public synchronized PClassLoader linkJar(Path path) throws ValidateException, ToolException {
+	public synchronized PizClassLoader linkJar(Path path) throws ValidateException, ToolException {
 		ValidateUtils.notNull("linkJar", path);
 
 		if (!Files.isReadable(path) || !Files.isRegularFile(path)) {
@@ -190,7 +196,7 @@ public class PClassLoader extends URLClassLoader implements IObject {
 	 * @throws ToolException 重复加载异常或链接加载异常
 	 * @throws ValidateException 参数验证异常
 	 */
-	public synchronized PClassLoader linkJar(URL url) throws ValidateException, ToolException {
+	public synchronized PizClassLoader linkJar(URL url) throws ValidateException, ToolException {
 		ValidateUtils.notNull("linkJar", url);
 
 		if (ArrayUtils.contains(super.getURLs(), url)) {
@@ -226,7 +232,7 @@ public class PClassLoader extends URLClassLoader implements IObject {
 			synchronized (lock) {
 				if (dir == null) {
 					try {
-						dir = PathUtils.createTempDirectory(Constant.NAMING_SHORT + "_CLASS_");
+						dir = PathUtils.createTempDirectory(PizContext.NAMING_SHORT + "_CLASS_");
 					} catch (BaseException e) {
 						dir = SystemUtils.LOCAL_DIR;
 					}
@@ -246,6 +252,7 @@ public class PClassLoader extends URLClassLoader implements IObject {
 		}
 		closeables.keySet().forEach(SystemUtils::close);
 		closeables.clear();
+		ClassContext.getInstance().unregister(getId());
 	}
 
 	@Override

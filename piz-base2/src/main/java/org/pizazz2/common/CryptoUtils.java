@@ -213,18 +213,18 @@ public class CryptoUtils {
      */
     public static byte[] digest(String algorithm, ByteBuffer data) throws ValidateException, UtilityException {
         ValidateUtils.notNull("digest", algorithm, data);
-        MessageDigest _digest;
+        MessageDigest digest;
         try {
             // 获得摘要算法的 MessageDigest 对象
-            _digest = MessageDigest.getInstance(algorithm);
+            digest = MessageDigest.getInstance(algorithm);
         } catch (NoSuchAlgorithmException e) {
             String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CRYPTO.KEYS.NEW", algorithm, e.getMessage());
             throw new UtilityException(BasicCodeEnum.MSG_0015, msg, e);
         }
         // 使用指定的字节更新摘要
-        _digest.update(data);
+        digest.update(data);
         // 获得密文
-        return _digest.digest();
+        return digest.digest();
     }
 
     /**
@@ -292,17 +292,17 @@ public class CryptoUtils {
      */
     public static byte[] sign(String algorithm, PrivateKey key, ByteBuffer data) throws ValidateException, UtilityException {
         ValidateUtils.notNull("sign", algorithm, key, data);
-        Signature _signature;
+        Signature signature;
         try {
-            _signature = Signature.getInstance(algorithm);
-            _signature.initSign(key);
+            signature = Signature.getInstance(algorithm);
+            signature.initSign(key);
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CRYPTO.SIGNATURE.NEW", e.getMessage());
             throw new UtilityException(BasicCodeEnum.MSG_0015, msg, e);
         }
         try {
-            _signature.update(data);
-            return _signature.sign();
+            signature.update(data);
+            return signature.sign();
         } catch (SignatureException e) {
             String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CRYPTO.SIGNATURE.NEW", e.getMessage());
             throw new UtilityException(BasicCodeEnum.MSG_0015, msg, e);

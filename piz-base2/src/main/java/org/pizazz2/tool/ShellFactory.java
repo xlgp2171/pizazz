@@ -7,13 +7,12 @@ import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-import org.pizazz2.Constant;
+import org.pizazz2.PizContext;
 import org.pizazz2.ICloseable;
 import org.pizazz2.IMessageOutput;
 import org.pizazz2.helper.ConfigureHelper;
@@ -32,20 +31,20 @@ import org.pizazz2.tool.ref.IShellFactory;
  * @author xlgp2171
  * @version 2.0.210201
  */
-public final class PShellFactory implements IShellFactory, ICloseable {
+public final class ShellFactory implements IShellFactory, ICloseable {
 
     private final ThreadPoolExecutor threadPool;
 
-    public PShellFactory() {
+    public ShellFactory() {
         int maximumPoolSize = ConfigureHelper.getInt(TypeEnum.BASIC, "DEF_SHELL_POOL_MAX",
 				Runtime.getRuntime().availableProcessors() * 2);
         long keepAliveTime = ConfigureHelper.getLong(TypeEnum.BASIC, "DEF_SHELL_THREAD_KEEP", 0L);
         threadPool = new ThreadPoolExecutor(maximumPoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS,
-				new LinkedBlockingQueue<>(), new PThreadFactory(Constant.NAMING_SHORT + "-shell", true));
+				new LinkedBlockingQueue<>(), new PizThreadFactory(PizContext.NAMING_SHORT + "-shell", true));
     }
 
-    public static PShellBuilder newInstance(String... command) throws ValidateException {
-        return new PShellBuilder(Singleton.INSTANCE.get(), command);
+    public static ShellBuilder newInstance(String... command) throws ValidateException {
+        return new ShellBuilder(Singleton.INSTANCE.get(), command);
     }
 
     @Override
@@ -73,7 +72,7 @@ public final class PShellFactory implements IShellFactory, ICloseable {
     @Override
     public CompletableFuture<List<String>> apply(InputStream in, Charset charset, IMessageOutput<String> output) {
         return CompletableFuture.supplyAsync(new StreamSupplier(in, charset, output == null ?
-                IMessageOutput.EMPTY_STRING_ENABLED : output), threadPool);
+                IMessageOutput.EMPTY_STRING : output), threadPool);
     }
 
     @Override
@@ -108,9 +107,9 @@ public final class PShellFactory implements IShellFactory, ICloseable {
                 @Override
                 public void write(String message) {
                     if (call.isEnabled()) {
-                        tmp.add(message);
+                        call.write(message);
                     }
-                    call.write(message);
+                    tmp.add(message);
                 }
 
                 @Override
@@ -128,13 +127,13 @@ public final class PShellFactory implements IShellFactory, ICloseable {
          */
         INSTANCE;
 
-        private final PShellFactory factory;
+        private final ShellFactory factory;
 
         private Singleton() {
-            factory = new PShellFactory();
+            factory = new ShellFactory();
         }
 
-        public PShellFactory get() {
+        public ShellFactory get() {
             return factory;
         }
     }

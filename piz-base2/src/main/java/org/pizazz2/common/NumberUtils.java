@@ -136,8 +136,6 @@ public class NumberUtils {
         if (min >= max) {
             return max;
         }
-        // TODO
-        System.out.println(Math.random() * (max - min));
         return min + Math.random() * (max - min);
     }
 }

@@ -8,7 +8,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.pizazz2.Constant;
+import org.pizazz2.PizContext;
 import org.pizazz2.ICloseable;
 import org.pizazz2.common.SystemUtils;
 import org.pizazz2.message.TypeEnum;
@@ -88,7 +88,7 @@ public final class LocaleContext implements ICloseable {
     }
 
     private void load(Map<Locale, Properties> target, IType type, Locale locale) {
-        String postfix = SystemUtils.getSystemProperty(Constant.NAMING_SHORT + ".locale.postfix", "_Locale");
+        String postfix = SystemUtils.getSystemProperty(PizContext.NAMING_SHORT + ".locale.postfix", "_Locale");
         ResourceBundle resource = ResourceBundle.getBundle(type.value() + postfix, locale);
         Properties tmp = new Properties();
         resource.keySet().forEach(item -> tmp.setProperty(item, resource.getString(item)));

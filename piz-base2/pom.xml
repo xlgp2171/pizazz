@@ -9,27 +9,17 @@
 	<artifactId>piz-base2</artifactId>
 
 	<properties>
-		<fastjson.version>1.2.68</fastjson.version>
-		<jackson.version>2.10.3</jackson.version>
-		<kryo.version>4.0.2</kryo.version>
-		<codec.version>1.14</codec.version>
+		<fastjson.version>1.2.75</fastjson.version>
+		<snakeyaml.version>1.27</snakeyaml.version>
+		<codec.version>1.15</codec.version>
+		<kryo.version>5.0.1</kryo.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-core</artifactId>
-			<version>${jackson.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>${jackson.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.dataformat</groupId>
-			<artifactId>jackson-dataformat-yaml</artifactId>
-			<version>${jackson.version}</version>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>${snakeyaml.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.alibaba</groupId>
@@ -37,19 +27,15 @@
 			<version>${fastjson.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.esotericsoftware</groupId>
-			<artifactId>kryo</artifactId>
-			<version>${kryo.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
 			<version>${codec.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter</artifactId>
-			<version>RELEASE</version>
+			<groupId>com.esotericsoftware</groupId>
+			<artifactId>kryo</artifactId>
+			<version>${kryo.version}</version>
+			<!-- 需要时再引入，作用于类org.pizazz2.common.SerializationUtils -->
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>

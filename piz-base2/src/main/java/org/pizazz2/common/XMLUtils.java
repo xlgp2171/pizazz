@@ -1,6 +1,8 @@
 package org.pizazz2.common;
 
 import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -67,13 +69,52 @@ public class XMLUtils {
 		}
 	}
 
-	public static Element withElement(Node node) throws ValidateException, UtilityException {
+	public static boolean isElement(Node node) throws ValidateException {
+		ValidateUtils.notNull("isElement", node);
+		return node.getNodeType() == Node.ELEMENT_NODE;
+	}
+
+	public static Element getRootElement(Document doc) {
+		ValidateUtils.notNull("getRootElement", doc);
+		Node node = doc.getFirstChild();
+		List<Element> elements = XMLUtils.getNextElements(node);
+		return elements.isEmpty() ? null : elements.get(0);
+	}
+
+	public static List<Element> getNextElements(Node node) {
+		ValidateUtils.notNull("getChildElements", node);
+		List<Element> tmp = new LinkedList<>();
+
+		while(node != null) {
+			if(XMLUtils.isElement(node)) {
+				tmp.add(XMLUtils.withElement(node));
+			}
+			node = node.getNextSibling();
+		}
+		return tmp;
+	}
+
+	public static List<Element> getChildElements(NodeList nodes) {
+		ValidateUtils.notNull("getChildElements", nodes);
+		List<Element> tmp = new LinkedList<>();
+
+		for (int i = 0; i < nodes.getLength(); i ++) {
+			Node node = nodes.item(i);
+
+			if (XMLUtils.isElement(node)) {
+				tmp.add(XMLUtils.withElement(node));
+			}
+		}
+		return tmp;
+	}
+
+	public static Element withElement(Node node) throws ValidateException {
 		ValidateUtils.notNull("withElement", node);
 
 		if (node instanceof Element) {
 			return ClassUtils.cast(node, Element.class);
 		}
 		String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.W3C.UNKNOWN", node.getClass().getName());
-		throw new UtilityException(BasicCodeEnum.MSG_0005, msg);
+		throw new ValidateException(BasicCodeEnum.MSG_0005, msg);
 	}
 }

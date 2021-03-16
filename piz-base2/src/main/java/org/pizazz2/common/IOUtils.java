@@ -5,11 +5,12 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.pizazz2.Constant;
+import org.pizazz2.PizContext;
 import org.pizazz2.IMessageOutput;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.exception.UtilityException;
@@ -60,6 +61,20 @@ public class IOUtils {
 		return IOUtils.getResourceAsStream(resource, null, null);
 	}
 
+	public static InputStream getResourceAsStream(String resource, ClassLoader loader) throws UtilityException {
+		ValidateUtils.notEmpty(resource, "getResourceAsStream");
+
+		if (loader == null) {
+			loader = PizContext.CLASS_LOADER;
+		}
+		InputStream stream = loader.getResourceAsStream(resource);
+
+		if (stream == null) {
+			stream = IOUtils.getInputStream(Paths.get(resource));
+		}
+		return stream;
+	}
+
 	public static InputStream getResourceAsStream(String resource, Class<?> clazz, Thread current)
 			throws ValidateException, UtilityException {
 		ValidateUtils.notEmpty(resource, "getResourceAsStream");
@@ -73,32 +88,47 @@ public class IOUtils {
 				stream = clazz.getResourceAsStream(resource);
 			}
 		} else {
-			stream = Constant.class.getResourceAsStream(resource);
+			stream = PizContext.class.getResourceAsStream(resource);
 
 			if (stream == null) {
-				stream = Constant.class.getClassLoader().getResourceAsStream(resource);
+				stream = PizContext.CLASS_LOADER.getResourceAsStream(resource);
 			}
 		}
 		if (stream == null) {
-			try {
-				stream = Files.newInputStream(Paths.get(resource));
-			} catch (IOException e) {
-				String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO.PATH", resource, e.getMessage());
-				throw new UtilityException(BasicCodeEnum.MSG_0003, msg, e);
-			}
+			stream = IOUtils.getInputStream(Paths.get(resource));
 		}
 		return stream;
+	}
+
+	public static InputStream getInputStream(Path path) throws ValidateException, UtilityException {
+		ValidateUtils.notNull("getInputStream", path);
+		try {
+			return Files.newInputStream(path);
+		} catch (IOException e) {
+			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO.PATH", path.toAbsolutePath(), e.getMessage());
+			throw new UtilityException(BasicCodeEnum.MSG_0003, msg, e);
+		}
+	}
+
+	public static OutputStream getOutputStream(Path path) throws ValidateException, UtilityException {
+		ValidateUtils.notNull("getOutputStream", path);
+		try {
+			return Files.newOutputStream(path);
+		} catch (IOException e) {
+			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO.PATH", path.toAbsolutePath(), e.getMessage());
+			throw new UtilityException(BasicCodeEnum.MSG_0003, msg, e);
+		}
 	}
 
 	public static long copyLarge(InputStream input, OutputStream output, int size)
 			throws ValidateException, UtilityException {
 		ValidateUtils.notNull("copyLarge", input, output);
-		byte[] _buffer = new byte[size <= 0 ? 4096 : size];
+		byte[] buffer = new byte[size <= 0 ? 4096 : size];
 		long count = 0L;
 		int len;
 		try {
-			while (-1 != (len = input.read(_buffer))) {
-				output.write(_buffer, 0, len);
+			while (-1 != (len = input.read(buffer))) {
+				output.write(buffer, 0, len);
 				count += len;
 			}
 		} catch (IOException e) {
@@ -139,9 +169,9 @@ public class IOUtils {
 	public static long copy(FileInputStream in, FileOutputStream out) throws ValidateException, UtilityException {
 		ValidateUtils.notNull("copy", in, out);
 
-		try (FileChannel tmp = in.getChannel(); FileChannel _out = out.getChannel()) {
+		try (FileChannel tmp = in.getChannel(); FileChannel outF = out.getChannel()) {
 			// 将fileChannelInput通道的数据，写入到fileChannelOutput通道
-			return tmp.transferTo(0, tmp.size(), _out);
+			return tmp.transferTo(0, tmp.size(), outF);
 		} catch (IOException e) {
 			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO", e.getMessage());
 			throw new UtilityException(BasicCodeEnum.MSG_0003, msg, e);

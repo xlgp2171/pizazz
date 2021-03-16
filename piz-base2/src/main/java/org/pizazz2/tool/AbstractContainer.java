@@ -3,7 +3,7 @@ package org.pizazz2.tool;
 import java.time.Duration;
 import java.util.concurrent.*;
 
-import org.pizazz2.Constant;
+import org.pizazz2.PizContext;
 import org.pizazz2.IMessageOutput;
 import org.pizazz2.IObject;
 import org.pizazz2.IPlugin;
@@ -71,7 +71,7 @@ public abstract class AbstractContainer<T> implements IPlugin {
     @Override
     public void initialize(IObject config) throws ToolException {
         properties.append(CONTAINER_TIMEOUT, ConfigureHelper.getConfig(TypeEnum.BASIC,
-				Constant.NAMING_SHORT + ".sc." + CONTAINER_TIMEOUT, "DEF_CONTAINER_TIMEOUT", "30000"));
+				PizContext.NAMING_SHORT + ".sc." + CONTAINER_TIMEOUT, "DEF_CONTAINER_TIMEOUT", "30000"));
     }
 
     @Override
@@ -102,7 +102,7 @@ public abstract class AbstractContainer<T> implements IPlugin {
             log(msg, null);
             ScheduledThreadPoolExecutor pool = null;
             try {
-                pool = new ScheduledThreadPoolExecutor(1, new PThreadFactory());
+                pool = new ScheduledThreadPoolExecutor(1, new PizThreadFactory());
                 status = pool.submit(callable).get(timeout.toMillis(), TimeUnit.MILLISECONDS);
             } catch (TimeoutException e) {
                 msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CONTAINER.TIMEOUT", timeout);

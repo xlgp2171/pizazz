@@ -1,6 +1,6 @@
 package org.pizazz2.data;
 
-import org.pizazz2.Constant;
+import org.pizazz2.PizContext;
 import org.pizazz2.IObject;
 import org.pizazz2.common.ClassUtils;
 import org.pizazz2.common.SystemUtils;
@@ -53,7 +53,7 @@ public class TupleObject extends LinkedHashMap<String, Object> implements IObjec
         if (id == null) {
             synchronized (this) {
                 if (id == null) {
-                    id = Constant.NAMING_SHORT + "@" + SystemUtils.newUUID();
+                    id = PizContext.NAMING_SHORT + "@" + SystemUtils.newUUID();
                 }
             }
         }
@@ -61,7 +61,7 @@ public class TupleObject extends LinkedHashMap<String, Object> implements IObjec
     }
 
     @Override
-    public void set(IObject target) {
+    public void set(String key, Object target) {
         if (target instanceof TupleObject) {
             super.putAll((TupleObject) target);
         }
@@ -78,11 +78,11 @@ public class TupleObject extends LinkedHashMap<String, Object> implements IObjec
     }
 
     @Override
-    public Object get(String id, Object defValue) {
-        if (!super.containsKey(id)) {
+    public Object get(String key, Object defValue) {
+        if (!super.containsKey(key)) {
             return defValue;
         }
-        return super.get(id);
+        return super.get(key);
     }
 
     @Override

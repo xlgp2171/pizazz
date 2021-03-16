@@ -8,7 +8,7 @@ import java.net.SocketException;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.pizazz2.Constant;
+import org.pizazz2.PizContext;
 import org.pizazz2.IMessageOutput;
 import org.pizazz2.IObject;
 import org.pizazz2.IPlugin;
@@ -41,6 +41,13 @@ public class SocketContainer extends AbstractContainer<String> {
 	private Thread hook;
 	private IMessageOutput<byte[]> command;
 
+	/**
+	 *
+	 * @param plugin 容器销毁时需要安全关闭的组件
+	 * @param config 容器配置
+	 * @param output 容器日志输出接口
+	 * @throws ValidateException 验证异常
+	 */
 	public SocketContainer(IPlugin plugin, TupleObject config, IMessageOutput<String> output) throws ValidateException {
 		super(plugin, output);
 		try {
@@ -54,9 +61,9 @@ public class SocketContainer extends AbstractContainer<String> {
 		Object value = config.get(key, StringUtils.EMPTY);
 
 		if (value == null || StringUtils.isTrimEmpty(StringUtils.of(value))) {
-			value = SystemUtils.getSystemProperty(Constant.NAMING_SHORT + ".sc." + key, defValue);
+			value = SystemUtils.getSystemProperty(PizContext.NAMING_SHORT + ".sc." + key, defValue);
 		}
-		properties.append(Constant.ATTRIBUTE_PREFIX + key, value);
+		properties.append(PizContext.ATTRIBUTE_PREFIX + key, value);
 		return this;
 	}
 
@@ -65,9 +72,9 @@ public class SocketContainer extends AbstractContainer<String> {
 
 		if (value == null || NumberUtils.toInt(StringUtils.of(value), -1) == -1) {
 			value = ConfigureHelper.getConfig(TypeEnum.BASIC,
-					Constant.NAMING_SHORT + ".sc." + key, configKey, defValue);
+					PizContext.NAMING_SHORT + ".sc." + key, configKey, defValue);
 		}
-		properties.append(Constant.ATTRIBUTE_PREFIX + key, value);
+		properties.append(PizContext.ATTRIBUTE_PREFIX + key, value);
 		return this;
 	}
 
@@ -92,9 +99,9 @@ public class SocketContainer extends AbstractContainer<String> {
 	@Override
 	public void waitForShutdown() throws BaseException {
 		hook = SystemUtils.addShutdownHook(this, null);
-		int port = TupleObjectHelper.getInt(properties, Constant.ATTRIBUTE_PREFIX + CONTAINER_PORT, -1);
+		int port = TupleObjectHelper.getInt(properties, PizContext.ATTRIBUTE_PREFIX + CONTAINER_PORT, -1);
 		// port为0也可以super.waitForShutdown
-		if (port <= 0) {
+		if (port <= 1_000) {
 			if (output.isEnabled()) {
 				output.write(LocaleHelper.toLocaleText(TypeEnum.BASIC, "CONTAINER.ALIVE"));
 			}
@@ -107,15 +114,15 @@ public class SocketContainer extends AbstractContainer<String> {
 
 	protected void socketWaiting(int port) throws UtilityException, ToolException {
 		// 终止socket的字符串
-		String key = TupleObjectHelper.getString(properties, Constant.ATTRIBUTE_PREFIX + CONTAINER_KEY,
+		String key = TupleObjectHelper.getString(properties, PizContext.ATTRIBUTE_PREFIX + CONTAINER_KEY,
 				StringUtils.EMPTY);
-		key = StringUtils.isEmpty(key) ? Constant.NAMING : key;
+		key = StringUtils.isEmpty(key) ? PizContext.NAMING : key;
 		// 字符串数据长度，根据字符串长度和设置长度定义
 		int lenMax = ConfigureHelper.getInt(TypeEnum.BASIC, "DEF_COMMAND_LENGTH_MAX", 1024);
-		int cmdLen = TupleObjectHelper.getInt(properties, Constant.ATTRIBUTE_PREFIX + COMMAND_LENGTH, key.length());
+		int cmdLen = TupleObjectHelper.getInt(properties, PizContext.ATTRIBUTE_PREFIX + COMMAND_LENGTH, key.length());
 		cmdLen = (cmdLen < key.length() || cmdLen > lenMax) ? key.length() : cmdLen;
 		// 获取配置host
-		String host = TupleObjectHelper.getString(properties, Constant.ATTRIBUTE_PREFIX + CONTAINER_HOST,
+		String host = TupleObjectHelper.getString(properties, PizContext.ATTRIBUTE_PREFIX + CONTAINER_HOST,
 				StringUtils.EMPTY);
 		InetAddress address = NetworkUtils.nullToEmpty(host);
 		try {

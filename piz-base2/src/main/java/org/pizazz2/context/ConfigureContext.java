@@ -6,7 +6,7 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.pizazz2.Constant;
+import org.pizazz2.PizContext;
 import org.pizazz2.ICloseable;
 import org.pizazz2.common.ResourceUtils;
 import org.pizazz2.common.SystemUtils;
@@ -62,7 +62,7 @@ public final class ConfigureContext implements ICloseable {
 	}
 
 	private void load(IType type) {
-		String postfix = SystemUtils.getSystemProperty(Constant.NAMING_SHORT + ".configure.postfix", "_Configure");
+		String postfix = SystemUtils.getSystemProperty(PizContext.NAMING_SHORT + ".configure.postfix", "_Configure");
 		try {
 			Properties tmp = ResourceUtils.loadProperties(type.value() + postfix + ".properties");
 			tree.put(type, tmp);

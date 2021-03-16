@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.pizazz2.exception.ValidateException;
-import org.pizazz2.exception.UtilityException;
 import org.pizazz2.helper.LocaleHelper;
 import org.pizazz2.message.BasicCodeEnum;
 import org.pizazz2.message.TypeEnum;
@@ -40,23 +39,23 @@ public class DateUtils {
 		return LocalDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), zoneId);
 	}
 
-	public static Date parse(String time, String pattern) throws ValidateException, UtilityException {
+	public static Date parse(String time, String pattern) throws ValidateException {
 		ValidateUtils.notNull("parse", time, pattern);
 		try {
 			return new SimpleDateFormat(pattern).parse(time);
 		} catch (ParseException e) {
 			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.DATE.PARSE", time, pattern);
-			throw new UtilityException(BasicCodeEnum.MSG_0017, msg, e);
+			throw new ValidateException(BasicCodeEnum.MSG_0017, msg, e);
 		}
 	}
 
-	public static LocalDateTime parse(String time, DateTimeFormatter formatter) throws ValidateException, UtilityException {
+	public static LocalDateTime parse(String time, DateTimeFormatter formatter) throws ValidateException {
 		ValidateUtils.notNull("parse", time, formatter);
 		try {
 			return LocalDateTime.parse(time, formatter);
 		} catch (DateTimeParseException e) {
 			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.DATE.PARSE", time, formatter.toString());
-			throw new UtilityException(BasicCodeEnum.MSG_0017, msg, e);
+			throw new ValidateException(BasicCodeEnum.MSG_0017, msg, e);
 		}
 	}
 

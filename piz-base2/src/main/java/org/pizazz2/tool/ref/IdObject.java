@@ -1,5 +1,7 @@
 package org.pizazz2.tool.ref;
 
+import org.pizazz2.PizContext;
+
 /**
  * ID生成组件对象
  * 
@@ -8,7 +10,7 @@ package org.pizazz2.tool.ref;
  */
 public class IdObject {
 	/**
-	 * piz版本{@link org.pizazz2.Constant#VERSION}
+	 * piz版本{@link PizContext#VERSION}
 	 */
 	private final byte version;
 	/**

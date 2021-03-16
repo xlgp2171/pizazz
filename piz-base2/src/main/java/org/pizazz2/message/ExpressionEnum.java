@@ -18,7 +18,7 @@ public enum ExpressionEnum {
     /**
      * 匹配中文字符的正则表达式
      */
-    CHINESE("[\\u4e00-\\u9fa5]"),
+    CHINESE("[\\u4e00-\\u9fa5]+"),
     /**
      * 验证年龄
      */
@@ -26,7 +26,7 @@ public enum ExpressionEnum {
     /**
      * 中文或英文
      */
-    CN_OR_EN("^([\\u4e00-\\u9fa5]{2,})$|^([a-zA-Z0-9]{4,})$"),
+    CN_OR_EN("[\\u4e00-\\u9fa5a-zA-Z0-9]+"),
     /**
      * 匹配HTML标记的正则表达式
      */

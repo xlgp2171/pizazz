@@ -30,7 +30,7 @@ import org.pizazz2.message.TypeEnum;
  * @author xlgp2171
  * @version 2.0.210201
  */
-public class PCompiler implements ICloseable {
+public class DynamicCompiler implements ICloseable {
     private final JavaCompiler compiler;
     /**
      * 诊断信息
@@ -39,17 +39,17 @@ public class PCompiler implements ICloseable {
     private final StandardJavaFileManager manager;
     private final Set<String> options = new LinkedHashSet<>();
     private final List<String> paths = new LinkedList<>();
-    private final PClassLoader loader;
+    private final PizClassLoader loader;
 
-    public PCompiler(PClassLoader loader) throws ValidateException {
-        ValidateUtils.notNull("PCompiler", loader);
+    public DynamicCompiler(PizClassLoader loader) throws ValidateException {
+        ValidateUtils.notNull("PizClassLoader", loader);
         compiler = ToolProvider.getSystemJavaCompiler();
         collector = new DiagnosticCollector<>();
         manager = compiler.getStandardFileManager(collector, null, null);
         this.loader = loader;
     }
 
-    public PCompiler setOptions(String... options) {
+    public DynamicCompiler setOptions(String... options) {
         // 增加参数可以跟编译依赖javac -extdirs lib;lib_ext -Xlint:unchecked
         if (!ArrayUtils.isEmpty(options)) {
             this.options.addAll(Arrays.asList(options));
@@ -57,7 +57,7 @@ public class PCompiler implements ICloseable {
         return this;
     }
 
-    public PCompiler addResource(Path dir, Path name) throws ValidateException, UtilityException {
+    public DynamicCompiler addResource(Path dir, Path name) throws ValidateException, UtilityException {
         ValidateUtils.notNull("addResource", dir, name);
         Path source = dir.resolve(name);
 
@@ -67,7 +67,7 @@ public class PCompiler implements ICloseable {
         return this;
     }
 
-    public PCompiler addFile(Path path) throws ValidateException, ToolException {
+    public DynamicCompiler addFile(Path path) throws ValidateException, ToolException {
         ValidateUtils.notNull("addFile", path);
 
         if (PathUtils.isRegularFile(path) && path.toString().endsWith(JavaFileObject.Kind.SOURCE.extension)) {
@@ -79,7 +79,7 @@ public class PCompiler implements ICloseable {
         return this;
     }
 
-    public PClassLoader compile() throws ToolException {
+    public PizClassLoader compile() throws ToolException {
         options.addAll(Arrays.asList("-d", loader.getDirectory().toString(), "-Xlint:unchecked"));
         Iterable<? extends JavaFileObject> files = manager.getJavaFileObjectsFromStrings(paths);
         JavaCompiler.CompilationTask task = compiler.getTask(null, manager, collector, options, null, files);

@@ -1,12 +1,12 @@
 package org.pizazz2;
 
 /**
- * 全局常量
+ * 全局环境
  *
  * @author xlgp2171
  * @version 2.0.210201
  */
-public final class Constant {
+public final class PizContext {
     /**
      * 全局名称
      */
@@ -23,4 +23,12 @@ public final class Constant {
 	 * 属性前缀
 	 */
     public static final String ATTRIBUTE_PREFIX = "$";
+	/**
+	 * 当前框架类加载器
+	 */
+	public static final ClassLoader CLASS_LOADER;
+
+	static {
+		CLASS_LOADER = PizContext.class.getClassLoader();
+	}
 }

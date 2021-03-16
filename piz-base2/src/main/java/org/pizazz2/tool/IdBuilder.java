@@ -10,11 +10,11 @@ import org.pizazz2.tool.ref.IdObject;
  * @author xlgp2171
  * @version 2.0.210201
  */
-public class PIdBuilder {
+public class IdBuilder {
 	private final IIdFactory factory;
 	private final short custom;
 
-	public PIdBuilder(IIdFactory factory, short custom) {
+	public IdBuilder(IIdFactory factory, short custom) {
 		this.factory = factory;
 		this.custom = custom;
 	}

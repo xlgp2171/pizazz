@@ -23,7 +23,7 @@ import java.time.Duration;
  * @version 2.0.210201
  *
  */
-public abstract class AbstractClassPlugin<C extends IObject> implements IPlugin {
+public abstract class AbstractClassPlugin<C extends IObject> {
 	private final C configure;
 
 	public AbstractClassPlugin(C configure) {
@@ -41,7 +41,7 @@ public abstract class AbstractClassPlugin<C extends IObject> implements IPlugin 
 	protected final C setConfig(C config) {
 		if (config != null) {
 			synchronized (configure) {
-				configure.set(config);
+				configure.set(null, config);
 			}
 		}
 		return configure;
@@ -85,9 +85,9 @@ public abstract class AbstractClassPlugin<C extends IObject> implements IPlugin 
 	 */
 	public IPlugin loadPlugin(String key, IPlugin defPlugin, ClassLoader loader, boolean initialize)
 			throws AbstractException, ValidateException {
-		String _classpath = StringUtils.of(configure.get(key, StringUtils.EMPTY));
+		String classpath = StringUtils.of(configure.get(key, StringUtils.EMPTY));
 		try {
-			return load(_classpath, key, defPlugin, loader, initialize, null);
+			return load(classpath, key, defPlugin, loader, initialize, null);
 		} catch (AbstractException e) {
 			log(e.getMessage(), e);
 			return load(StringUtils.EMPTY, key, defPlugin, loader, initialize, e);

@@ -169,13 +169,13 @@ public class StringUtils {
 
 	public static String match(Pattern pattern, String input, int group) throws ValidateException {
 		ValidateUtils.notNull("match", pattern, input);
-		Matcher _matcher = pattern.matcher(input);
+		Matcher matcher = pattern.matcher(input);
 
-		if (_matcher.find()) {
-			if (group < 0 || group > _matcher.groupCount()) {
+		if (matcher.find()) {
+			if (group < 0 || group > matcher.groupCount()) {
 				return StringUtils.EMPTY;
 			}
-			return _matcher.group(group);
+			return matcher.group(group);
 		}
 		return StringUtils.EMPTY;
 	}
@@ -199,7 +199,7 @@ public class StringUtils {
 	 * @return 变换后的字符串
 	 */
 	public static String capitalize(String target) {
-		return isTrimEmpty(target) ? EMPTY : Character.toTitleCase(target.charAt(0)) + target.substring(1);
+		return StringUtils.isTrimEmpty(target) ? EMPTY : Character.toTitleCase(target.charAt(0)) + target.substring(1);
 	}
 
 	public static String of(Object target) {

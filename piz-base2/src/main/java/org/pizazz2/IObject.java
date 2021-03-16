@@ -23,9 +23,10 @@ public interface IObject extends Cloneable {
     /**
      * 更新对象
      *
+     * @param key 标识
      * @param target 目标对象
      */
-    default void set(IObject target) {
+    default void set(String key, Object target) {
     }
 
     /**
@@ -44,11 +45,11 @@ public interface IObject extends Cloneable {
 
     /**
      * 获取对应字符串
-     * @param id 标识
+     * @param key 标识
      * @param defValue 默认值
      * @return 标识对应值
      */
-    default Object get(String id, Object defValue) {
+    default Object get(String key, Object defValue) {
         return defValue;
     }
 }

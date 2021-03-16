@@ -25,9 +25,9 @@ import org.pizazz2.tool.ref.IShellFactory;
  * @author xlgp2171
  * @version 2.0.210201
  */
-public class PShellBuilder implements ICloseable, IObject {
+public class ShellBuilder implements ICloseable, IObject {
 
-	private final PIdBuilder idBuilder = PIdFactory.newInstance();
+	private final IdBuilder idBuilder = IdFactory.newInstance();
 	private final AtomicLong id = new AtomicLong(-1L);
 	private final IShellFactory factory;
 	private final ProcessBuilder builder;
@@ -35,8 +35,8 @@ public class PShellBuilder implements ICloseable, IObject {
 	private Duration timeout = Duration.ZERO;
 	private Process tmpProcess;
 
-	public PShellBuilder(IShellFactory factory, String[] command) throws ValidateException {
-		ValidateUtils.notNull("PShellBuilder", factory);
+	public ShellBuilder(IShellFactory factory, String[] command) throws ValidateException {
+		ValidateUtils.notNull("ShellBuilder", factory);
 		this.factory = factory;
 		builder = new ProcessBuilder();
 		command(command);
@@ -53,7 +53,7 @@ public class PShellBuilder implements ICloseable, IObject {
 		return StringUtils.of(id);
 	}
 
-	public PShellBuilder charset(Charset charset) {
+	public ShellBuilder charset(Charset charset) {
 		if (charset != null) {
 			this.charset = charset;
 		}
@@ -67,7 +67,7 @@ public class PShellBuilder implements ICloseable, IObject {
 	 * @param timeout 等待超时时间
 	 * @return 当前对象
 	 */
-	public PShellBuilder waitFor(Duration timeout) {
+	public ShellBuilder waitFor(Duration timeout) {
 		if (timeout != null) {
 			this.timeout = timeout;
 		}

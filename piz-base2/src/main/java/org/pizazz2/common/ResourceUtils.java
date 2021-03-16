@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
 
-import org.pizazz2.Constant;
+import org.pizazz2.PizContext;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.exception.UtilityException;
 import org.pizazz2.helper.LocaleHelper;
@@ -21,18 +21,18 @@ import org.pizazz2.message.TypeEnum;
 public class ResourceUtils {
 
 	public static Properties loadProperties(String resource) throws ValidateException, UtilityException {
-		return ResourceUtils.loadProperties(resource, Constant.class, null, true);
+		return ResourceUtils.loadProperties(resource, PizContext.CLASS_LOADER, true);
 	}
 
-	public static Properties loadProperties(String resource, Class<?> clazz, Thread current, boolean close)
+	public static Properties loadProperties(String resource, ClassLoader loader, boolean close)
 			throws ValidateException, UtilityException {
-		InputStream _stream = IOUtils.getResourceAsStream(resource, clazz, current);
-		return ResourceUtils.loadProperties(_stream, close);
+		InputStream stream = IOUtils.getResourceAsStream(resource, loader);
+		return ResourceUtils.loadProperties(stream, close);
 	}
 
 	public static Properties mergeProperties(Properties target, String resource)
 			throws ValidateException, UtilityException {
-		InputStream stream = IOUtils.getResourceAsStream(resource, Constant.class, null);
+		InputStream stream = IOUtils.getResourceAsStream(resource, PizContext.class, null);
 		return ResourceUtils.mergeProperties(stream, target, true);
 	}
 
@@ -52,7 +52,7 @@ public class ResourceUtils {
 			throw new UtilityException(BasicCodeEnum.MSG_0003, msg, e);
 		}
 		if (target != null) {
-			target.putAll(properties);
+			properties.putAll(target);
 		}
 		try {
 			return properties;

@@ -27,6 +27,6 @@ public class IOUtilsTest {
 	public void testToByteArray() throws UtilityException {
 		InputStream in = IOUtils.getResourceAsStream("DynamicObject.tmp");
 		byte[] data = IOUtils.toByteArray(in);
-		Assert.assertEquals(335, data.length);
+		Assert.assertEquals(335, data.length, 1);
 	}
 }

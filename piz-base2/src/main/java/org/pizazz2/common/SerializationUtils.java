@@ -1,11 +1,7 @@
 package org.pizazz2.common;
 
-import java.io.IOException;
-
-import org.pizazz2.common.ref.IJacksonConfig;
 import org.pizazz2.common.ref.IKryoConfig;
 import org.pizazz2.exception.ValidateException;
-import org.pizazz2.exception.UtilityException;
 import org.pizazz2.helper.LocaleHelper;
 import org.pizazz2.message.BasicCodeEnum;
 import org.pizazz2.message.TypeEnum;
@@ -18,7 +14,8 @@ import org.pizazz2.message.TypeEnum;
  * @version 2.0.210201
  */
 public class SerializationUtils {
-	public static byte[] serialize(Object target, IKryoConfig config) throws ValidateException, UtilityException {
+
+	public static byte[] serialize(Object target, IKryoConfig config) throws ValidateException {
 		ValidateUtils.notNull("serialize", target);
 
 		if (config == null) {
@@ -26,6 +23,7 @@ public class SerializationUtils {
 		}
 		com.esotericsoftware.kryo.Kryo kryo = new com.esotericsoftware.kryo.Kryo();
 		config.set(kryo);
+		kryo.register(target.getClass());
 		int buffer = config.getBufferSize();
 
 		try (com.esotericsoftware.kryo.io.Output output = new com.esotericsoftware.kryo.io.Output(
@@ -34,12 +32,11 @@ public class SerializationUtils {
 			return output.toBytes();
 		} catch (Exception e) {
 			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.KRYO.PROCESS", e.getMessage());
-			throw new UtilityException(BasicCodeEnum.MSG_0013, msg, e);
+			throw new ValidateException(BasicCodeEnum.MSG_0013, msg, e);
 		}
 	}
 
-	public static <T> T deserialize(byte[] target, Class<T> type, IKryoConfig config)
-			throws ValidateException, UtilityException {
+	public static <T> T deserialize(byte[] target, Class<T> type, IKryoConfig config) throws ValidateException {
 		ValidateUtils.notNull("deserialize", target, type);
 		com.esotericsoftware.kryo.Kryo kryo = new com.esotericsoftware.kryo.Kryo();
 
@@ -50,10 +47,11 @@ public class SerializationUtils {
 			return kryo.readObject(input, type);
 		} catch (Exception e) {
 			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.KRYO.PROCESS", e.getMessage());
-			throw new UtilityException(BasicCodeEnum.MSG_0013, msg, e);
+			throw new ValidateException(BasicCodeEnum.MSG_0013, msg, e);
 		}
 	}
 
+	/*
 	public static byte[] serialize(Object target, IJacksonConfig config) throws ValidateException, UtilityException {
 		ValidateUtils.notNull("serialize", target);
 
@@ -88,4 +86,5 @@ public class SerializationUtils {
 			throw new UtilityException(BasicCodeEnum.MSG_0013, msg, e);
 		}
 	}
+	 */
 }

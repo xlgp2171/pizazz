@@ -2,7 +2,7 @@ package org.pizazz2.tool;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.pizazz2.Constant;
+import org.pizazz2.PizContext;
 import org.pizazz2.common.NumberUtils;
 import org.pizazz2.helper.LocaleHelper;
 import org.pizazz2.exception.ValidateException;
@@ -18,7 +18,7 @@ import org.pizazz2.tool.ref.IdObject;
  * @author xlgp2171
  * @version 2.0.210201
  */
-public class PIdFactory implements IIdFactory {
+public class IdFactory implements IIdFactory {
 	public static final byte BIT_TOP = 1;
 	public static final byte BIT_VERSION = 3;
 	public static final byte BIT_CUSTOM = 6;
@@ -27,12 +27,12 @@ public class PIdFactory implements IIdFactory {
 
 	private final AtomicReference<Sequence> cache = new AtomicReference<>(new Sequence());
 
-	public static PIdBuilder newInstance() {
-		return new PIdBuilder(Singleton.INSTANCE.get(), NumberUtils.ZERO.shortValue());
+	public static IdBuilder newInstance() {
+		return new IdBuilder(Singleton.INSTANCE.get(), NumberUtils.ZERO.shortValue());
 	}
 
-	public static PIdBuilder newInstance(short custom) {
-		return new PIdBuilder(Singleton.INSTANCE.get(), custom);
+	public static IdBuilder newInstance(short custom) {
+		return new IdBuilder(Singleton.INSTANCE.get(), custom);
 	}
 
 	public static IdObject parseObject(long id) throws ValidateException {
@@ -42,7 +42,7 @@ public class PIdFactory implements IIdFactory {
 	@Override
 	public IdObject create(short custom) throws ValidateException {
 		custom = validateCustom(custom);
-		return new IdObject(Constant.VERSION, custom);
+		return new IdObject(PizContext.VERSION, custom);
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class PIdFactory implements IIdFactory {
 		if (top != 1) {
 			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.EQUALS", "top", "BIT(" + BIT_TOP + ")");
 			throw new ValidateException(BasicCodeEnum.MSG_0005, msg);
-		} else if (version != Constant.VERSION) {
+		} else if (version != PizContext.VERSION) {
 			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.EQUALS", "version",
 					"BIT(" + BIT_VERSION + ")");
 			throw new ValidateException(BasicCodeEnum.MSG_0005, msg);
@@ -158,13 +158,13 @@ public class PIdFactory implements IIdFactory {
 		 */
 		INSTANCE;
 
-		private final PIdFactory factory;
+		private final IdFactory factory;
 
 		private Singleton() {
-			factory = new PIdFactory();
+			factory = new IdFactory();
 		}
 
-		public PIdFactory get() {
+		public IdFactory get() {
 			return factory;
 		}
 	}

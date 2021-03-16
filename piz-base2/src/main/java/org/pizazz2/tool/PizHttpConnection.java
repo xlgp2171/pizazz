@@ -44,11 +44,11 @@ import org.pizazz2.tool.ref.ResponseObject;
  * @author xlgp2171
  * @version 2.0.210201
  */
-public class PHttpConnection {
+public class PizHttpConnection {
     public static final String PROTOCOL_HTTPS = "https";
     private final URL url;
 
-    public PHttpConnection(String url) throws ToolException {
+    public PizHttpConnection(String url) throws ToolException {
         try {
             this.url = new URL(url);
         } catch (MalformedURLException e) {
@@ -57,8 +57,8 @@ public class PHttpConnection {
         }
     }
 
-    public PHttpConnection(URL url) throws ValidateException {
-        ValidateUtils.notNull("PHttpConnection", url);
+    public PizHttpConnection(URL url) throws ValidateException {
+        ValidateUtils.notNull("PizHttpConnection", url);
         this.url = url;
     }
 
@@ -113,10 +113,11 @@ public class PHttpConnection {
     }
 
     public static ResponseObject response(HttpURLConnection connection) throws ToolException {
-        return PHttpConnection.response(connection, HttpURLConnection.HTTP_OK);
+        return PizHttpConnection.response(connection, HttpURLConnection.HTTP_OK);
     }
 
     public static ResponseObject response(HttpURLConnection connection, int httpStatus) throws ValidateException, ToolException {
+        ValidateUtils.notNull("response", connection);
         int code;
         try {
             code = connection.getResponseCode();
@@ -134,11 +135,11 @@ public class PHttpConnection {
                 String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.HTTP.INPUT", e.getMessage());
                 throw new ToolException(BasicCodeEnum.MSG_0003, msg, e);
             } finally {
-                disconnect(connection);
+                PizHttpConnection.disconnect(connection);
             }
             return new ResponseObject(code, data, properties);
         } else {
-            PHttpConnection.disconnect(connection);
+            PizHttpConnection.disconnect(connection);
             return new ResponseObject(code, null, null);
         }
     }
@@ -186,7 +187,7 @@ public class PHttpConnection {
     /**
      * 构建SSL环境
      *
-     * @param protocol 指定的协议，如：SSLv3
+     * @param protocol 指定的协议，如：SSLv3,TLSv1.2
      * @return SSL
      *
      * @throws ToolException SSL环境构建异常
@@ -239,7 +240,7 @@ public class PHttpConnection {
 
         @Override
         public String getDefaultSSLProtocol() {
-            return "SSLv3";
+            return "TLSv1.2";
         }
     }
 }

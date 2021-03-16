@@ -35,10 +35,10 @@ public class NetworkUtils {
 		Set<InetAddress> tmp = new LinkedHashSet<>();
 
 		while (network.hasMoreElements()) {
-			Enumeration<InetAddress> _address = network.nextElement().getInetAddresses();
+			Enumeration<InetAddress> address = network.nextElement().getInetAddresses();
 
-			while (_address.hasMoreElements()) {
-				InetAddress item = _address.nextElement();
+			while (address.hasMoreElements()) {
+				InetAddress item = address.nextElement();
 
 				if (item instanceof Inet4Address && type != NetworkEnum.Inet.INET6) {
 					tmp.add(item);
@@ -52,9 +52,9 @@ public class NetworkUtils {
 	}
 
 	public static InetAddress getAddressByNetwork(NetworkEnum.Inet type) throws UtilityException {
-		InetAddress[] _address = NetworkUtils.getAddressesByNetwork(type);
+		InetAddress[] address = NetworkUtils.getAddressesByNetwork(type);
 
-		if (ArrayUtils.isEmpty(_address)) {
+		if (ArrayUtils.isEmpty(address)) {
 			try {
 				return InetAddress.getLocalHost();
 			} catch (UnknownHostException e) {
@@ -66,7 +66,7 @@ public class NetworkUtils {
 				}
 			}
 		} else {
-			return _address[0];
+			return address[0];
 		}
 	}
 
@@ -82,22 +82,22 @@ public class NetworkUtils {
 	}
 
 	public static String[] getHostByNetwork(NetworkEnum.Inet type, String... filter) {
-		InetAddress[] _address = NetworkUtils.getAddressesByNetwork(type);
-		Set<String> _filter = CollectionUtils.asHashSet(filter);
+		InetAddress[] address = NetworkUtils.getAddressesByNetwork(type);
+		Set<String> filterS = CollectionUtils.asHashSet(filter);
 		Set<String> tmp = new LinkedHashSet<>();
 
-		for (InetAddress item : _address) {
-			NetworkUtils.hostFilter(item, _filter, tmp);
+		for (InetAddress item : address) {
+			NetworkUtils.hostFilter(item, filterS, tmp);
 		}
 		return tmp.toArray(new String[0]);
 	}
 
 	public static void hostFilter(InetAddress address, Set<String> filter, Set<String> hosts) {
 		if (address != null) {
-			String _host = address.getHostAddress();
+			String host = address.getHostAddress();
 
-			if (filter == null || !filter.contains(_host)) {
-				hosts.add(_host);
+			if (filter == null || !filter.contains(host)) {
+				hosts.add(host);
 			}
 		}
 	}
@@ -143,31 +143,34 @@ public class NetworkUtils {
 			return StringUtils.EMPTY;
 		}
 		// 下面代码是把mac地址拼装成String
-		StringBuilder _builder = new StringBuilder();
+		/*
+		StringBuilder builder = new StringBuilder();
 
-		for (int _i = 0; _i < mac.length; _i++) {
-			if (_i != 0) {
-				_builder.append("-");
+		for (int i = 0; i < mac.length; i++) {
+			if (i != 0) {
+				builder.append("-");
 			}
 			// mac[i] & 0xFF 是为了把byte转化为正整数
-			String tmp = Integer.toHexString(mac[_i] & 0xFF);
-			_builder.append(tmp.length() == 1 ? 0 + tmp : tmp);
+			String tmp = Integer.toHexString(mac[i] & 0xFF);
+			builder.append(tmp.length() == 1 ? 0 + tmp : tmp);
 		}
 		// 把字符串所有小写字母改为大写成为正规的mac地址并返回
-		return _builder.toString();
+		return builder.toString();
+		 */
+		return StringUtils.toHexString(mac,"-");
 	}
 
 	public static int ipToInt(String ip) throws ValidateException, UtilityException {
 		ValidateUtils.notNull("ipToInt", ip);
-		InetAddress _address;
+		InetAddress address;
 		try {
-			_address = InetAddress.getByName(ip);
+			address = InetAddress.getByName(ip);
 		} catch (UnknownHostException e) {
 			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.SOCKET.NETWORK", ip, e.getMessage());
 			throw new UtilityException(BasicCodeEnum.MSG_0016, msg, e);
 		}
 		// 获取网络字节顺序
-		byte[] tmp = _address.getAddress();
+		byte[] tmp = address.getAddress();
 		return (NetworkUtils.toInt(tmp[0]) << 24) | (NetworkUtils.toInt(tmp[1]) << 16) |
 				(NetworkUtils.toInt(tmp[2]) << 8) | NetworkUtils.toInt(tmp[3]);
 	}
@@ -178,22 +181,22 @@ public class NetworkUtils {
 
 	public static String longToIp(long target) {
 		Long[] tmp = new Long[] { (target >> 24) & 0xff, (target >> 16) & 0xff, (target >> 8) & 0xff, target & 0xff };
-		String[] _result = new String[tmp.length];
+		String[] result = new String[tmp.length];
 
-		for (int _i = 0; _i < tmp.length; _i++) {
-			_result[_i] = Integer.toString(tmp[_i].intValue());
+		for (int i = 0; i < tmp.length; i++) {
+			result[i] = Integer.toString(tmp[i].intValue());
 		}
-		return StringUtils.join(_result, ".");
+		return StringUtils.join(result, ".");
 	}
 
 	static int toInt(byte target) {
-		int _result = target & 0x07f;
-		return target < 0 ? _result | 0x80 : _result;
+		int result = target & 0x07f;
+		return target < 0 ? result | 0x80 : result;
 	}
 
 	static long toLong(int target) {
-		long _result = target & 0x7fffffffL;
-		return target < 0 ? _result | 0x080000000L : _result;
+		long result = target & 0x7fffffffL;
+		return target < 0 ? result | 0x080000000L : result;
 	}
 
 	/**
@@ -211,18 +214,18 @@ public class NetworkUtils {
 	public static NetworkEnum.IpAddressType getIpAddressTypeByIP4(String ip) throws ValidateException {
 		ValidateUtils.notNull("getIpAddressTypeByIP4", ip);
 		ValidateUtils.verifyExpression(ExpressionEnum.IP_ADDRESS, ip);
-		String[] _ip = ip.split(NetworkUtils.IP_SEPARATOR);
-		int _netAddress = NumberUtils.toInt(_ip[0], 0);
+		String[] ipArray = ip.split(NetworkUtils.IP_SEPARATOR);
+		int netAddress = NumberUtils.toInt(ipArray[0], 0);
 
-		if (_netAddress >= 1 && _netAddress <= 126) {
+		if (netAddress >= 1 && netAddress <= 126) {
 			return NetworkEnum.IpAddressType.A;
-		} else if (_netAddress >= 128 && _netAddress <= 191) {
+		} else if (netAddress >= 128 && netAddress <= 191) {
 			return NetworkEnum.IpAddressType.B;
-		} else if (_netAddress >= 192 && _netAddress <= 223) {
+		} else if (netAddress >= 192 && netAddress <= 223) {
 			return NetworkEnum.IpAddressType.C;
-		} else if (_netAddress >= 224 && _netAddress <= 239) {
+		} else if (netAddress >= 224 && netAddress <= 239) {
 			return NetworkEnum.IpAddressType.D;
-		} else if (_netAddress >= 240 && _netAddress <= 254) {
+		} else if (netAddress >= 240 && netAddress <= 254) {
 			return NetworkEnum.IpAddressType.E;
 		} else {
 			return NetworkEnum.IpAddressType.UNKNOWN;

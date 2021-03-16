@@ -21,7 +21,7 @@ import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 
-import org.pizazz2.Constant;
+import org.pizazz2.PizContext;
 import org.pizazz2.ICloseable;
 import org.pizazz2.common.ref.IMXBean;
 import org.pizazz2.common.ref.OSTypeEnum;
@@ -66,7 +66,7 @@ public class SystemUtils {
     static {
         LOCAL_OS = SystemUtils.getOSType(SystemUtils.getSystemProperty("os.name", StringUtils.EMPTY).toLowerCase());
         // 默认中文环境
-        String tmp = SystemUtils.getSystemProperty(Constant.NAMING_SHORT + ".locale", "en_US");
+        String tmp = SystemUtils.getSystemProperty(PizContext.NAMING_SHORT + ".locale", "en_US");
         Locale tmpL = Locale.forLanguageTag(tmp);
         LOCAL_LOCALE = StringUtils.isTrimEmpty(tmpL.toString()) ? Locale.forLanguageTag("zh_CN") : tmpL;
         Path tmpPath;
@@ -78,7 +78,7 @@ public class SystemUtils {
         LOCAL_DIR = tmpPath;
         // 默认UTF-8
         String defE = SystemUtils.getSystemProperty("file.encoding", StandardCharsets.UTF_8.name());
-        tmp = SystemUtils.getSystemProperty(Constant.NAMING_SHORT + ".encoding", defE);
+        tmp = SystemUtils.getSystemProperty(PizContext.NAMING_SHORT + ".encoding", defE);
         Charset tmpC;
         try {
             tmpC = Charset.forName(tmp);
@@ -199,7 +199,7 @@ public class SystemUtils {
      * @return 关闭狗子的线程
      */
     public static Thread addShutdownHook(ICloseable closeable, Duration timeout) {
-        Thread tmp = new Thread(() -> destroy(closeable, timeout));
+        Thread tmp = new Thread(() -> SystemUtils.destroy(closeable, timeout));
         Runtime.getRuntime().addShutdownHook(tmp);
         return tmp;
     }

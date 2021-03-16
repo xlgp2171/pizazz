@@ -1,6 +1,6 @@
 package org.pizazz2.test;
 
-import org.pizazz.common.StringUtils;
+import org.pizazz2.common.StringUtils;
 
 public final class DynamicObject<E> {
 	private final E element;

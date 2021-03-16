@@ -6,6 +6,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.pizazz2.data.TupleObject;
 import org.pizazz2.exception.ValidateException;
@@ -30,8 +32,8 @@ public class ReflectUtils {
 
 	public static <T> T invokeConstructor(Class<T> clazz, Object... arguments)
 			throws ValidateException, UtilityException {
-		Class<?>[] _types = ClassUtils.toClass(false, arguments);
-		return invokeConstructor(clazz, _types, arguments, false);
+		Class<?>[] types = ClassUtils.toClass(false, arguments);
+		return ReflectUtils.invokeConstructor(clazz, types, arguments, false);
 	}
 
 	public static <T> T invokeConstructor(Class<T> clazz, Class<?>[] types, Object[] arguments, boolean isDeclared)
@@ -39,9 +41,9 @@ public class ReflectUtils {
 		ValidateUtils.notNull("invokeConstructor", clazz);
 		types = ArrayUtils.nullToEmpty(types);
 		arguments = ArrayUtils.nullToEmpty(arguments);
-		Constructor<T> _constructor;
+		Constructor<T> constructor;
 		try {
-			_constructor = clazz.getConstructor(types);
+			constructor = clazz.getConstructor(types);
 		} catch (NoSuchMethodException | SecurityException e1) {
 			if (!isDeclared) {
 				String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CONSTRUCTOR", Arrays.toString(types),
@@ -49,7 +51,7 @@ public class ReflectUtils {
 				throw new UtilityException(BasicCodeEnum.MSG_0010, msg, e1);
 			}
 			try {
-				_constructor = clazz.getDeclaredConstructor(types);
+				constructor = clazz.getDeclaredConstructor(types);
 			} catch (NoSuchMethodException | SecurityException e2) {
 				String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CONSTRUCTOR", Arrays.toString(types),
 						clazz.getName(), e2.getMessage());
@@ -57,7 +59,7 @@ public class ReflectUtils {
 			}
 		}
 		try {
-			return _constructor.newInstance(arguments);
+			return constructor.newInstance(arguments);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException e) {
 			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CONSTRUCTOR.INIT", Arrays.toString(types),
@@ -69,9 +71,9 @@ public class ReflectUtils {
 	public static <T> T invokeMethod(Object target, String methodName, Class<?>[] types, Object[] arguments,
 			Class<T> returnType, boolean accessible) throws ValidateException, UtilityException {
 		ValidateUtils.notNull("invokeMethod", target);
-		Method _method = getMethod(target instanceof Class ? (Class<?>) target : target.getClass(), methodName, types,
+		Method method = getMethod(target instanceof Class ? (Class<?>) target : target.getClass(), methodName, types,
 				accessible);
-		Object tmp = invokeMethod(_method, target, arguments, accessible);
+		Object tmp = ReflectUtils.invokeMethod(method, target, arguments, accessible);
 		return ClassUtils.cast(tmp, returnType);
 	}
 
@@ -114,11 +116,11 @@ public class ReflectUtils {
 	}
 
 	public static Field getField(String name, Object target, boolean accessible) throws UtilityException {
-		Class<?> _type = target instanceof Class ? (Class<?>) target : target.getClass();
+		Class<?> type = target instanceof Class ? (Class<?>) target : target.getClass();
 		try {
-			return accessible ? _type.getDeclaredField(name) : _type.getField(name);
+			return accessible ? type.getDeclaredField(name) : type.getField(name);
 		} catch (NoSuchFieldException | SecurityException e) {
-			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.FIELD.GET", _type.getName(), name,
+			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.FIELD.GET", type.getName(), name,
 					e.getMessage());
 			throw new UtilityException(BasicCodeEnum.MSG_0010, msg, e);
 		}
@@ -128,23 +130,34 @@ public class ReflectUtils {
 		ValidateUtils.notNull("getFields", clazz);
 
 		if (isDeclared) {
-			// FIXME 看下是否能获取父类字段
 			return clazz.getDeclaredFields();
 		}
 		return clazz.getFields();
 	}
 
+	public static Map<Class<?>, Field[]> getAllFields(Class<?> clazz, boolean isDeclared) {
+		ValidateUtils.notNull("getAllFields", clazz);
+		Map<Class<?>, Field[]> tmp = new LinkedHashMap<>();
+		Class<?> current = clazz;
+
+		do {
+			tmp.put(current, ReflectUtils.getFields(current, isDeclared));
+			current = current.getSuperclass();
+		} while (current != Object.class);
+		return tmp;
+	}
+
 	public static TupleObject invokeGetFields(Object target, boolean accessible) throws ValidateException,
 			UtilityException {
 		ValidateUtils.notNull("invokeGetFields", target);
-		Field[] _fields = ReflectUtils.getFields(target instanceof Class ? (Class<?>) target : target.getClass(),
+		Field[] fields = ReflectUtils.getFields(target instanceof Class ? (Class<?>) target : target.getClass(),
 				accessible);
-		TupleObject tmp = TupleObjectHelper.newObject(_fields.length);
+		TupleObject tmp = TupleObjectHelper.newObject(fields.length);
 
-		for (Field item : _fields) {
-			Object _value = ReflectUtils.invokeGetField(item, Modifier.isStatic(item.getModifiers()) ?
+		for (Field item : fields) {
+			Object value = ReflectUtils.invokeGetField(item, Modifier.isStatic(item.getModifiers()) ?
 					target.getClass() : target, Object.class, accessible);
-			tmp.append(item.getName(), _value);
+			tmp.append(item.getName(), value);
 		}
 		return tmp;
 	}
@@ -152,8 +165,8 @@ public class ReflectUtils {
 	public static void invokeSetField(String name, Object target, Object value, boolean accessible)
 			throws ValidateException, UtilityException {
 		ValidateUtils.notNull("invokeSetField", name, target, value);
-		Field _field = ReflectUtils.getField(name, target, accessible);
-		ReflectUtils.invokeSetField(_field, target, value, accessible);
+		Field field = ReflectUtils.getField(name, target, accessible);
+		ReflectUtils.invokeSetField(field, target, value, accessible);
 	}
 
 	public static void invokeSetField(Field field, Object target, Object value, boolean accessible)
@@ -174,8 +187,8 @@ public class ReflectUtils {
 	public static <T> T invokeGetField(String name, Object target, Class<T> returnType, boolean accessible)
 			throws ValidateException, UtilityException {
 		ValidateUtils.notNull("invokeGetField", name, target, returnType);
-		Field _field = ReflectUtils.getField(name, target, accessible);
-		return ReflectUtils.invokeGetField(_field, target, returnType, accessible);
+		Field field = ReflectUtils.getField(name, target, accessible);
+		return ReflectUtils.invokeGetField(field, target, returnType, accessible);
 	}
 
 	public static <T> T invokeGetField(Field field, Object target, Class<T> returnType, boolean accessible)

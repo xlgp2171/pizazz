@@ -2,9 +2,8 @@ package org.pizazz2.common;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.pizazz2.exception.UtilityException;
 
-import java.net.InetAddress;
+import java.math.BigDecimal;
 
 /**
  * NumberUtils测试
@@ -13,6 +12,36 @@ import java.net.InetAddress;
  * @version 2.0.210201
  */
 public class NumberUtilsTest {
+
+	@Test
+	public void testValidate() {
+		boolean result = NumberUtils.validate(321, 123L, 456L);
+		Assert.assertTrue(result);
+	}
+
+	@Test
+	public void testToInt() {
+		int result = NumberUtils.toInt("0x0008", 16, 16);
+		Assert.assertEquals(result, 16);
+	}
+
+	@Test
+	public void testValueOf() {
+		Number result = NumberUtils.valueOf(new BigDecimal(1097110568869782150L));
+		Assert.assertEquals(1097110568869782150L, result);
+	}
+
+	@Test
+	public void testToPlainString() {
+		String result = NumberUtils.toPlainString(123.0987654321, 5);
+		Assert.assertEquals(result, "123.09877");
+	}
+
+	@Test
+	public void testRound() {
+		double result = NumberUtils.round(12.3456, 3);
+		Assert.assertEquals(result,12.346, 0);
+	}
 
 	@Test
 	public void testRandom() {

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.pizazz2.Constant;
+import org.pizazz2.PizContext;
 import org.pizazz2.data.TupleObject;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.exception.BaseException;
@@ -138,7 +138,7 @@ public class ClassUtils {
         ValidateUtils.notEmpty(classpath, "loadClass");
 
         if (loader == null) {
-            loader = ClassUtils.getClassLoader(Constant.class, Thread.currentThread());
+            loader = ClassUtils.getClassLoader(PizContext.class, Thread.currentThread());
         }
         try {
             if (ABBREVIATION.containsKey(classpath)) {
@@ -168,25 +168,25 @@ public class ClassUtils {
      * @return 根据条件获取的类加载器
      */
     public static ClassLoader getClassLoader(Class<?> target, Thread current) {
-        ClassLoader _loader = null;
+        ClassLoader loader = null;
 
         if (current != null) {
             try {
-                _loader = current.getContextClassLoader();
+                loader = current.getContextClassLoader();
             } catch (SecurityException e) {
                 // do nothing
             }
         }
-        if (_loader == null && target != null) {
-            _loader = target.getClassLoader();
+        if (loader == null && target != null) {
+            loader = target.getClassLoader();
         }
-        if (_loader == null) {
-            _loader = ClassLoader.getSystemClassLoader();
+        if (loader == null) {
+            loader = ClassLoader.getSystemClassLoader();
         }
         if (current != null) {
-            current.setContextClassLoader(_loader);
+            current.setContextClassLoader(loader);
         }
-        return _loader;
+        return loader;
     }
 
     /**
@@ -200,22 +200,22 @@ public class ClassUtils {
         if (ArrayUtils.isEmpty(arguments)) {
             return ArrayUtils.EMPTY_CLASS;
         }
-        Class<?>[] _classTypes = new Class<?>[arguments.length];
+        Class<?>[] classTypes = new Class<?>[arguments.length];
 
-        for (int _i = 0; _i < arguments.length; _i++) {
-            if (arguments[_i] == null) {
-                _classTypes[_i] = null;
+        for (int i = 0; i < arguments.length; i++) {
+            if (arguments[i] == null) {
+                classTypes[i] = null;
             } else if (primitive) {
                 try {
-                    _classTypes[_i] = ClassUtils.toPrimitiveClass(arguments[_i]);
+                    classTypes[i] = ClassUtils.toPrimitiveClass(arguments[i]);
                 } catch (ValidateException e) {
-                    _classTypes[_i] = null;
+                    classTypes[i] = null;
                 }
             } else {
-                _classTypes[_i] = arguments[_i].getClass();
+                classTypes[i] = arguments[i].getClass();
             }
         }
-        return _classTypes;
+        return classTypes;
     }
 
     /**
