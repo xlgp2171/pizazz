@@ -38,56 +38,6 @@ import org.pizazz2.message.TypeEnum;
  * @version 2.0.210201
  */
 public class SystemUtils {
-    /**
-     * 当前操作系统
-     */
-    public static final OSTypeEnum LOCAL_OS;
-    /**
-     * 当前时区
-     */
-    public static final Locale LOCAL_LOCALE;
-    /**
-     * 当前目录
-     */
-    public static final Path LOCAL_DIR;
-    /**
-     * 当前编码
-     */
-    public static final Charset LOCAL_ENCODING;
-    /**
-     * 当前系统目录分隔符
-     */
-    public static final String FILE_SEPARATOR = getSystemProperty("file.separator", "/");
-    /**
-     * 当前系统换行符
-     */
-    public static final String LINE_SEPARATOR = getSystemProperty("line.separator", "\n");
-
-    static {
-        LOCAL_OS = SystemUtils.getOSType(SystemUtils.getSystemProperty("os.name", StringUtils.EMPTY).toLowerCase());
-        // 默认中文环境
-        String tmp = SystemUtils.getSystemProperty(PizContext.NAMING_SHORT + ".locale", "en_US");
-        Locale tmpL = Locale.forLanguageTag(tmp);
-        LOCAL_LOCALE = StringUtils.isTrimEmpty(tmpL.toString()) ? Locale.forLanguageTag("zh_CN") : tmpL;
-        Path tmpPath;
-        try {
-            tmpPath = Paths.get("").toRealPath();
-        } catch (SecurityException | IOException e) {
-            tmpPath = Paths.get(SystemUtils.getSystemProperty("user.dir", StringUtils.EMPTY));
-        }
-        LOCAL_DIR = tmpPath;
-        // 默认UTF-8
-        String defE = SystemUtils.getSystemProperty("file.encoding", StandardCharsets.UTF_8.name());
-        tmp = SystemUtils.getSystemProperty(PizContext.NAMING_SHORT + ".encoding", defE);
-        Charset tmpC;
-        try {
-            tmpC = Charset.forName(tmp);
-        } catch (UnsupportedCharsetException e) {
-            tmpC = Charset.forName(defE);
-        }
-        LOCAL_ENCODING = tmpC;
-    }
-
     public static String getSystemProperty(String property, String defValue) {
         try {
             return System.getProperty(property, defValue);

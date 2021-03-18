@@ -46,11 +46,11 @@ public class DynamicCompilerTest {
 		String resource = "DynamicObject.tmp";
 		JavaClass tmp = getJavaClass(resource);
 		PizClassLoader loader = new PizClassLoader(resource, this.getClass().getClassLoader());
-		loader.extractJar(SystemUtils.LOCAL_DIR.resolve("target/piz-base2-1.0.0.jar"));
+		loader.extractJar(PizContext.LOCAL_PATH.resolve("target/piz-base2-2.0.0.jar"));
 		// 编译
 		try (DynamicCompiler compiler = new DynamicCompiler(loader)) {
 			loader = compiler
-					.setOptions("-cp", SystemUtils.LOCAL_DIR.resolve("target/piz-base2-1.0.0.jar").toString())
+					.setOptions("-cp", PizContext.LOCAL_PATH.resolve("target/piz-base2-2.0.0.jar").toString())
 					.addFile(tmp.path).compile();
 		}
 		//　反射

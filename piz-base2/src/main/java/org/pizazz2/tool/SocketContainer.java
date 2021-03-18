@@ -150,7 +150,7 @@ public class SocketContainer extends AbstractContainer<String> {
 				throw new ToolException(BasicCodeEnum.MSG_0016, msg);
 			}
 			data = command(packet.getData());
-			String tmp = new String(data, SystemUtils.LOCAL_ENCODING).trim();
+			String tmp = new String(data, PizContext.LOCAL_ENCODING).trim();
 			boolean valid = key.equals(tmp);
 
 			if (output.isEnabled()) {

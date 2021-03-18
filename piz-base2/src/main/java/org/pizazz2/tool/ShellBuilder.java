@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.pizazz2.ICloseable;
 import org.pizazz2.IMessageOutput;
 import org.pizazz2.IObject;
+import org.pizazz2.PizContext;
 import org.pizazz2.common.ArrayUtils;
 import org.pizazz2.common.StringUtils;
 import org.pizazz2.common.ValidateUtils;
@@ -44,7 +45,7 @@ public class ShellBuilder implements ICloseable, IObject {
 
 	public void command(String[] command) {
 		if (!ArrayUtils.isEmpty(command)) {
-			builder.command(ArrayUtils.merge(SystemUtils.LOCAL_OS.getEnvironment(), command));
+			builder.command(ArrayUtils.merge(PizContext.LOCAL_OS.getEnvironment(), command));
 		}
 	}
 

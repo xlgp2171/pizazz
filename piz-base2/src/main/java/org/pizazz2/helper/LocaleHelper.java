@@ -3,9 +3,9 @@ package org.pizazz2.helper;
 import java.util.Locale;
 import java.util.Properties;
 
+import org.pizazz2.PizContext;
 import org.pizazz2.common.ResourceUtils;
 import org.pizazz2.common.StringUtils;
-import org.pizazz2.common.SystemUtils;
 import org.pizazz2.context.LocaleContext;
 import org.pizazz2.message.TypeEnum;
 import org.pizazz2.message.ref.IType;
@@ -23,7 +23,7 @@ public class LocaleHelper {
 			type = TypeEnum.BASIC;
 		}
 		if (locale == null) {
-			locale = SystemUtils.LOCAL_LOCALE;
+			locale = PizContext.LOCAL_LOCALE;
 		}
 		return LocaleContext.getInstance().register(type, locale).getProperties(type, locale);
 	}
@@ -37,7 +37,7 @@ public class LocaleHelper {
 	 * @return 消息字符串
 	 */
 	public static String toLocaleText(IType type, String key, Object... arguments) {
-		return LocaleHelper.toLocaleText(type, SystemUtils.LOCAL_LOCALE, key, arguments);
+		return LocaleHelper.toLocaleText(type, PizContext.LOCAL_LOCALE, key, arguments);
 	}
 
 	public static String toLocaleText(IType type, Locale locale, String key, Object... arguments) {

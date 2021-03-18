@@ -9,6 +9,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Locale;
 
+import org.pizazz2.PizContext;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.helper.LocaleHelper;
 import org.pizazz2.message.BasicCodeEnum;
@@ -71,7 +72,7 @@ public class DateUtils {
 
 	public static String format(Date date, String pattern) throws ValidateException {
 		ValidateUtils.notNull("format", date, pattern);
-		return DateUtils.format(date, pattern, SystemUtils.LOCAL_LOCALE);
+		return DateUtils.format(date, pattern, PizContext.LOCAL_LOCALE);
 	}
 
 	public static String format(Date date, String pattern, Locale locale) throws ValidateException {

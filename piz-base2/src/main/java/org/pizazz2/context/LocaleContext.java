@@ -29,7 +29,7 @@ public final class LocaleContext implements ICloseable {
 
     public LocaleContext() {
         tree = new ConcurrentHashMap<>();
-        register(TypeEnum.BASIC, SystemUtils.LOCAL_LOCALE);
+        register(TypeEnum.BASIC, PizContext.LOCAL_LOCALE);
     }
 
     public LocaleContext register(IType type, Locale locale) {

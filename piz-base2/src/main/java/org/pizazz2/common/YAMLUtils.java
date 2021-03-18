@@ -78,6 +78,6 @@ public class YAMLUtils {
 	public static void toYAML(Path path, TupleObject data) throws ValidateException, UtilityException {
 		ValidateUtils.notNull("fromYAML", path, data);
 		String tmp = YAMLUtils.toYAMLString(path, data);
-		PathUtils.copyToPath(tmp.getBytes(SystemUtils.LOCAL_ENCODING), path);
+		PathUtils.copyToPath(tmp.getBytes(PizContext.LOCAL_ENCODING), path);
 	}
 }

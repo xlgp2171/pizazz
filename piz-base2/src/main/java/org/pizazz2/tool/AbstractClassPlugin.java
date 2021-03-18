@@ -26,7 +26,8 @@ import java.time.Duration;
 public abstract class AbstractClassPlugin<C extends IObject> {
 	private final C configure;
 
-	public AbstractClassPlugin(C configure) {
+	public AbstractClassPlugin(C configure) throws ValidateException {
+		ValidateUtils.notNull("AbstractClassPlugin", configure);
 		this.configure = configure;
 	}
 

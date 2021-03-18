@@ -1,5 +1,6 @@
 package org.pizazz2.common;
 
+import org.pizazz2.PizContext;
 import org.pizazz2.exception.UtilityException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.helper.LocaleHelper;
@@ -51,7 +52,7 @@ public class PathUtils {
         }
         String newTarget;
         try {
-            newTarget = URLEncoder.encode(target, SystemUtils.LOCAL_ENCODING.name());
+            newTarget = URLEncoder.encode(target, PizContext.LOCAL_ENCODING.name());
         } catch (UnsupportedEncodingException e) {
             return uri;
         }

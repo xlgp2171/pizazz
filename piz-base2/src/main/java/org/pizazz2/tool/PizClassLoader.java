@@ -234,7 +234,7 @@ public class PizClassLoader extends URLClassLoader implements IObject {
 					try {
 						dir = PathUtils.createTempDirectory(PizContext.NAMING_SHORT + "_CLASS_");
 					} catch (BaseException e) {
-						dir = SystemUtils.LOCAL_DIR;
+						dir = PizContext.LOCAL_PATH;
 					}
 				}
 			}
