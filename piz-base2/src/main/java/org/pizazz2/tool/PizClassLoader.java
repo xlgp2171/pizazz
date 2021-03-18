@@ -40,7 +40,7 @@ import org.pizazz2.message.TypeEnum;
  * @author xlgp2171
  * @version 2.0.210201
  */
-public class PizClassLoader extends URLClassLoader implements IObject {
+public class PizClassLoader extends URLClassLoader {
 	/**
 	 * 未关闭的JAR文件
 	 */
@@ -64,7 +64,6 @@ public class PizClassLoader extends URLClassLoader implements IObject {
 		ClassContext.getInstance().register(this);
 	}
 
-	@Override
 	public String getId() {
 		return id;
 	}

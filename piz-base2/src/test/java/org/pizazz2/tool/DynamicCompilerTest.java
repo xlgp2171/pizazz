@@ -24,8 +24,8 @@ public class DynamicCompilerTest {
 	private JavaClass getJavaClass(String resource) throws IOException, UtilityException {
 		String code;
 		// 加载文件
-		try (InputStream _in = IOUtils.getResourceAsStream(resource)) {
-			code = IOUtils.readInputStream(_in);
+		try (InputStream in = IOUtils.getResourceAsStream(resource)) {
+			code = IOUtils.readInputStream(in);
 		}
 		// 类路径
 		String classpath = ClassUtils.getPackageName(code) + "." + ClassUtils.getClassName(code);

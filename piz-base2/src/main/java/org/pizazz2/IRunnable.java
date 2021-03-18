@@ -8,7 +8,7 @@ import org.pizazz2.exception.AbstractException;
  * @author xlgp2171
  * @version 2.0.210201
  */
-public interface IRunnable extends IObject, ICloseable, Runnable {
+public interface IRunnable extends ICloseable, Runnable {
 	/**
 	 * 是否启用
 	 * @throws AbstractException 初始化异常

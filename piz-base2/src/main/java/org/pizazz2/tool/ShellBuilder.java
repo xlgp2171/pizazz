@@ -26,7 +26,7 @@ import org.pizazz2.tool.ref.IShellFactory;
  * @author xlgp2171
  * @version 2.0.210201
  */
-public class ShellBuilder implements ICloseable, IObject {
+public class ShellBuilder implements ICloseable {
 
 	private final IdBuilder idBuilder = IdFactory.newInstance();
 	private final AtomicLong id = new AtomicLong(-1L);
@@ -49,7 +49,6 @@ public class ShellBuilder implements ICloseable, IObject {
 		}
 	}
 
-	@Override
 	public String getId() {
 		return StringUtils.of(id);
 	}

@@ -119,8 +119,8 @@ public class ClassUtils {
      * @throws ValidateException classpath空异常
      */
     public static <T> T newClass(String classpath, ClassLoader loader, Class<T> type) throws ValidateException, UtilityException {
-        Class<?> _clazz = ClassUtils.loadClass(classpath, loader, true);
-        return ClassUtils.newAndCast(_clazz, type);
+        Class<?> clazz = ClassUtils.loadClass(classpath, loader, true);
+        return ClassUtils.newAndCast(clazz, type);
     }
 
     /**
@@ -278,9 +278,9 @@ public class ClassUtils {
         ValidateUtils.notNull("getInterfaces", 0, cache);
 
         while (clazz != null) {
-            Class<?>[] _interfaces = clazz.getInterfaces();
+            Class<?>[] interfaces = clazz.getInterfaces();
 
-            for (Class<?> item : _interfaces) {
+            for (Class<?> item : interfaces) {
                 if (cache.add(item)) {
                     ClassUtils.getInterfaces(item, cache);
                 }
