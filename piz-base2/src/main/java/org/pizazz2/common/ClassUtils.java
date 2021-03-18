@@ -135,7 +135,7 @@ public class ClassUtils {
      * @throws ValidateException classpath空异常
      */
     public static Class<?> loadClass(String classpath, ClassLoader loader, boolean initialize) throws ValidateException, UtilityException {
-        ValidateUtils.notEmpty(classpath, "loadClass");
+        ValidateUtils.notEmpty("loadClass", classpath);
 
         if (loader == null) {
             loader = ClassUtils.getClassLoader(PizContext.class, Thread.currentThread());

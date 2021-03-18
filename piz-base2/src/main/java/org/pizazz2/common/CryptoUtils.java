@@ -322,20 +322,21 @@ public class CryptoUtils {
      * @throws UtilityException 签名无效或算法无效
      */
     public static boolean verify(String algorithm, PublicKey key, ByteBuffer data, byte[] signature) throws ValidateException, UtilityException {
-        ValidateUtils.notNull("verify", algorithm, key, data, signature);
-        Signature _signature;
+        ValidateUtils.notNull("verify", algorithm, key, data);
+        ValidateUtils.notEmpty("verify", signature, 4);
+        Signature tmp;
         try {
-            _signature = Signature.getInstance(algorithm);
-            _signature.initVerify(key);
+            tmp = Signature.getInstance(algorithm);
+            tmp.initVerify(key);
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CRYPTO.SIGNATURE.VALID", e.getMessage());
             throw new UtilityException(BasicCodeEnum.MSG_0015, msg, e);
         }
         try {
             // 装载签名
-            _signature.update(data);
+            tmp.update(data);
             // 验证签名是否正确
-            return _signature.verify(signature);
+            return tmp.verify(signature);
         } catch (SignatureException e) {
             String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CRYPTO.SIGNATURE.VALID", e.getMessage());
             throw new UtilityException(BasicCodeEnum.MSG_0015, msg, e);

@@ -23,7 +23,7 @@ public class CharUtils {
 	}
 
 	public static char toChar(String target, int radix) throws ValidateException {
-		ValidateUtils.notEmpty(target, "toChar");
+		ValidateUtils.notEmpty("toChar", target, 1);
 
 		if (target.startsWith(MAGIC_UNICODE)) {
 			target = target.substring(2);

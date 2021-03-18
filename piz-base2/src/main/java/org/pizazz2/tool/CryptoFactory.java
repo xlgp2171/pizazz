@@ -24,18 +24,17 @@ import org.pizazz2.exception.UtilityException;
  */
 public class CryptoFactory {
 
-	public static class BaseCoder implements IObject {
+	public static class BaseCoder {
 		private final ByteBuffer target;
 		private final String algorithm;
 
 		public BaseCoder(String algorithm, byte[] data) throws ValidateException {
-			ValidateUtils.notEmpty(algorithm, "BaseCoder");
-			ValidateUtils.notEmpty(data, "BaseCoder");
+			ValidateUtils.notEmpty("BaseCoder", algorithm);
+			ValidateUtils.notEmpty("BaseCoder", data, 2);
 			this.algorithm = algorithm;
 			this.target = ByteBuffer.wrap(data);
 		}
 
-		@Override
 		public String getId() {
 			return algorithm;
 		}
@@ -72,20 +71,19 @@ public class CryptoFactory {
 		}
 	}
 
-	public static class SymmetricCoder implements IObject {
+	public static class SymmetricCoder {
 		private final SecretKey key;
 		private final String algorithm;
 
 		public SymmetricCoder(String algorithm, byte[] key) throws ValidateException, UtilityException {
-			ValidateUtils.notEmpty(algorithm, "SymmetricCoder");
-			ValidateUtils.notEmpty(key, "SymmetricCoder");
+			ValidateUtils.notEmpty("SymmetricCoder", algorithm );
+			ValidateUtils.notEmpty("SymmetricCoder", key, 2);
 			this.algorithm = algorithm;
 			DESKeySpec keySpec = CryptoUtils.newDESKeySpec(key);
 			// 从原始密钥数据创建DESKeySpec对象
 			this.key = CryptoUtils.newSecretKey(getId(), keySpec);
 		}
 
-		@Override
 		public String getId() {
 			return algorithm;
 		}
@@ -125,7 +123,7 @@ public class CryptoFactory {
 	/**
 	 * 非对称编码器
 	 */
-	public static class AsymmetricCodec<E extends CryptoFactory.AsymmetricCodec<?>> implements IObject {
+	public static class AsymmetricCodec<E extends CryptoFactory.AsymmetricCodec<?>> {
 		protected final KeyFactory factory;
 		protected final String algorithm;
 		protected final String signatureAlgorithm;
@@ -140,14 +138,13 @@ public class CryptoFactory {
 		 * @throws UtilityException 公钥私钥工厂加载失败
 		 */
 		public AsymmetricCodec(String algorithm, String signatureAlgorithm) throws ValidateException, UtilityException {
-			ValidateUtils.notEmpty(algorithm, "AsymmetricCodec");
-			ValidateUtils.notEmpty(signatureAlgorithm, "AsymmetricCodec");
+			ValidateUtils.notEmpty("AsymmetricCodec", algorithm);
+			ValidateUtils.notEmpty("AsymmetricCodec", signatureAlgorithm, 2);
 			factory = CryptoUtils.newKeyFactory(algorithm);
 			this.algorithm = algorithm;
 			this.signatureAlgorithm = signatureAlgorithm;
 		}
 
-		@Override
 		public String getId() {
 			return algorithm;
 		}
@@ -169,7 +166,7 @@ public class CryptoFactory {
 		 * @throws ValidateException 验证异常
 		 */
 		public byte[] sign(byte[] target) throws ValidateException, UtilityException {
-			ValidateUtils.notEmpty(target, "sign");
+			ValidateUtils.notEmpty("sign", target);
 			// 用私钥对信息生成数字签名
 			return CryptoUtils.sign(signatureAlgorithm, getPrivateKey(), ByteBuffer.wrap(target));
 		}
@@ -184,7 +181,7 @@ public class CryptoFactory {
 		 * @throws UtilityException 签名无效或算法无效
 		 */
 		public boolean verify(byte[] target, byte[] signature) throws ValidateException, UtilityException {
-			ValidateUtils.notEmpty(target, "verify");
+			ValidateUtils.notEmpty("verify", target);
 			// 验证签名是否正常
 			return CryptoUtils.verify(signatureAlgorithm, getPublicKey(), ByteBuffer.wrap(target), signature);
 		}

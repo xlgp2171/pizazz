@@ -1,5 +1,7 @@
 package org.pizazz2.common;
 
+import org.pizazz2.IObject;
+import org.pizazz2.data.TupleObject;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.helper.LocaleHelper;
 import org.pizazz2.message.BasicCodeEnum;
@@ -23,16 +25,35 @@ public class ValidateUtils {
         }
     }
 
-    public static void notEmpty(byte[] target, String method) throws ValidateException {
-        if (ArrayUtils.isEmpty(target)) {
-            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, 1);
+    public static void notEmpty(String method, IObject target) throws ValidateException {
+        ValidateUtils.notEmpty(method, target, 1);
+    }
+
+    public static void notEmpty(String method, IObject target, int seq) {
+        if (target == null || target.isEmpty()) {
+            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, seq);
             throw new ValidateException(BasicCodeEnum.MSG_0001, msg);
         }
     }
 
-    public static void notEmpty(String target, String method) throws ValidateException {
+    public static void notEmpty(String method, byte[] target) throws ValidateException {
+        ValidateUtils.notEmpty(method, target, 1);
+    }
+
+    public static void notEmpty(String method, byte[] target, int seq) throws ValidateException {
+        if (ArrayUtils.isEmpty(target)) {
+            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, seq);
+            throw new ValidateException(BasicCodeEnum.MSG_0001, msg);
+        }
+    }
+
+    public static void notEmpty(String method, String target) throws ValidateException {
+        ValidateUtils.notEmpty(method, target, 1);
+    }
+
+    public static void notEmpty(String method, String target, int seq) throws ValidateException {
         if (StringUtils.isTrimEmpty(target)) {
-            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, 1);
+            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, seq);
             throw new ValidateException(BasicCodeEnum.MSG_0001, msg);
         }
     }
@@ -48,12 +69,7 @@ public class ValidateUtils {
         }
     }
 
-    public static void notEmpty(String method, int index, String target) throws ValidateException {
-        if (StringUtils.isTrimEmpty(target)) {
-            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, index);
-            throw new ValidateException(BasicCodeEnum.MSG_0001, msg);
-        }
-    }
+
 
     public static void isTrue(String method, boolean target) throws ValidateException {
         if (!target) {

@@ -21,6 +21,12 @@ public interface IObject extends Cloneable {
     }
 
     /**
+     * 对象是否为空
+     * @return True/False:是/否
+     */
+    boolean isEmpty();
+
+    /**
      * 更新对象
      *
      * @param key 标识

@@ -62,7 +62,7 @@ public class IOUtils {
 	}
 
 	public static InputStream getResourceAsStream(String resource, ClassLoader loader) throws UtilityException {
-		ValidateUtils.notEmpty(resource, "getResourceAsStream");
+		ValidateUtils.notEmpty("getResourceAsStream", resource);
 
 		if (loader == null) {
 			loader = PizContext.CLASS_LOADER;
@@ -77,7 +77,7 @@ public class IOUtils {
 
 	public static InputStream getResourceAsStream(String resource, Class<?> clazz, Thread current)
 			throws ValidateException, UtilityException {
-		ValidateUtils.notEmpty(resource, "getResourceAsStream");
+		ValidateUtils.notEmpty("getResourceAsStream", resource);
 		InputStream stream;
 		ClassLoader loader = ClassUtils.getClassLoader(clazz, current);
 

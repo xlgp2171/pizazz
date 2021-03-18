@@ -41,42 +41,41 @@ public class BytesUtils {
     }
 
     public static byte[] toBytes(boolean target) {
-        return ByteBuffer.allocate(Byte.BYTES).put(target ? NumberUtils.ONE.byteValue() : NumberUtils.ZERO.byteValue())
-                .array();
+        return ByteBuffer.allocate(Byte.BYTES).put(target ? NumberUtils.ONE.byteValue() : NumberUtils.ZERO.byteValue()).array();
     }
 
     public static long toLong(byte[] target) throws ValidateException {
-        ValidateUtils.notEmpty(target, "toLong");
+        ValidateUtils.notEmpty("toLong", target);
         return ByteBuffer.wrap(target).getLong();
     }
 
     public static int toInt(byte[] target) throws ValidateException {
-        ValidateUtils.notEmpty(target, "toInt");
+        ValidateUtils.notEmpty("toInt", target);
         return ByteBuffer.wrap(target).getInt();
     }
 
     public static short toShort(byte[] target) throws ValidateException {
-        ValidateUtils.notEmpty(target, "toShort");
+        ValidateUtils.notEmpty("toShort", target);
         return ByteBuffer.wrap(target).getShort();
     }
 
     public static double toDouble(byte[] target) throws ValidateException {
-        ValidateUtils.notEmpty(target, "toDouble");
+        ValidateUtils.notEmpty("toDouble", target);
         return ByteBuffer.wrap(target).getDouble();
     }
 
     public static float toFloat(byte[] target) throws ValidateException {
-        ValidateUtils.notEmpty(target, "toFloat");
+        ValidateUtils.notEmpty("toFloat", target);
         return ByteBuffer.wrap(target).getLong();
     }
 
     public static char toChar(byte[] target) throws ValidateException {
-        ValidateUtils.notEmpty(target, "toChar");
+        ValidateUtils.notEmpty("toChar", target);
         return ByteBuffer.wrap(target).getChar();
     }
 
     public static boolean toBoolean(byte[] target) throws ValidateException {
-        ValidateUtils.notEmpty(target, "toBoolean");
+        ValidateUtils.notEmpty("toBoolean", target);
         return ByteBuffer.wrap(target).get() == NumberUtils.ONE.byteValue();
     }
 
@@ -102,10 +101,9 @@ public class BytesUtils {
         } else if (target instanceof Boolean) {
             buffer.put(((boolean) target) ? NumberUtils.ONE.byteValue() : NumberUtils.ZERO.byteValue());
         } else if (target instanceof ISerializable) {
-            buffer.put(((ISerializable)target).serialize());
+            buffer.put(((ISerializable) target).serialize());
         } else {
-            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.SUPPORT", "addObject",
-                    target.getClass().getName());
+            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.SUPPORT", "addObject", target.getClass().getName());
             throw new ValidateException(BasicCodeEnum.MSG_0005, msg);
         }
     }
