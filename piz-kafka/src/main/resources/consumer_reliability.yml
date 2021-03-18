@@ -1,0 +1,24 @@
+client:
+  fetch.min.bytes: 64
+  heartbeat.interval.ms: 1000
+  max.partition.fetch.bytes: 1048576
+  session.timeout.ms: 5000
+  auto.offset.reset: earliest
+  enable.auto.commit: false
+  exclude.internal.topics: false
+  fetch.max.bytes: 52428800
+  isolation.level: read_committed
+  max.poll.interval.ms: 300000
+  max.poll.records: 600
+  receive.buffer.bytes: 65536
+  send.buffer.bytes: 131072
+  auto.commit.interval.ms： 1000
+  fetch.max.wait.ms: 500
+config:
+  mode: MANUAL_SYNC_EACH
+  ignore: NONE
+  duration: 5000
+  offsetProcessor:
+    classpath: org.pizazz2.kafka.consumer.OffsetProcessor
+  dataProcessor:
+    classpath: org.pizazz2.kafka.consumer.adapter.SequenceAdapter

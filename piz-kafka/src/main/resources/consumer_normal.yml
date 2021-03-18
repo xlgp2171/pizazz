@@ -1,0 +1,13 @@
+client:
+  fetch.min.bytes: 64
+  enable.auto.commit: false
+  isolation.level: read_uncommitted
+  max.poll.records: 400
+config:
+  mode: MANUAL_ASYNC_ROUND
+  ignore: OFFSET
+  duration: 3000
+  offsetProcessor:
+    classpath: org.pizazz2.kafka.consumer.OffsetProcessor
+  dataProcessor:
+    classpath: org.pizazz2.kafka.consumer.adapter.SequenceAdapter

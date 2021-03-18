@@ -1,0 +1,122 @@
+piz_kafka:
+  subscription:
+    client:
+      # [必要]服务地址(逗号分割)
+      bootstrap.servers: localhost:9092
+      # 请求服务器返回的最小字节数,数据不足则等待(默认:1)
+      fetch.min.bytes: 1
+      # [特殊]组ID(订阅模式下必要)
+      group.id: DemoGroup
+      # 与服务器的约定时间,用于获取其它节点上下线(默认:3*1000,不能大于配置session.timeout.ms)
+      heartbeat.interval.ms: 3000
+      # 每个partition最大返回数据量(默认:1024*1024)
+      max.partition.fetch.bytes: 1048576
+      # 与服务器的心跳时间,用于监测当前节点存活(默认:10*1000,不能大于BROKER配置group.min.session.timeout)
+      session.timeout.ms: 10000
+      # 初始偏移量设置,包括'earliest'(最新未提交的offset),'latest'(最新的offset),'none'(若没有获取到以前的offset则抛出异常).(默认:latest)
+      auto.offset.reset: earliest
+      # [特殊]开启自动提交Offset(默认:true)(该值会因为subscription/config/mode设置自动修改)
+      enable.auto.commit: false
+      # 是否只能使用订阅确定主题方式，排除正则匹配等(默认:true)
+      exclude.internal.topics: true
+      # 服务器单次请求返回最大数据量(默认:1024*1024*50)
+      fetch.max.bytes: 52428800
+      # 控制读取以事务方式写入的消息,包括:'read_committed'(只能读取第一个未提交事务的Producer之前的事务offset或非事务offset),'read_uncommitted'(任意offset)
+      isolation.level: read_uncommitted
+      # 与服务器的约定时间，用于监测两次poll调用之间时间，超时则断掉(默认:5*60*1000)
+      max.poll.interval.ms: 300000
+      # 单次poll调用获取最大数据量(默认:500)
+      max.poll.records: 500
+      # 读取数据使用缓冲区大小(默认:1024*64,-1为使用OS设置)
+      receive.buffer.bytes: 65536
+      # 发送数据使用缓冲区大小(默认:1024*128,-1为使用OS设置)
+      send.buffer.bytes: 131072
+      # 自动提交周期(默认:5*1000,需要配置enable.auto.commit为true)
+      auto.commit.interval.ms： 3000
+      # 消费端ID(默认:"")
+      # client.id:
+      # 无法满足配置fetch.min.bytes的情况下等待最大时间(默认:0.5*1000)
+      fetch.max.wait.ms: 500
+      # 消费端拦截器,需要实现org.apache.kafka.clients.consumer.ConsumerInterceptor接口(默认:"",逗号分割)
+      # interceptor.classes:
+      # [必要]序列化KEY
+      key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      # [必要]序列化VALUE
+      value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    config:
+      # [必要]消费模式,包括'AUTO_ASYNC_ROUND','MANUAL_ASYNC_EACH','MANUAL_SYNC_EACH','MANUAL_ASYNC_ROUND','MANUAL_SYNC_ROUND','MANUAL_NONE_NONE'
+      mode: AUTO_ASYNC_ROUND
+      # 异常忽略,包括'NONE','OFFSET','CONSUME','OFFSET_CONSUME'(默认:NONE)
+      ignore: NONE
+      # poll轮询时间(默认:10*1000)
+      duration: 10000
+      # [特殊]指定消费topic和partition模式(参数格式:{topic}#{partition}#...)(代码未设置时必要)
+      topicPartition:
+        - TopicA#1#2
+        - TopicB#2
+      # [特殊]按照正则表达式订阅(配置exclude.internal.topics为false生效)(代码未设置时必要)
+      topicPattern: Topic*
+      # [特殊]按照主题名称订阅(代码未设置时必要)
+      topic:
+        - TopicA
+        - TopicB
+      # offset处理器(默认:org.pizazz.kafka.consumer.OffsetProcessor)
+      offsetProcessor:
+        classpath: org.pizazz.kafka.consumer.OffsetProcessor
+      # 数据处理器,包括'ForkPoolAdapter','OrderLoopAdapter'(默认:org.pizazz.kafka.consumer.adapter.OrderLoopAdapter)
+      dataProcessor:
+        threads: 8
+        classpath: org.pizazz.kafka.consumer.adapter.ForkPoolAdapter
+    # 配置模版,包括'CONSUMER_EFFICIENCY'(高效),'CONSUMER_NORMAL'(标准),'CONSUMER_RELIABILITY'(可靠),'NONE'
+    # template:
+  production:
+    client:
+      # [必要]服务地址(逗号分割)
+      bootstrap.servers: localhost:9092
+      # 发送Broker成功确认,包括'all'(同－1),'-1'(发送到所有成功),'0'(不等待发送确认),'1'(发送到一个成功).(默认:1)
+      acks: 1
+      # 发送缓存,发送超过大小将开始阻塞，阻塞超过配置max.block.ms将抛出异常(默认:1024*1024*32)
+      buffer.memory: 33554432
+      # 数据压缩方式,包括'none','gzip','snappy','lz4'(默认:none)
+      compression.type: none
+      # 发送失败重试次数(默认:0)
+      retries: 0
+      # 发送批处理数据大小(默认:1024*16)
+      batch.size: 16384
+      # 生产端ID(默认:"")
+      # client.id:
+      # 发送数据延迟,用于减少请求次数,关联配置batch.size(默认:0)
+      linger.ms: 0
+      # 对于阻塞send和partitionsFor方法的最大时间，超过时间将抛出异常(默认:60*1000)
+      max.block.ms: 60000
+      # 单次请求最大字节数(默认:1024*1024-20000)
+      max.request.size: 1028576
+      # 读取数据使用缓冲区大小(默认:1024*32,-1为使用OS设置)
+      receive.buffer.bytes: 32768
+      # 客户端等待响应最长时间(默认:30*1000)
+      request.timeout.ms: 30000
+      # 发送数据使用缓冲区大小(默认:1024*128,-1为使用OS设置)
+      send.buffer.bytes: 131072
+      # 是否幂等判断,true时,配置retries需要大于0,配置acks需要为all,配置max.in.flight.requests.per.connection需要小于等于5(默认:false)
+      enable.idempotence: false
+      # 生产端拦截器,需要实现org.apache.kafka.clients.producer.ProducerInterceptor接口(默认:"",逗号分割)
+      # interceptor.classes:
+      # 发送未确认请求最大数量(默认:5)
+      max.in.flight.requests.per.connection: 5
+      # 事务操作业务流程的最大等待时间,不能超过BROKER配置transaction.max.timeout.ms(默认:60*1000)
+      transaction.timeout.ms: 60000
+      # 事务ID,相同ID事务提交之前只存在唯一,若配置该ID,需要启用配置enable.idempotence,至少需要3个BROKER(默认:null)
+      # transactional.id:
+      # [必要]序列化KEY
+      key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      # [必要]序列化VALUE
+      value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    config:
+      mode:
+      transactionProcessor:
+        classpath: org.pizazz.kafka.producer.TransactionProcessor
+      senderProcessor:
+    # template:
+  
+  
+  

@@ -1,0 +1,12 @@
+client:
+  acks: "1"
+  retries: 1
+  batch.size: 128
+  linger.ms: 1
+  enable.idempotence: false
+  partitioner.class: org.pizazz2.kafka.support.RandomPartitioner
+config:
+  mode: ASYNC
+  transactionProcessor:
+    classpath: org.pizazz2.kafka.producer.TransactionProcessor
+  senderProcessor: 

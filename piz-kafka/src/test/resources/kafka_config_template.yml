@@ -1,0 +1,17 @@
+subscription:
+  client:
+    bootstrap.servers: 127.0.0.1:9092
+    group.id: GROUP_DEMO
+    auto.offset.reset: earliest
+    key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  config:
+  template: CONSUMER_NORMAL
+production:
+  client:
+    bootstrap.servers: 127.0.0.1:9092
+    key.serializer: org.apache.kafka.common.serialization.StringSerializer
+    value.serializer: org.apache.kafka.common.serialization.StringSerializer
+  config:
+  template: PRODUCER_NORMAL
+      
