@@ -7,7 +7,7 @@ import org.pizazz2.common.StringUtils;
 import org.pizazz2.common.SystemUtils;
 import org.pizazz2.common.ValidateUtils;
 import org.pizazz2.context.PluginContext;
-import org.pizazz2.exception.AbstractException;
+import org.pizazz2.exception.BaseException;
 import org.pizazz2.exception.UtilityException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.helper.LocaleHelper;
@@ -37,7 +37,7 @@ public abstract class AbstractClassPlugin<C extends IObject> {
 	 * @param message 日志消息
 	 * @param exception 异常输出
 	 */
-	protected abstract void log(String message, AbstractException exception);
+	protected abstract void log(String message, BaseException exception);
 
 	protected final C setConfig(C config) {
 		if (config != null) {
@@ -81,22 +81,22 @@ public abstract class AbstractClassPlugin<C extends IObject> {
 	 * @param loader 采用的类加载器,null为默认加载器
 	 * @param initialize 是否加载后调用初始化方法
 	 * @return 加载后的实现类,可用cast方法转换类型
-	 * @throws AbstractException 插件类型转换异常，插件不存在或插件初始化异常
+	 * @throws BaseException 插件类型转换异常，插件不存在或插件初始化异常
 	 * @throws ValidateException 参数验证异常
 	 */
 	public IPlugin loadPlugin(String key, IPlugin defPlugin, ClassLoader loader, boolean initialize)
-			throws AbstractException, ValidateException {
+			throws BaseException, ValidateException {
 		String classpath = StringUtils.of(configure.get(key, StringUtils.EMPTY));
 		try {
 			return load(classpath, key, defPlugin, loader, initialize, null);
-		} catch (AbstractException e) {
+		} catch (BaseException e) {
 			log(e.getMessage(), e);
 			return load(StringUtils.EMPTY, key, defPlugin, loader, initialize, e);
 		}
 	}
 
 	protected IPlugin load(String classpath, String defClass, IPlugin defPlugin, ClassLoader loader, boolean initialize,
-						   AbstractException e) throws AbstractException, ValidateException {
+						   BaseException e) throws BaseException, ValidateException {
 		if (StringUtils.isTrimEmpty(classpath)) {
 			if (defPlugin != null) {
 				log(LocaleHelper.toLocaleText(TypeEnum.BASIC, "PLUGIN.LOAD", defPlugin.getId()), null);
@@ -111,13 +111,13 @@ public abstract class AbstractClassPlugin<C extends IObject> {
 		return switchPlugin(tmp, initialize);
 	}
 
-	protected IPlugin switchPlugin(IPlugin instance, boolean initialize) throws AbstractException {
+	protected IPlugin switchPlugin(IPlugin instance, boolean initialize) throws BaseException {
 		PluginContext.getInstance().register(getClass(), instance);
 		log(LocaleHelper.toLocaleText(TypeEnum.BASIC, "PLUGIN.REGISTER", instance.getId()), null);
 		return initialize ? initialPlugin(instance) : instance;
 	}
 
-	protected IPlugin initialPlugin(IPlugin instance) throws AbstractException {
+	protected IPlugin initialPlugin(IPlugin instance) throws BaseException {
 		instance.initialize(configure.copy());
 		log(LocaleHelper.toLocaleText(TypeEnum.BASIC, "PLUGIN.INIT", instance.getId()), null);
 		return instance;

@@ -1,6 +1,6 @@
 package org.pizazz2;
 
-import org.pizazz2.exception.AbstractException;
+import org.pizazz2.exception.BaseException;
 
 /**
  * 类运行接口
@@ -11,8 +11,8 @@ import org.pizazz2.exception.AbstractException;
 public interface IRunnable extends ICloseable, Runnable {
 	/**
 	 * 是否启用
-	 * @throws AbstractException 初始化异常
+	 * @throws BaseException 初始化异常
 	 */
-	default void activate() throws AbstractException {
+	default void activate() throws BaseException {
 	}
 }

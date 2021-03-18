@@ -8,6 +8,7 @@ import org.pizazz2.message.BasicCodeEnum;
 import org.pizazz2.message.ExpressionEnum;
 import org.pizazz2.message.TypeEnum;
 
+import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -36,11 +37,33 @@ public class ValidateUtils {
         }
     }
 
+    public static void notEmpty(String method, Collection<?> target) throws ValidateException {
+        ValidateUtils.notEmpty(method, target, 1);
+    }
+
+    public static void notEmpty(String method, Collection<?> target, int seq) throws ValidateException {
+        if (CollectionUtils.isEmpty(target)) {
+            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, seq);
+            throw new ValidateException(BasicCodeEnum.MSG_0001, msg);
+        }
+    }
+
     public static void notEmpty(String method, byte[] target) throws ValidateException {
         ValidateUtils.notEmpty(method, target, 1);
     }
 
     public static void notEmpty(String method, byte[] target, int seq) throws ValidateException {
+        if (ArrayUtils.isEmpty(target)) {
+            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, seq);
+            throw new ValidateException(BasicCodeEnum.MSG_0001, msg);
+        }
+    }
+
+    public static void notEmpty(String method, String[] target) throws ValidateException {
+        ValidateUtils.notEmpty(method, target, 1);
+    }
+
+    public static void notEmpty(String method, String[] target, int seq) throws ValidateException {
         if (ArrayUtils.isEmpty(target)) {
             String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, seq);
             throw new ValidateException(BasicCodeEnum.MSG_0001, msg);

@@ -1,7 +1,5 @@
 package org.pizazz2;
 
-import org.pizazz2.exception.AbstractException;
-
 import java.time.Duration;
 
 /**
@@ -12,7 +10,6 @@ import java.time.Duration;
  * @param <T> 根据输出内容注册泛型
  * @author xlgp2171
  * @version 2.0.210201
- * @see AbstractException
  */
 @FunctionalInterface
 public interface IMessageOutput<T> extends ICloseable {

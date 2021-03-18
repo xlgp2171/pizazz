@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.pizazz2.IObject;
 import org.pizazz2.IPlugin;
-import org.pizazz2.exception.AbstractException;
+import org.pizazz2.exception.BaseException;
 
 import java.time.Duration;
 
@@ -20,7 +20,7 @@ public class SystemUtilsTest {
 	public void testDestroy() {
 		IPlugin plugin = new IPlugin() {
 			@Override
-			public void initialize(IObject config) throws AbstractException {
+			public void initialize(IObject config) throws BaseException {
 			}
 
 			@Override
