@@ -19,11 +19,11 @@ public enum ProducerModeEnum {
     /**
      * 同步事务发送
      */
-    SYNC_TRANSACTION(false, true),
+    SYNC_TRANSACTION(true, true),
     /**
      * 异步发送
      */
-    ASYNC(true, false),
+    ASYNC(false, false),
     /**
      * 同步发送
      */

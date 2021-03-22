@@ -51,7 +51,7 @@ import java.util.regex.Pattern;
 public class Subscription<K, V> extends AbstractClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(Subscription.class);
 
-    private final Lock lock = new ReentrantLock();
+    private final Lock lock = new ReentrantLock(true);
     private final AtomicBoolean loop = new AtomicBoolean(true);
     private KafkaConsumer<K, V> consumer;
     protected IOffsetProcessor offset;
@@ -110,18 +110,15 @@ public class Subscription<K, V> extends AbstractClient {
         return getConvertor().getConsumerGroupId();
     }
 
-    public boolean unsubscribe() {
-        if (lock.tryLock()) {
-            try {
-                loop.set(false);
-                consumer.unsubscribe();
-            } finally {
-                lock.unlock();
-            }
-            LOGGER.info("subscription:unsubscribe");
-            return true;
+    public void unsubscribe() {
+        loop.set(false);
+        lock.lock();
+        try {
+            consumer.unsubscribe();
+        } finally {
+            lock.unlock();
         }
-        return false;
+        LOGGER.info("subscription:unsubscribe");
     }
 
     protected void consume(IDataExecutor<K, V> executor) throws KafkaException {

@@ -31,6 +31,7 @@ public class KafkaTest {
 		SUBSCRIPTION = new Subscription<>(TupleObjectHelper.getTupleObject(_config, KafkaConstant.KEY_SUBSCRIPTION));
 	}
 
+//	@org.junit.Test
 	public void sentExample() throws KafkaException {
 		for (int i = 0; i < 100; i ++) {
 			PRODUCTION.sent(new ProducerRecord<>(TOPIC, "MSG:" + i));
@@ -38,6 +39,7 @@ public class KafkaTest {
 		System.out.println("SEND FINISHED");
 	}
 
+//	@org.junit.Test
 	public void subscribeExample() throws KafkaException {
 		SUBSCRIPTION.subscribe(new IDataExecutor<String, String>() {
 			@Override
