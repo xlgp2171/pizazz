@@ -6,6 +6,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -58,6 +59,14 @@ public class DateUtils {
 			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.DATE.PARSE", time, formatter.toString());
 			throw new ValidateException(BasicCodeEnum.MSG_0017, msg, e);
 		}
+	}
+
+	public static String format(long timestamp, String pattern, ZoneId zoneId) {
+		return DateUtils.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), zoneId), pattern, null);
+	}
+
+	public static String format(long timestamp, String pattern) {
+		return DateUtils.format(timestamp, pattern, ZoneId.systemDefault());
 	}
 
 	public static String format(LocalDateTime dateTime, String pattern, ZoneId zoneId) throws ValidateException {
