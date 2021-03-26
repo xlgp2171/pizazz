@@ -3,10 +3,7 @@ package org.pizazz2.tool;
 import java.time.Duration;
 import java.util.concurrent.*;
 
-import org.pizazz2.PizContext;
-import org.pizazz2.IMessageOutput;
-import org.pizazz2.IObject;
-import org.pizazz2.IPlugin;
+import org.pizazz2.*;
 import org.pizazz2.common.ValidateUtils;
 import org.pizazz2.exception.BaseException;
 import org.pizazz2.exception.ToolException;
@@ -32,18 +29,10 @@ public abstract class AbstractContainer<T> implements IPlugin {
     public static final String CONTAINER_TIMEOUT = "timeout";
 
     protected final TupleObject properties;
-    protected final IPlugin plugin;
+    protected final IRunnable runnable;
     protected final IMessageOutput<T> output;
 
-    private final Callable<ContainerStatusEnum> callable = () -> {
-		try {
-			AbstractContainer.this.plugin.destroy(Duration.ZERO);
-		} catch (Exception e) {
-			AbstractContainer.this.output.throwException(e);
-			return ContainerStatusEnum.DESTROY_ERROR;
-		}
-		return ContainerStatusEnum.DESTROYED;
-	};
+
 
 	/**
 	 * 日志记录及异常抛出
@@ -52,10 +41,10 @@ public abstract class AbstractContainer<T> implements IPlugin {
 	 */
 	protected abstract void log(String msg, Exception exception);
 
-    public AbstractContainer(IPlugin plugin, IMessageOutput<T> output) throws ValidateException {
-        ValidateUtils.notNull("AbstractContainer", plugin, output);
+    public AbstractContainer(IRunnable runnable, IMessageOutput<T> output) throws ValidateException {
+        ValidateUtils.notNull("AbstractContainer", runnable, output);
         properties = TupleObjectHelper.newObject(4);
-        this.plugin = plugin;
+        this.runnable = runnable;
         this.output = output;
     }
 
@@ -76,6 +65,15 @@ public abstract class AbstractContainer<T> implements IPlugin {
 
     @Override
     public void destroy(Duration timeout) {
+        final Callable<ContainerStatusEnum> callable = () -> {
+            try {
+                AbstractContainer.this.runnable.destroy(Duration.ZERO);
+            } catch (Exception e) {
+                AbstractContainer.this.output.throwException(e);
+                return ContainerStatusEnum.DESTROY_ERROR;
+            }
+            return ContainerStatusEnum.DESTROYED;
+        };
 		ContainerStatusEnum status = ContainerStatusEnum.DESTROYED;
 
         if (timeout == null || timeout.isNegative()) {

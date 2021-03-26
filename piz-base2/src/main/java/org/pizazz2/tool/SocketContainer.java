@@ -8,10 +8,7 @@ import java.net.SocketException;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.pizazz2.PizContext;
-import org.pizazz2.IMessageOutput;
-import org.pizazz2.IObject;
-import org.pizazz2.IPlugin;
+import org.pizazz2.*;
 import org.pizazz2.common.*;
 import org.pizazz2.exception.UtilityException;
 import org.pizazz2.helper.ConfigureHelper;
@@ -43,13 +40,13 @@ public class SocketContainer extends AbstractContainer<String> {
 
 	/**
 	 *
-	 * @param plugin 容器销毁时需要安全关闭的组件
+	 * @param runnable 容器销毁时需要安全关闭的组件
 	 * @param config 容器配置
 	 * @param output 容器日志输出接口
 	 * @throws ValidateException 验证异常
 	 */
-	public SocketContainer(IPlugin plugin, TupleObject config, IMessageOutput<String> output) throws ValidateException {
-		super(plugin, output);
+	public SocketContainer(IRunnable runnable, TupleObject config, IMessageOutput<String> output) throws ValidateException {
+		super(runnable, output);
 		try {
 			initialize(config);
 		} catch (ToolException e) {
