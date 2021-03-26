@@ -27,7 +27,7 @@ import org.pizazz2.message.TypeEnum;
  * @author xlgp2171
  * @version 2.0.210201
  */
-public class SocketContainer extends AbstractContainer<String> {
+public class SocketContainer extends AbstractContainer<String> implements IRunnable {
 	public static final String CONTAINER_HOST = "host";
 	public static final String CONTAINER_PORT = "port";
 	public static final String CONTAINER_KEY = "key";
@@ -91,6 +91,11 @@ public class SocketContainer extends AbstractContainer<String> {
 	@Override
 	public String getId() {
 		return getClass().getName();
+	}
+
+	@Override
+	public void activate() throws BaseException {
+		runnable.activate();
 	}
 
 	@Override
