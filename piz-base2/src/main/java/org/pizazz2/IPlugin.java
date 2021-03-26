@@ -16,5 +16,5 @@ public interface IPlugin extends IObject, ICloseable {
      * @param config 初始化配置
      * @throws BaseException 抛出初始化异常
      */
-    <T extends IObject> void initialize(T config) throws BaseException;
+    void initialize(IObject config) throws BaseException;
 }
