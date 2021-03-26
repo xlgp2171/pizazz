@@ -12,7 +12,7 @@ import java.time.Duration;
 import org.pizazz2.IMessageOutput;
 import org.pizazz2.IRunnable;
 import org.pizazz2.common.ValidateUtils;
-import org.pizazz2.common.IOUtils;
+import org.pizazz2.exception.BaseException;
 import org.pizazz2.helper.LocaleHelper;
 import org.pizazz2.common.SystemUtils;
 import org.pizazz2.exception.ValidateException;
@@ -46,7 +46,7 @@ public class FolderWatcher implements IRunnable {
 	}
 
 	@Override
-	public void run() {
+	public void activate() throws BaseException {
 		while (watcher.isEnabled()) {
 			WatchKey key;
 			try {
