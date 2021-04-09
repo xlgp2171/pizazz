@@ -66,7 +66,7 @@ public class BytesUtils {
 
     public static float toFloat(byte[] target) throws ValidateException {
         ValidateUtils.notEmpty("toFloat", target);
-        return ByteBuffer.wrap(target).getLong();
+        return ByteBuffer.wrap(target).getFloat();
     }
 
     public static char toChar(byte[] target) throws ValidateException {
