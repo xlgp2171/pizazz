@@ -21,7 +21,7 @@ import java.util.stream.Stream;
  * 文件工具
  *
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.0.210425
  */
 public class PathUtils {
 
@@ -36,7 +36,7 @@ public class PathUtils {
                 try {
                     return new URI("string", null, uri, null);
                 } catch (URISyntaxException e3) {
-                    String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "BASIC.ERR.PATH.FORMAT", "URI", uri, e3.getMessage());
+                    String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PATH.FORMAT", "URI", uri, e3.getMessage());
                     throw new UtilityException(BasicCodeEnum.MSG_0005, msg, e3);
                 }
             }
@@ -62,8 +62,20 @@ public class PathUtils {
 				.replaceAll("\\%7E", "~"));
     }
 
+    public static boolean exists(Path path) {
+        return path != null && Files.exists(path);
+    }
+
+    public static boolean directoryExists(Path path) {
+        return PathUtils.exists(path) && Files.isDirectory(path);
+    }
+
     public static boolean isRegularFile(Path path) {
-        return path != null && Files.isReadable(path) && Files.isRegularFile(path);
+        return PathUtils.exists(path) && Files.isReadable(path) && Files.isRegularFile(path);
+    }
+
+    public static boolean isDirectory(Path path) {
+        return Files.isDirectory(path);
     }
 
     public static byte[] toByteArray(Path path) throws ValidateException, UtilityException {
@@ -78,14 +90,13 @@ public class PathUtils {
 
     public static void delete(Path path, boolean deep) throws UtilityException {
         if (path != null) {
-            if (Files.isDirectory(path) && deep) {
+            if (PathUtils.isDirectory(path) && deep) {
                 PathUtils.deleteDirectory(path);
-            } else {
-                try {
-                    Files.delete(path);
-                } catch (IOException e) {
-                    // do nothing
-                }
+            }
+            try {
+                Files.delete(path);
+            } catch (IOException e) {
+                // do nothing
             }
         }
     }

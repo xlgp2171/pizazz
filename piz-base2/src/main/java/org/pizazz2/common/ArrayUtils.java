@@ -90,16 +90,20 @@ public class ArrayUtils {
         return false;
     }
 
+    public static byte[] nullToEmpty(byte[] target) {
+        return ArrayUtils.isEmpty(target) ? ArrayUtils.EMPTY_BYTE : target;
+    }
+
     public static Object[] nullToEmpty(Object[] target) {
-        return isEmpty(target) ? EMPTY_OBJECT : target;
+        return ArrayUtils.isEmpty(target) ? ArrayUtils.EMPTY_OBJECT : target;
     }
 
 	public static String[] nullToEmpty(String[] target) {
-		return isEmpty(target) ? EMPTY_STRING : target;
+		return ArrayUtils.isEmpty(target) ? ArrayUtils.EMPTY_STRING : target;
 	}
 
     public static Class<?>[] nullToEmpty(Class<?>[] target) {
-		return isEmpty(target) ? EMPTY_CLASS : target;
+		return ArrayUtils.isEmpty(target) ? ArrayUtils.EMPTY_CLASS : target;
     }
 
     public static String[] newArray(int size, String fill) {

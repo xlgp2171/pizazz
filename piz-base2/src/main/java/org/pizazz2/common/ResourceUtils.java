@@ -16,7 +16,7 @@ import org.pizazz2.message.TypeEnum;
  * 资源工具
  * 
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.0.210425
  */
 public class ResourceUtils {
 
@@ -48,7 +48,7 @@ public class ResourceUtils {
 		try {
 			properties.load(stream);
 		} catch (IOException e) {
-			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "BASIC.ERR.IO.IN", e.getMessage());
+			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO.IN", e.getMessage());
 			throw new UtilityException(BasicCodeEnum.MSG_0003, msg, e);
 		}
 		if (target != null) {

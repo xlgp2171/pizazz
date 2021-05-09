@@ -129,7 +129,7 @@ public final class ShellFactory implements IShellFactory, ICloseable {
 
         private final ShellFactory factory;
 
-        private Singleton() {
+        Singleton() {
             factory = new ShellFactory();
         }
 

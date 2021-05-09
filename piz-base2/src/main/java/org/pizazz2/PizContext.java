@@ -53,6 +53,10 @@ public final class PizContext {
 	 */
 	public static final Path LOCAL_PATH;
 	/**
+	 * 当前系统临时文件夹
+	 */
+	public static final Path TEMP_DIRECTORY;
+	/**
 	 * 当前编码
 	 */
 	public static final Charset LOCAL_ENCODING;
@@ -78,6 +82,9 @@ public final class PizContext {
 			tmpPath = Paths.get(SystemUtils.getSystemProperty("user.dir", StringUtils.EMPTY));
 		}
 		LOCAL_PATH = tmpPath;
+		// 临时文件夹(无权限检查)
+		String tempDirectory = SystemUtils.getSystemProperty("java.io.tmpdir", StringUtils.EMPTY);
+		TEMP_DIRECTORY = StringUtils.isEmpty(tempDirectory) ? LOCAL_PATH : Paths.get(tempDirectory);
 		// 默认UTF-8
 		String defE = SystemUtils.getSystemProperty("file.encoding", StandardCharsets.UTF_8.name());
 		tmp = SystemUtils.getSystemProperty(PizContext.NAMING_SHORT + ".encoding", defE);
@@ -88,9 +95,7 @@ public final class PizContext {
 			tmpC = Charset.forName(defE);
 		}
 		LOCAL_ENCODING = tmpC;
-	}
-
-	static {
+		//
 		CLASS_LOADER = PizContext.class.getClassLoader();
 	}
 }

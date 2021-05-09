@@ -15,7 +15,7 @@ import org.pizazz2.message.TypeEnum;
  * <li/>参考com.alibaba.dubbo.common.compiler.support.AbstractCompiler
  * 
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.0.210425
  */
 public abstract class AbstractCompiler {
 	public Class<?> compile(String source, ClassLoader loader) throws ValidateException, ToolException {
@@ -30,7 +30,7 @@ public abstract class AbstractCompiler {
 			try {
 				return doCompile(classpath, source.trim(), loader);
 			} catch (Throwable t) {
-				String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "BASIC.ERR.CLASS.COMPILE", classpath,
+				String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CLASS.COMPILE", classpath,
 						t.getMessage());
 				throw new ToolException(BasicCodeEnum.MSG_0006, msg, t);
 			}
