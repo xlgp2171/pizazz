@@ -1,0 +1,246 @@
+package org.pizazz2.tool;
+
+import org.pizazz2.ICloseable;
+import org.pizazz2.PizContext;
+import org.pizazz2.common.ValidateUtils;
+import org.pizazz2.data.LinkedObject;
+import org.pizazz2.data.TupleObject;
+import org.pizazz2.exception.ValidateException;
+import org.pizazz2.helper.LocaleHelper;
+import org.pizazz2.message.BasicCodeEnum;
+import org.pizazz2.message.TypeEnum;
+import org.pizazz2.tool.ref.BatchedData;
+import org.pizazz2.tool.ref.IDataflowListener;
+
+import java.time.Duration;
+import java.util.Collection;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.BiConsumer;
+
+/**
+ * 流式处理器
+ *
+ * @author xlgp2171
+ * @version 2.0.210512
+ */
+public class DataflowProcessor<T extends LinkedObject<byte[]>> implements ICloseable {
+    private final DataflowHandler<T> handler;
+    private final int actions;
+    private final long size;
+    private final long interval;
+    private final BatchedData<T> batchedData;
+    private final ScheduledThreadPoolExecutor scheduler;
+    private final ScheduledFuture<?> future;
+
+    private final AtomicBoolean closed = new AtomicBoolean(false);
+    private final AtomicLong executionIdGen = new AtomicLong();
+
+    DataflowProcessor(BiConsumer<Collection<T>, TupleObject> consumer, IDataflowListener<T> listener,
+                      DataflowHandler<T> handler, TupleObject config, boolean sync, int threads, int actions, long size,
+                      long interval) throws ValidateException {
+        if (actions <= 0 && size <= 0 && interval <= 0) {
+            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.MULTI", "DataflowProcessor");
+            throw new ValidateException(BasicCodeEnum.MSG_0005, msg);
+        }
+        if (handler == null) {
+            listener = new IDataflowListener.ProxyListener<>(listener);
+            handler = new DataflowHandler<>(consumer, listener, config, sync, threads);
+        }
+        this.handler = handler;
+        this.actions = actions;
+        this.size = size;
+        this.interval = interval;
+        // 若小于10个就10个
+        batchedData = new BatchedData<>(Math.max(actions, 10));
+
+        scheduler = new ScheduledThreadPoolExecutor(1, new PizThreadFactory(PizContext.NAMING_SHORT +
+                "_dataflow_", true));
+        scheduler.setRemoveOnCancelPolicy(true);
+        //
+        future = startFlushTask();
+    }
+
+    public static <E extends LinkedObject<byte[]>> Builder<E> builder(
+            BiConsumer<Collection<E>, TupleObject> consumer, IDataflowListener<E> listener) {
+        return new Builder<>(consumer, listener);
+    }
+
+    public void add(T object) throws ValidateException {
+        ValidateUtils.notNull("add", object);
+        internalAdd(object);
+    }
+
+    private synchronized void internalAdd(T object) {
+        if (!isClosed()) {
+            batchedData.add(object);
+
+            if (isOverTheLimit()) {
+                execute();
+            }
+        }
+    }
+
+    private boolean isOverTheLimit() {
+        if (actions != -1 && batchedData.total() >= actions) {
+            return true;
+        } else {
+            return size != -1 && batchedData.bytes() >= size;
+        }
+    }
+
+    private ScheduledFuture<?> startFlushTask() {
+        ScheduledFuture<?> future = null;
+
+        if (interval > 0) {
+            future = scheduler.scheduleWithFixedDelay(new Flush(), interval, interval, TimeUnit.MILLISECONDS);
+        }
+        return future;
+    }
+
+    private void execute() {
+        this.handler.execute(executionIdGen.incrementAndGet(), batchedData.reset());
+    }
+
+    public boolean isClosed() {
+        return closed.get();
+    }
+
+    @Override
+    public void destroy(Duration timeout) {
+        if (closed.compareAndSet(false, true)) {
+            if (timeout != null && !timeout.isZero()) {
+                if (future != null) {
+                    try {
+                        future.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
+                    } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                        // do nothing
+                    }
+                }
+            } else {
+                if (future != null) {
+                    future.cancel(true);
+                }
+            }
+            scheduler.shutdownNow();
+        }
+    }
+
+    public static class Builder<E extends LinkedObject<byte[]>> {
+        private final BiConsumer<Collection<E>, TupleObject> consumer;
+        private final IDataflowListener<E> listener;
+        /**
+         * 同步执行
+         */
+        private boolean sync = false;
+        /**
+         * 运行线程数
+         */
+        private int threads = 1;
+        /**
+         * 触发个数(个)
+         */
+        private int actions = 20;
+        /**
+         * 触发大小(byte)
+         */
+        private long size = 1024 * 1024 * 10;
+        /**
+         * 触发周期(ms)
+         */
+        private long interval = 1000;
+
+        private DataflowHandler<E> handler;
+        private TupleObject config;
+
+        Builder(BiConsumer<Collection<E>, TupleObject> consumer, IDataflowListener<E> listener) {
+            this.consumer = consumer;
+            this.listener = listener;
+        }
+
+        public Builder<E> setSync(boolean sync) {
+            this.sync = sync;
+            return this;
+        }
+
+        public Builder<E> setThreads(int threads) {
+            this.threads = threads;
+            return this;
+        }
+
+        /**
+         * 数据流发送量阈值
+         * @param actions 发送量阈值
+         * @return 当前对象
+         */
+        public Builder<E> setActions(int actions) {
+            if (actions > 0) {
+                this.actions = actions;
+            }
+            return this;
+        }
+
+        /**
+         * 数据流发送大小阈值
+         * @param size 发送大小阈值
+         * @return 当前对象
+         */
+        public Builder<E> setSize(long size) {
+            if (size > 0) {
+                this.size = size;
+            }
+            return this;
+        }
+
+        /**
+         * 数据流发送时限阈值
+         * @param interval 发送时限阈值
+         * @return 当前对象
+         */
+        public Builder<E> setInterval(long interval) {
+            if (interval > 0) {
+                this.interval = interval;
+            }
+            return this;
+        }
+
+        /**
+         * 流式处理操作实现
+         * @param handler 操作实现
+         * @return 当前对象
+         */
+        public Builder<E> setHandler(DataflowHandler<E> handler) {
+            this.handler = handler;
+            return this;
+        }
+
+        public Builder<E> setConfig(TupleObject config) {
+            this.config = config;
+            return this;
+        }
+
+        /**
+         * 通过配置构建
+         * @return 流式处理器实现
+         */
+        public DataflowProcessor<E> build() {
+            return new DataflowProcessor<>(consumer, listener, handler, config, sync, threads, actions, size, interval);
+        }
+    }
+
+    class Flush implements Runnable {
+        @Override
+        public void run() {
+            synchronized (DataflowProcessor.this) {
+                if (isClosed()) {
+                    return;
+                }
+                if (batchedData.total() == 0) {
+                    return;
+                }
+                execute();
+            }
+        }
+    }
+}
