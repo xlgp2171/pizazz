@@ -1,7 +1,7 @@
 package org.pizazz2.tool;
 
 import org.pizazz2.ICloseable;
-import org.pizazz2.PizContext;
+import org.pizazz2.common.ThreadUtils;
 import org.pizazz2.data.LinkedObject;
 import org.pizazz2.data.TupleObject;
 import org.pizazz2.tool.ref.IDataflowListener;
@@ -10,6 +10,7 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
 /**
@@ -23,8 +24,10 @@ public class DataflowHandler<T extends LinkedObject<byte[]>> implements ICloseab
     protected final IDataflowListener<T> listener;
     protected final TupleObject config;
     protected final boolean sync;
+    protected final int threads;
     protected final Semaphore semaphore;
     protected final ThreadPoolExecutor executor;
+    private final AtomicBoolean closed = new AtomicBoolean(false);
 
     public DataflowHandler(BiConsumer<Collection<T>, TupleObject> consumer, IDataflowListener<T> listener,
                            TupleObject config, boolean sync, int threads) {
@@ -32,31 +35,36 @@ public class DataflowHandler<T extends LinkedObject<byte[]>> implements ICloseab
         this.listener = listener;
         this.config = config;
         this.sync = sync;
+        this.threads = threads;
         int tmp = Math.max(threads, 1);
         this.semaphore = new Semaphore(tmp);
-        executor = new ThreadPoolExecutor(tmp, tmp, 0L,
-                TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), new PizThreadFactory(PizContext.NAMING_SHORT +
-                "_dataflow_execute_", true));
+        executor = ThreadUtils.newDaemonThreadPool(tmp, "-dataflow-execute");
+    }
+
+    protected Runnable doExecute(long executionId, List<T> data) {
+        return () -> {
+            try {
+                if (!isClosed()) {
+                    consumer.accept(data, config);
+                    listener.after(executionId, data);
+                }
+            } catch (RuntimeException e) {
+                listener.exception(executionId, data, e);
+            } finally {
+                semaphore.release();
+            }
+        };
     }
 
     public void execute(long executionId, List<T> data) {
         Runnable toRelease = () -> {};
         boolean bulkRequestSetupSuccessful = false;
         try {
-            listener.before(executionId,data);
+            listener.before(executionId, data);
             // 只允许单一处理进行通过
             semaphore.acquire();
             toRelease = semaphore::release;
-            Runnable runnable = () -> {
-                try {
-                    consumer.accept(data, config);
-                    listener.after(executionId, data);
-                } catch (RuntimeException e) {
-                    listener.exception(executionId, data, e);
-                } finally {
-                    semaphore.release();
-                }
-            };
+            Runnable runnable = doExecute(executionId, data);
             // 同步执行
             if (sync) {
                 runnable.run();
@@ -76,12 +84,23 @@ public class DataflowHandler<T extends LinkedObject<byte[]>> implements ICloseab
         }
     }
 
+    public boolean isClosed() {
+        return closed.get();
+    }
+
     @Override
     public void destroy(Duration timeout) {
-        if (timeout != null && !timeout.isZero()) {
-            executor.shutdown();
-        } else {
-            executor.shutdownNow();
+        if (closed.compareAndSet(false, true)) {
+            if (timeout != null && !timeout.isNegative() && !timeout.isZero()) {
+                try {
+                    if (semaphore.tryAcquire(threads, 0L, TimeUnit.MILLISECONDS)) {
+                        semaphore.release(threads);
+                    }
+                } catch (InterruptedException e) {
+                    // do nothing
+                }
+            }
+            ThreadUtils.shutdown(executor, timeout);
         }
     }
 }
