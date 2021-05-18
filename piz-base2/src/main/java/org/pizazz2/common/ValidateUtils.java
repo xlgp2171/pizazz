@@ -1,7 +1,6 @@
 package org.pizazz2.common;
 
 import org.pizazz2.IObject;
-import org.pizazz2.data.TupleObject;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.helper.LocaleHelper;
 import org.pizazz2.message.BasicCodeEnum;
@@ -15,7 +14,7 @@ import java.util.Objects;
  * 验证工具
  *
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.0.210512
  */
 public class ValidateUtils {
     public static void verifyExpression(ExpressionEnum expression, String target) throws ValidateException {
@@ -170,15 +169,16 @@ public class ValidateUtils {
         }
     }
 
-    public static void limit(String method, int index, int target, Integer min, Integer max) throws ValidateException {
+    public static void limit(String method, int index, Number target, Number min, Number max) throws ValidateException {
+        ValidateUtils.notNull("limit", 1, 1, target);
         boolean result = true;
         String tmp = "";
 
-        if (min != null && target < min) {
+        if (min != null && target.doubleValue() < min.doubleValue()) {
             tmp = ">=" + min;
             result = false;
         }
-        if (max != null && target > max) {
+        if (max != null && target.doubleValue() > max.doubleValue()) {
             tmp = "<=" + max;
             result = false;
         }
