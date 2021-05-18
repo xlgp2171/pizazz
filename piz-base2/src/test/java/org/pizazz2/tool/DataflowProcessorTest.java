@@ -17,6 +17,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * DataflowProcessor测试
+ *
+ * @author xlgp2171
+ * @version 2.0.210512
+ */
 public class DataflowProcessorTest {
 
     static DataflowProcessor<ContentObject> PROCESSOR;
@@ -54,7 +60,7 @@ public class DataflowProcessorTest {
 
     @Test
     public void testActions() throws InterruptedException {
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 9; i++) {
             PROCESSOR.add(new ContentObject(-1, "A" + i, ArrayUtils.EMPTY_BYTE));
         }
         Thread.sleep(1000);
