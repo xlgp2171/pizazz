@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.concurrent.*;
 
 import org.pizazz2.*;
+import org.pizazz2.common.ThreadUtils;
 import org.pizazz2.common.ValidateUtils;
 import org.pizazz2.exception.BaseException;
 import org.pizazz2.exception.ToolException;
@@ -23,7 +24,7 @@ import org.pizazz2.tool.ref.ContainerStatusEnum;
  *
  * @param <T> 输出类型
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.0.210512
  */
 public abstract class AbstractContainer<T> implements IPlugin {
     public static final String CONTAINER_TIMEOUT = "timeout";
@@ -59,8 +60,8 @@ public abstract class AbstractContainer<T> implements IPlugin {
 
     @Override
     public void initialize(IObject config) throws ToolException {
-        properties.append(CONTAINER_TIMEOUT, ConfigureHelper.getConfig(TypeEnum.BASIC,
-				PizContext.NAMING_SHORT + ".sc." + CONTAINER_TIMEOUT, "DEF_CONTAINER_TIMEOUT", "30000"));
+        properties.append(CONTAINER_TIMEOUT, ConfigureHelper.getConfig(TypeEnum.BASIC,PizContext.NAMING_SHORT +
+                ".sc." + CONTAINER_TIMEOUT, "DEF_CONTAINER_TIMEOUT", "30000"));
     }
 
     @Override
@@ -98,9 +99,9 @@ public abstract class AbstractContainer<T> implements IPlugin {
             String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "CONTAINER.DESTROY.TIMEOUT", timeout.toMillis());
             SystemUtils.println(System.out, new StringBuffer(msg));
             log(msg, null);
-            ScheduledThreadPoolExecutor pool = null;
+            ThreadPoolExecutor pool = null;
             try {
-                pool = new ScheduledThreadPoolExecutor(1, new PizThreadFactory());
+                pool = ThreadUtils.newSingleThreadPool();
                 status = pool.submit(callable).get(timeout.toMillis(), TimeUnit.MILLISECONDS);
             } catch (TimeoutException e) {
                 msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CONTAINER.TIMEOUT", timeout);
@@ -114,10 +115,7 @@ public abstract class AbstractContainer<T> implements IPlugin {
                 Runtime.getRuntime().halt(status.getStatus());
             } finally {
                 SystemUtils.destroy(output, Duration.ZERO);
-
-                if (pool != null) {
-                    pool.shutdownNow();
-                }
+                ThreadUtils.shutdown(pool,null);
             }
         }
         if (status != ContainerStatusEnum.THREAD_ERROR) {
