@@ -1,7 +1,8 @@
 package org.pizazz2.tool;
 
 import org.pizazz2.ICloseable;
-import org.pizazz2.PizContext;
+import org.pizazz2.common.SystemUtils;
+import org.pizazz2.common.ThreadUtils;
 import org.pizazz2.common.ValidateUtils;
 import org.pizazz2.data.LinkedObject;
 import org.pizazz2.data.TupleObject;
@@ -14,7 +15,8 @@ import org.pizazz2.tool.ref.IDataflowListener;
 
 import java.time.Duration;
 import java.util.Collection;
-import java.util.concurrent.*;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
@@ -32,14 +34,13 @@ public class DataflowProcessor<T extends LinkedObject<byte[]>> implements IClose
     private final long interval;
     private final BatchedData<T> batchedData;
     private final ScheduledThreadPoolExecutor scheduler;
-    private final ScheduledFuture<?> future;
 
     private final AtomicBoolean closed = new AtomicBoolean(false);
     private final AtomicLong executionIdGen = new AtomicLong();
 
     DataflowProcessor(BiConsumer<Collection<T>, TupleObject> consumer, IDataflowListener<T> listener,
-                      DataflowHandler<T> handler, TupleObject config, boolean sync, int threads, int actions, long size,
-                      long interval) throws ValidateException {
+                      DataflowHandler<T> handler, TupleObject config, boolean sync, int threads, int actions,
+                      long size, long interval) throws ValidateException {
         if (actions <= 0 && size <= 0 && interval <= 0) {
             String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.MULTI", "DataflowProcessor");
             throw new ValidateException(BasicCodeEnum.MSG_0005, msg);
@@ -54,12 +55,11 @@ public class DataflowProcessor<T extends LinkedObject<byte[]>> implements IClose
         this.interval = interval;
         // 若小于10个就10个
         batchedData = new BatchedData<>(Math.max(actions, 10));
-
-        scheduler = new ScheduledThreadPoolExecutor(1, new PizThreadFactory(PizContext.NAMING_SHORT +
-                "_dataflow_", true));
+        // 定时任务线程池
+        scheduler = ThreadUtils.newDaemonScheduledThreadPool(1, "-dataflow");
         scheduler.setRemoveOnCancelPolicy(true);
-        //
-        future = startFlushTask();
+        // 按照设定时间启动任务
+        startFlushTask();
     }
 
     public static <E extends LinkedObject<byte[]>> Builder<E> builder(
@@ -90,13 +90,10 @@ public class DataflowProcessor<T extends LinkedObject<byte[]>> implements IClose
         }
     }
 
-    private ScheduledFuture<?> startFlushTask() {
-        ScheduledFuture<?> future = null;
-
+    private void startFlushTask() {
         if (interval > 0) {
-            future = scheduler.scheduleWithFixedDelay(new Flush(), interval, interval, TimeUnit.MILLISECONDS);
+            scheduler.schedule(new Flush(), interval, TimeUnit.MILLISECONDS);
         }
-        return future;
     }
 
     private void execute() {
@@ -110,20 +107,8 @@ public class DataflowProcessor<T extends LinkedObject<byte[]>> implements IClose
     @Override
     public void destroy(Duration timeout) {
         if (closed.compareAndSet(false, true)) {
-            if (timeout != null && !timeout.isZero()) {
-                if (future != null) {
-                    try {
-                        future.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
-                    } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                        // do nothing
-                    }
-                }
-            } else {
-                if (future != null) {
-                    future.cancel(true);
-                }
-            }
-            scheduler.shutdownNow();
+            SystemUtils.destroy(handler, timeout);
+            ThreadUtils.shutdown(scheduler, null);
         }
     }
 
@@ -171,6 +156,7 @@ public class DataflowProcessor<T extends LinkedObject<byte[]>> implements IClose
 
         /**
          * 数据流发送量阈值
+         *
          * @param actions 发送量阈值
          * @return 当前对象
          */
@@ -183,6 +169,7 @@ public class DataflowProcessor<T extends LinkedObject<byte[]>> implements IClose
 
         /**
          * 数据流发送大小阈值
+         *
          * @param size 发送大小阈值
          * @return 当前对象
          */
@@ -195,6 +182,7 @@ public class DataflowProcessor<T extends LinkedObject<byte[]>> implements IClose
 
         /**
          * 数据流发送时限阈值
+         *
          * @param interval 发送时限阈值
          * @return 当前对象
          */
@@ -207,6 +195,7 @@ public class DataflowProcessor<T extends LinkedObject<byte[]>> implements IClose
 
         /**
          * 流式处理操作实现
+         *
          * @param handler 操作实现
          * @return 当前对象
          */
@@ -222,6 +211,7 @@ public class DataflowProcessor<T extends LinkedObject<byte[]>> implements IClose
 
         /**
          * 通过配置构建
+         *
          * @return 流式处理器实现
          */
         public DataflowProcessor<E> build() {
@@ -239,7 +229,11 @@ public class DataflowProcessor<T extends LinkedObject<byte[]>> implements IClose
                 if (batchedData.total() == 0) {
                     return;
                 }
-                execute();
+                try {
+                    execute();
+                } finally {
+                    scheduler.schedule(Flush.this, interval, TimeUnit.MILLISECONDS);
+                }
             }
         }
     }

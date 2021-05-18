@@ -41,7 +41,7 @@ public class DataflowHandler<T extends LinkedObject<byte[]>> implements ICloseab
         executor = ThreadUtils.newDaemonThreadPool(tmp, "-dataflow-execute");
     }
 
-    protected Runnable doExecute(long executionId, List<T> data) {
+    protected Runnable toRunnable(long executionId, List<T> data) {
         return () -> {
             try {
                 if (!isClosed()) {
@@ -56,6 +56,17 @@ public class DataflowHandler<T extends LinkedObject<byte[]>> implements ICloseab
         };
     }
 
+    protected void executeRunnable(Runnable runnable) {
+        if (runnable != null) {
+            // 同步执行
+            if (sync) {
+                runnable.run();
+            } else {
+                executor.execute(runnable);
+            }
+        }
+    }
+
     public void execute(long executionId, List<T> data) {
         Runnable toRelease = () -> {};
         boolean bulkRequestSetupSuccessful = false;
@@ -64,13 +75,8 @@ public class DataflowHandler<T extends LinkedObject<byte[]>> implements ICloseab
             // 只允许单一处理进行通过
             semaphore.acquire();
             toRelease = semaphore::release;
-            Runnable runnable = doExecute(executionId, data);
-            // 同步执行
-            if (sync) {
-                runnable.run();
-            } else {
-                executor.execute(runnable);
-            }
+            Runnable runnable = toRunnable(executionId, data);
+            executeRunnable(runnable);
             bulkRequestSetupSuccessful = true;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -93,7 +99,7 @@ public class DataflowHandler<T extends LinkedObject<byte[]>> implements ICloseab
         if (closed.compareAndSet(false, true)) {
             if (timeout != null && !timeout.isNegative() && !timeout.isZero()) {
                 try {
-                    if (semaphore.tryAcquire(threads, 0L, TimeUnit.MILLISECONDS)) {
+                    if (semaphore.tryAcquire(threads, 1L, TimeUnit.MILLISECONDS)) {
                         semaphore.release(threads);
                     }
                 } catch (InterruptedException e) {
