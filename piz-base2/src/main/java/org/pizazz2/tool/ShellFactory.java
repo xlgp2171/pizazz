@@ -1,5 +1,18 @@
 package org.pizazz2.tool;
 
+import org.pizazz2.ICloseable;
+import org.pizazz2.IMessageOutput;
+import org.pizazz2.common.IOUtils;
+import org.pizazz2.common.ThreadUtils;
+import org.pizazz2.exception.BaseException;
+import org.pizazz2.exception.ToolException;
+import org.pizazz2.exception.ValidateException;
+import org.pizazz2.helper.ConfigureHelper;
+import org.pizazz2.helper.LocaleHelper;
+import org.pizazz2.message.BasicCodeEnum;
+import org.pizazz2.message.TypeEnum;
+import org.pizazz2.tool.ref.IShellFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -7,40 +20,25 @@ import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-
-import org.pizazz2.PizContext;
-import org.pizazz2.ICloseable;
-import org.pizazz2.IMessageOutput;
-import org.pizazz2.helper.ConfigureHelper;
-import org.pizazz2.common.IOUtils;
-import org.pizazz2.helper.LocaleHelper;
-import org.pizazz2.exception.ValidateException;
-import org.pizazz2.exception.BaseException;
-import org.pizazz2.exception.ToolException;
-import org.pizazz2.message.BasicCodeEnum;
-import org.pizazz2.message.TypeEnum;
-import org.pizazz2.tool.ref.IShellFactory;
 
 /**
  * SHELL工厂组件
  *
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.0.210512
  */
 public final class ShellFactory implements IShellFactory, ICloseable {
-
+    public static final int POOL_SIZE = 8;
     private final ThreadPoolExecutor threadPool;
 
     public ShellFactory() {
-        int maximumPoolSize = ConfigureHelper.getInt(TypeEnum.BASIC, "DEF_SHELL_POOL_MAX",
-				Runtime.getRuntime().availableProcessors() * 2);
-        long keepAliveTime = ConfigureHelper.getLong(TypeEnum.BASIC, "DEF_SHELL_THREAD_KEEP", 0L);
-        threadPool = new ThreadPoolExecutor(maximumPoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS,
-				new LinkedBlockingQueue<>(), new PizThreadFactory(PizContext.NAMING_SHORT + "-shell", true));
+        int poolSize = ConfigureHelper.getInt(TypeEnum.BASIC, "DEF_SHELL_POOL_MAX",
+                Runtime.getRuntime().availableProcessors());
+        poolSize = poolSize > 0 ? Math.min(poolSize, POOL_SIZE) : POOL_SIZE;
+        threadPool = ThreadUtils.newDaemonThreadPool(poolSize, "-shell");
     }
 
     public static ShellBuilder newInstance(String... command) throws ValidateException {
@@ -82,11 +80,7 @@ public final class ShellFactory implements IShellFactory, ICloseable {
 
     @Override
     public void destroy(Duration timeout) {
-        if (timeout.isNegative() || timeout.isZero()) {
-            threadPool.shutdownNow();
-        } else {
-            threadPool.shutdown();
-        }
+        ThreadUtils.shutdown(threadPool, timeout);
     }
 
     private static class StreamSupplier implements Supplier<List<String>> {
@@ -121,7 +115,7 @@ public final class ShellFactory implements IShellFactory, ICloseable {
         }
     }
 
-    public static enum Singleton {
+    public enum Singleton {
         /**
          * 单例
          */
