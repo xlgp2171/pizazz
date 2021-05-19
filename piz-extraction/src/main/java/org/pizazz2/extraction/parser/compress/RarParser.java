@@ -22,6 +22,7 @@ import org.pizazz2.helper.TupleObjectHelper;
 import org.pizazz2.tool.ShellFactory;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -39,7 +40,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * 无解析属性Metadata
  *
  * @author xlgp2171
- * @version 2.0.210501
+ * @version 2.0.210512
  */
 public class RarParser extends AbstractCompressParser {
 	@Override
@@ -133,8 +134,14 @@ public class RarParser extends AbstractCompressParser {
 								.toString()).setStatus(ExtractObject.StatusEnum.EMPTY);
 					}
 				} else {
+					byte[] data;
+
+					try (ByteArrayOutputStream out = new ByteArrayOutputStream((int) item.getFullUnpackSize())) {
+						archive.extractFile(item, out);
+						data = out.toByteArray();
+					}
 					super.addAttachment(object, path.getFileName().toString(), ExtractHelper.pathResolve(parent, path))
-							.setData(item.getFileNameByteArray());
+							.setData(data);
 				}
 			}
 		}
