@@ -4,6 +4,7 @@ import org.apache.tika.mime.MediaType;
 import org.pizazz2.ICloseable;
 import org.pizazz2.common.CollectionUtils;
 import org.pizazz2.common.NumberUtils;
+import org.pizazz2.common.ThreadUtils;
 import org.pizazz2.data.TupleObject;
 import org.pizazz2.extraction.data.ExtractObject;
 import org.pizazz2.extraction.exception.DetectionException;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
  * 并发处理器
  *
  * @author xlgp2171
- * @version 2.0.210501
+ * @version 2.0.210512
  */
 public class ConcurrentProcessor implements ICloseable {
     private final Logger logger = LoggerFactory.getLogger(ConcurrentProcessor.class);
@@ -51,11 +52,7 @@ public class ConcurrentProcessor implements ICloseable {
 
     @Override
     public void destroy(Duration timeout) {
-        if (timeout == null || timeout.isZero()) {
-            pool.shutdownNow();
-        } else {
-            pool.shutdown();
-        }
+        ThreadUtils.shutdown(pool, timeout);
     }
 
     private class Partition extends RecursiveAction {
