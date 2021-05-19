@@ -8,11 +8,11 @@ import org.pizazz2.ICloseable;
 import org.pizazz2.common.ArrayUtils;
 import org.pizazz2.common.CollectionUtils;
 import org.pizazz2.common.SystemUtils;
+import org.pizazz2.common.ThreadUtils;
 import org.pizazz2.data.TupleObject;
 import org.pizazz2.exception.BaseException;
 import org.pizazz2.kafka.KafkaConstant;
 import org.pizazz2.kafka.Management;
-import org.pizazz2.tool.PizThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +28,7 @@ import java.util.function.BiConsumer;
  * 简单的kafka监控组件
  *
  * @author xlgp2171
- * @version 2.0.210301
+ * @version 2.0.210512
  */
 public class SimpleMonitor<K, V> implements ICloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleMonitor.class);
@@ -41,13 +41,15 @@ public class SimpleMonitor<K, V> implements ICloseable {
         management = new Management<>(config);
         nodes = new ConcurrentSkipListSet<>(NodeEntity::compareTo);
         consumers = new ConcurrentSkipListSet<>(ConsumerEntity::compareTo);
-        scheduled = new ScheduledThreadPoolExecutor(2, new PizThreadFactory(KafkaConstant.KEY_KAFKA, true));
+        scheduled = ThreadUtils.newDaemonScheduledThreadPool(2, KafkaConstant.KEY_KAFKA);
     }
 
     public final void activate(Duration period, boolean realtime) {
         Duration tmp = (period == null || period.isZero() || period.isNegative()) ? Duration.ofMillis(30000) : period;
-        scheduled.scheduleAtFixedRate(() -> resetConsumerEntities(realtime), 1000, tmp.toMillis(), TimeUnit.MILLISECONDS);
-        scheduled.scheduleWithFixedDelay(() -> refreshConsumerEntities(realtime), 1000 * 2, tmp.toMillis() / 3, TimeUnit.MILLISECONDS);
+        scheduled.scheduleAtFixedRate(() -> resetConsumerEntities(realtime), 1000, tmp.toMillis(),
+                TimeUnit.MILLISECONDS);
+        scheduled.scheduleWithFixedDelay(() -> refreshConsumerEntities(realtime), 1000 * 2,
+                tmp.toMillis() / 3, TimeUnit.MILLISECONDS);
         LOGGER.info("SimpleMonitor scheduled,period=" + period);
     }
 
@@ -91,8 +93,8 @@ public class SimpleMonitor<K, V> implements ICloseable {
             if (consumerSet.isEmpty()) {
                 consumers.clear();
             } else {
-                resetConsumerEntities(consumerSet, (item, target) -> item.setOffsetAndMetadata(target.getOffsetAndMetadata())
-						.setEndOffset(target.getEndOffset()));
+                resetConsumerEntities(consumerSet, (item, target) -> item.setOffsetAndMetadata(
+                        target.getOffsetAndMetadata()).setEndOffset(target.getEndOffset()));
             }
         }
     }
@@ -143,7 +145,8 @@ public class SimpleMonitor<K, V> implements ICloseable {
                     LOGGER.warn("getGroupDescription:" + e.getMessage(), e);
                 }
                 if (description != null) {
-                    ConsumerGroupListing group = new ConsumerGroupListing(description.groupId(), description.isSimpleConsumerGroup());
+                    ConsumerGroupListing group = new ConsumerGroupListing(description.groupId(),
+                            description.isSimpleConsumerGroup());
 					nodes.add(new NodeEntity(description.coordinator(), group, description.state()));
 
                     if (realtime) {
@@ -167,7 +170,8 @@ public class SimpleMonitor<K, V> implements ICloseable {
         		tp -> addConsumerEntities(new ConsumerEntity(item.consumerId(), item.host(), group, tp), consumers)));
     }
 
-    private void resetConsumerEntities(ConcurrentSkipListSet<ConsumerEntity> consumerSet, BiConsumer<ConsumerEntity, ConsumerEntity> consumer) {
+    private void resetConsumerEntities(ConcurrentSkipListSet<ConsumerEntity> consumerSet, BiConsumer<ConsumerEntity,
+            ConsumerEntity> consumer) {
         consumers.forEach(item -> {
             ConsumerEntity target = consumerSet.ceiling(item);
 
@@ -191,11 +195,7 @@ public class SimpleMonitor<K, V> implements ICloseable {
 
     @Override
     public void destroy(Duration timeout) {
-        if (timeout == null || timeout.isZero() || timeout.isNegative()) {
-            scheduled.shutdownNow();
-        } else {
-            scheduled.shutdown();
-        }
+        ThreadUtils.shutdown(scheduled, timeout);
         SystemUtils.destroy(management, timeout);
         LOGGER.info("SimpleMonitor destroyed,timeout=" + timeout);
     }
