@@ -32,22 +32,7 @@ public class DataflowProcessorTest {
     static final long INTERVAL = 1000;
     static final int THREADS = 2;
 
-    static final IDataflowListener<ContentObject> LISTENER = new IDataflowListener<ContentObject>() {
-        @Override
-        public void before(long executionId, List<ContentObject> data) {
-            System.out.println("BEFORE,id=" + executionId + ",data=" + data.size());
-        }
-
-        @Override
-        public void after(long executionId, List<ContentObject> data) {
-            System.out.println("AFTER,id=" + executionId + ",data=" + data.size());
-        }
-
-        @Override
-        public void exception(long executionId, List<ContentObject> data, Exception e) {
-            System.err.println("ERROR:" + e.getMessage() + ",id=" + executionId + ",data=" + data.size());
-        }
-    };
+    static final IDataflowListener<ContentObject> LISTENER = (executionId, data) -> {};
 
     @BeforeClass
     public static void init() {
