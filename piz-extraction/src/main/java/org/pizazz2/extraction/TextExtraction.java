@@ -76,23 +76,29 @@ public class TextExtraction implements ICloseable {
 
     public ExtractObject extract(String name, String source, byte[] data) throws DetectionException, ParseException,
             ValidateException {
-        return extract(name, source, data, TupleObjectHelper.emptyObject());
+        return extract(name, source, data, TupleObjectHelper.emptyObject(), true);
     }
 
-    public ExtractObject extract(String name, String source, byte[] data, TupleObject config) throws DetectionException,
+    public ExtractObject extract(String name, String source, byte[] data, TupleObject config, boolean includeAttachment)
+            throws DetectionException, ParseException, ValidateException {
+        return extract(new ExtractObject(ExtractHelper.generateId(), name, source, data), config, includeAttachment);
+    }
+
+    public ExtractObject extract(ExtractObject object, boolean includeAttachment) throws DetectionException,
             ParseException, ValidateException {
-        return extract(new ExtractObject(ExtractHelper.generateId(), name, source, data), config);
+        return extract(object, TupleObjectHelper.emptyObject(), includeAttachment);
     }
 
-    public ExtractObject extract(ExtractObject object) throws DetectionException, ParseException, ValidateException {
-        return extract(object, TupleObjectHelper.emptyObject());
+    public ExtractObject extract(ExtractObject object, TupleObject config) throws DetectionException,
+            ParseException, ValidateException {
+        return extract(object, config, true);
     }
 
-    public ExtractObject extract(ExtractObject object, TupleObject config) throws DetectionException, ParseException,
-            ValidateException {
+    public ExtractObject extract(ExtractObject object, TupleObject config, boolean includeAttachment)
+            throws DetectionException, ParseException, ValidateException {
         extract.extract(object, config, modify);
 
-        if (object.hasAttachment()) {
+        if (object.hasAttachment() && includeAttachment) {
             if (concurrent != null) {
                 concurrent.executeBatch(object.getAttachment(), config);
             } else {
