@@ -1,19 +1,36 @@
-package org.pizazz2.detection;
+package org.pizazz2.extraction;
 
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.detect.CompositeDetector;
 import org.apache.tika.detect.Detector;
+import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MediaType;
 import org.apache.tika.mime.MediaTypeRegistry;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.CompositeParser;
 import org.apache.tika.parser.Parser;
 import org.junit.Test;
+import org.pizazz2.common.IOUtils;
+import org.pizazz2.exception.UtilityException;
+import org.pizazz2.extraction.exception.ParseException;
+import org.pizazz2.extraction.support.TikaHelper;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
 public class TikaTest {
+    static final String NAME = "sample.zip";
+
+    @Test
+    public void testExtractByTika() throws ParseException, UtilityException {
+        byte[] data = IOUtils.toByteArray(IOUtils.getResourceAsStream(NAME));
+        Metadata metadata = new Metadata();
+        String content = TikaHelper.extractToText(data, metadata, StandardCharsets.UTF_8);
+        System.out.println("META: " + metadata);
+        System.out.println("TEXT: " + content);
+    }
+
     @Test
     public void testDisplaySupportedTypes() {
         AutoDetectParser parser = new AutoDetectParser();
