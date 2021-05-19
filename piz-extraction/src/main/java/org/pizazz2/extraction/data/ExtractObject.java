@@ -15,7 +15,7 @@ import java.util.LinkedList;
  * 文档链接流转对象
  *
  * @author xlgp2171
- * @version 2.0.210501
+ * @version 2.0.210512
  */
 public class ExtractObject extends LinkedObject<byte[]> {
     /**
@@ -169,7 +169,7 @@ public class ExtractObject extends LinkedObject<byte[]> {
 
     @Override
     public String getSource() {
-        return ExtractHelper.pathFormat(super.getSource());
+        return ExtractHelper.pathFormat(super.getSource(), true);
     }
 
     public Metadata getMetadata() {
