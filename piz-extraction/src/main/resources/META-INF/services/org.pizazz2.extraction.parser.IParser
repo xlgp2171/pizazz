@@ -1,0 +1,8 @@
+org.pizazz2.extraction.parser.mail.OutlookParser
+org.pizazz2.extraction.parser.mail.Rfc822Parser
+org.pizazz2.extraction.parser.compress.TarParser
+org.pizazz2.extraction.parser.compress.ZipParser
+org.pizazz2.extraction.parser.compress.GzipParser
+org.pizazz2.extraction.parser.compress.RarParser
+org.pizazz2.extraction.parser.text.HwpV3Parser
+org.pizazz2.extraction.parser.text.TikaParser
