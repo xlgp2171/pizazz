@@ -13,10 +13,11 @@ import java.nio.file.Path;
  * 提取辅助工具
  *
  * @author xlgp2171
- * @version 2.0.210501
+ * @version 2.0.210512
  */
 public class ExtractHelper {
     static final String WINDOWS_PATH_SEPARATOR = "\\";
+    static final String PATH_DIRECTORY = "/";
 
     static final IdBuilder ID = IdFactory.newInstance(new Integer(32).shortValue());
 
@@ -31,9 +32,12 @@ public class ExtractHelper {
         return tmp == null ? StringUtils.EMPTY : tmp.toString();
     }
 
-    public static String pathFormat(String path) {
+    public static String pathFormat(String path, boolean isDirectory) {
         if (!StringUtils.isTrimEmpty(path) && path.contains(WINDOWS_PATH_SEPARATOR)) {
-            path = path.replaceAll(WINDOWS_PATH_SEPARATOR + WINDOWS_PATH_SEPARATOR, "/");
+            path = path.replaceAll(WINDOWS_PATH_SEPARATOR + WINDOWS_PATH_SEPARATOR, PATH_DIRECTORY);
+        }
+        if (isDirectory && !path.endsWith(PATH_DIRECTORY)) {
+            path += PATH_DIRECTORY;
         }
         return path;
     }
@@ -74,7 +78,8 @@ public class ExtractHelper {
 
     public static ExtractObject addAttachment(ExtractObject object, String name, String source, Metadata metadata) {
         long id = ExtractHelper.generateId();
-        ExtractObject tmp = new ExtractObject(id, StringUtils.isEmpty(name) ? StringUtils.of(id) : name, source, metadata);
+        ExtractObject tmp = new ExtractObject(id,
+                StringUtils.isEmpty(name) ? StringUtils.of(id) : name, source, metadata);
         object.addAttachment(tmp);
         return tmp;
     }
