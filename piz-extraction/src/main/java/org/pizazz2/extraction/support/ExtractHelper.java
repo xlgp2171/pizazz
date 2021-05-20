@@ -36,7 +36,7 @@ public class ExtractHelper {
         if (!StringUtils.isTrimEmpty(path) && path.contains(WINDOWS_PATH_SEPARATOR)) {
             path = path.replaceAll(WINDOWS_PATH_SEPARATOR + WINDOWS_PATH_SEPARATOR, PATH_DIRECTORY);
         }
-        if (isDirectory && !path.endsWith(PATH_DIRECTORY)) {
+        if (isDirectory && !path.endsWith(PATH_DIRECTORY) && !StringUtils.isTrimEmpty(path)) {
             path += PATH_DIRECTORY;
         }
         return path;
