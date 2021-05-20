@@ -1,0 +1,1 @@
+mvn install:install-file -Dfile=piz-base2-2.0.0.jar -DgroupId=org.pizazz -DartifactId=piz-base2 -Dversion=2.0.0 -Dpackaging=jar
