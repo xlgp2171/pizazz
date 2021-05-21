@@ -31,7 +31,7 @@
 			<artifactId>kryo</artifactId>
 			<version>${kryo.version}</version>
 			<!-- 需要时再引入，作用于类org.pizazz2.common.SerializationUtils -->
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>
