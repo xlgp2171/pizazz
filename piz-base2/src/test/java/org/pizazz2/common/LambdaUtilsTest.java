@@ -2,6 +2,7 @@ package org.pizazz2.common;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.pizazz2.data.LinkedObject;
 import org.pizazz2.exception.UtilityException;
 
 import java.io.Serializable;
@@ -17,21 +18,9 @@ public class LambdaUtilsTest {
 
     @Test
     public void testToColumnName() throws UtilityException {
-        SFunction<User, ?> sFunction = User::getFirstName;
+        SFunction<LinkedObject<String>, ?> sFunction = LinkedObject::getChildren;
         String column = LambdaUtils.toColumnName(sFunction);
-        Assert.assertEquals(column, "firstName");
-    }
-
-    private static class User {
-        private String firstName;
-
-        public String getFirstName() {
-            return firstName;
-        }
-
-        public void setFirstName(String firstName) {
-            this.firstName = firstName;
-        }
+        Assert.assertEquals(column, "children");
     }
 
     @FunctionalInterface
