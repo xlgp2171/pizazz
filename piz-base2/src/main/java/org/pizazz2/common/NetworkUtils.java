@@ -83,7 +83,7 @@ public class NetworkUtils {
 
 	public static String[] getHostByNetwork(NetworkEnum.Inet type, String... filter) {
 		InetAddress[] address = NetworkUtils.getAddressesByNetwork(type);
-		Set<String> filterS = CollectionUtils.asHashSet(filter);
+		Set<String> filterS = ArrayUtils.asSet(filter);
 		Set<String> tmp = new LinkedHashSet<>();
 
 		for (InetAddress item : address) {

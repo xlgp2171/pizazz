@@ -67,4 +67,8 @@ public class ObjectUtils {
 	public static boolean isNull(WeakReference<?> target) {
 		return target == null || target.get() == null;
 	}
+
+	public static boolean isArray(Object obj) {
+		return obj != null && obj.getClass().isArray();
+	}
 }
