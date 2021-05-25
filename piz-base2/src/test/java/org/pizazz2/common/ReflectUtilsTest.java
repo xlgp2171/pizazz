@@ -3,7 +3,9 @@ package org.pizazz2.common;
 import org.junit.Assert;
 import org.junit.Test;
 import org.pizazz2.data.LinkedObject;
+import org.pizazz2.data.TupleObject;
 import org.pizazz2.exception.UtilityException;
+import org.pizazz2.helper.TupleObjectHelper;
 import org.pizazz2.test.ParentObject;
 import org.pizazz2.test.SubObject;
 
@@ -17,30 +19,32 @@ import java.util.*;
  * ReflectUtils测试
  *
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.0.210525
  */
 public class ReflectUtilsTest {
 
 	@Test
 	public void testInvokeMethod() throws UtilityException {
 		String target = "中文";
-		ParentObject parent = new ParentObject("P", 20.1, target.getBytes(StandardCharsets.UTF_8));
-		String result = ReflectUtils.invokeMethod(parent, "ofCharset", new Class<?>[]{ Charset.class },
+		SubObject sub = new SubObject();
+		sub.setParentData(target.getBytes());
+		String result = ReflectUtils.invokeMethod(sub, "ofCharset", new Class<?>[]{ Charset.class },
 				new Object[]{ StandardCharsets.UTF_8 }, String.class, false);
-		Assert.assertEquals(result,target);
+		Assert.assertEquals(result, target);
 	}
 
 	@Test
 	public void testInvokeSetField() throws UtilityException {
 		double target = 30.1;
-		ParentObject parent = new ParentObject("P", 20.1, "".getBytes());
-		ReflectUtils.invokeSetField("parentSize", parent, target, true);
-		Assert.assertEquals(parent.getParentSize(), target, 0);
+		SubObject sub = new SubObject();
+		sub.setParentSize(target);
+		ReflectUtils.invokeSetField("parentSize", sub, target, true);
+		Assert.assertEquals(sub.getParentSize(), target, 0);
 	}
 
 	@Test
 	public void testGetFields() {
-		Field[] fields = ReflectUtils.getFields(SubObject.class, true);
+		Field[] fields = ReflectUtils.getTargetFields(SubObject.class, true);
 		Assert.assertEquals(fields[0].getName(), "subName");
 	}
 
@@ -52,10 +56,25 @@ public class ReflectUtilsTest {
 	}
 
 	@Test
+	public void testInvokeGetFields() throws UtilityException {
+		SubObject sub = new SubObject();
+		sub.setParentSize(10.5);
+		sub.setParentName("A");
+		sub.setParentData("中文".getBytes());
+		sub.setSubData("汉化".getBytes());
+		sub.setSubName("B");
+		sub.setSubSize(2);
+		// 读取
+		TupleObject object = ReflectUtils.invokeGetFields(sub, true);
+		Assert.assertEquals(sub.getSubName(), TupleObjectHelper.getString(object, "subName",
+				StringUtils.EMPTY));
+	}
+
+	@Test
 	public void testInvokeConstructor() throws UtilityException {
 		double target = 30.1;
-		ParentObject parent = ReflectUtils.invokeConstructor(ParentObject.class, new Class<?>[]{String.class, double.class,
-				byte[].class}, new Object[]{"P", target, "中文".getBytes()}, true);
+		ParentObject parent = ReflectUtils.invokeConstructor(ParentObject.class, new Class<?>[]{String.class,
+				double.class, byte[].class}, new Object[]{"P", target, "中文".getBytes()}, true);
 		Assert.assertEquals(parent.getParentSize(), target, 0);
 	}
 

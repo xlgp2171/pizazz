@@ -1,10 +1,6 @@
 package org.pizazz2.common;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -21,7 +17,7 @@ import org.pizazz2.message.TypeEnum;
  * 反射工具
  * 
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.0.210525
  */
 public class ReflectUtils {
 
@@ -71,8 +67,8 @@ public class ReflectUtils {
 	public static <T> T invokeMethod(Object target, String methodName, Class<?>[] types, Object[] arguments,
 			Class<T> returnType, boolean accessible) throws ValidateException, UtilityException {
 		ValidateUtils.notNull("invokeMethod", target);
-		Method method = getMethod(target instanceof Class ? (Class<?>) target : target.getClass(), methodName, types,
-				accessible);
+		Method method = ReflectUtils.getMethod(target instanceof Class ? (Class<?>) target : target.getClass(),
+				methodName, types, accessible);
 		Object tmp = ReflectUtils.invokeMethod(method, target, arguments, accessible);
 		return ClassUtils.cast(tmp, returnType);
 	}
@@ -98,36 +94,35 @@ public class ReflectUtils {
 		ValidateUtils.notNull("getMethod", clazz, methodName);
 		types = ArrayUtils.nullToEmpty(types);
 		try {
-			return clazz.getMethod(methodName, types);
-		} catch (NoSuchMethodException | SecurityException e1) {
-			if (!isDeclared) {
-				String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.METHOD", clazz.getName(), methodName,
-						e1.getMessage());
-				throw new UtilityException(BasicCodeEnum.MSG_0010, msg, e1);
-			}
-			try {
-				return clazz.getDeclaredMethod(methodName, types);
-			} catch (NoSuchMethodException | SecurityException e2) {
-				String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.METHOD", clazz.getName(), methodName,
-						e2.getMessage());
-				throw new UtilityException(BasicCodeEnum.MSG_0010, msg, e2);
-			}
-		}
-	}
-
-	public static Field getField(String name, Object target, boolean accessible) throws UtilityException {
-		Class<?> type = target instanceof Class ? (Class<?>) target : target.getClass();
-		try {
-			return accessible ? type.getDeclaredField(name) : type.getField(name);
-		} catch (NoSuchFieldException | SecurityException e) {
-			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.FIELD.GET", type.getName(), name,
+			return isDeclared ? clazz.getDeclaredMethod(methodName, types) : clazz.getMethod(methodName, types);
+		} catch (NoSuchMethodException | SecurityException e) {
+			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.METHOD", clazz.getName(), methodName,
 					e.getMessage());
 			throw new UtilityException(BasicCodeEnum.MSG_0010, msg, e);
 		}
 	}
 
-	public static Field[] getFields(Class<?> clazz, boolean isDeclared) throws ValidateException {
-		ValidateUtils.notNull("getFields", clazz);
+	public static Field getField(String name, Class<?> target, boolean accessible) throws ValidateException,
+			UtilityException {
+		ValidateUtils.notEmpty("getField", name);
+		ValidateUtils.notNull("getField", 1, target);
+		try {
+			return accessible ? target.getDeclaredField(name) : target.getField(name);
+		} catch (NoSuchFieldException | SecurityException e) {
+			Class<?> type = target.getSuperclass();
+			// 若字段找不到
+			if (type != null && type != Object.class) {
+				return ReflectUtils.getField(name, type, accessible);
+			} else {
+				String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.FIELD.GET", target.getName(), name,
+						e.getMessage());
+				throw new UtilityException(BasicCodeEnum.MSG_0010, msg, e);
+			}
+		}
+	}
+
+	public static Field[] getTargetFields(Class<?> clazz, boolean isDeclared) throws ValidateException {
+		ValidateUtils.notNull("getTargetFields", clazz);
 
 		if (isDeclared) {
 			return clazz.getDeclaredFields();
@@ -139,9 +134,8 @@ public class ReflectUtils {
 		ValidateUtils.notNull("getAllFields", clazz);
 		Map<Class<?>, Field[]> tmp = new LinkedHashMap<>();
 		Class<?> current = clazz;
-
 		do {
-			tmp.put(current, ReflectUtils.getFields(current, isDeclared));
+			tmp.put(current, ReflectUtils.getTargetFields(current, isDeclared));
 			current = current.getSuperclass();
 		} while (current != Object.class);
 		return tmp;
@@ -150,14 +144,16 @@ public class ReflectUtils {
 	public static TupleObject invokeGetFields(Object target, boolean accessible) throws ValidateException,
 			UtilityException {
 		ValidateUtils.notNull("invokeGetFields", target);
-		Field[] fields = ReflectUtils.getFields(target instanceof Class ? (Class<?>) target : target.getClass(),
-				accessible);
-		TupleObject tmp = TupleObjectHelper.newObject(fields.length);
+		Map<Class<?>, Field[]> fields = ReflectUtils.getAllFields(target instanceof Class ? (Class<?>) target :
+						target.getClass(), accessible);
+		TupleObject tmp = TupleObjectHelper.newObject(fields.size());
 
-		for (Field item : fields) {
-			Object value = ReflectUtils.invokeGetField(item, Modifier.isStatic(item.getModifiers()) ?
-					target.getClass() : target, Object.class, accessible);
-			tmp.append(item.getName(), value);
+		for (Map.Entry<Class<?>, Field[]> item : fields.entrySet()) {
+			for (Field field : item.getValue()) {
+				Object value = ReflectUtils.invokeGetField(field, Modifier.isStatic(field.getModifiers()) ?
+						item.getKey() : target, Object.class, accessible);
+				tmp.append(field.getName(), value);
+			}
 		}
 		return tmp;
 	}
@@ -165,7 +161,7 @@ public class ReflectUtils {
 	public static void invokeSetField(String name, Object target, Object value, boolean accessible)
 			throws ValidateException, UtilityException {
 		ValidateUtils.notNull("invokeSetField", name, target, value);
-		Field field = ReflectUtils.getField(name, target, accessible);
+		Field field = ReflectUtils.getField(name, target.getClass(), accessible);
 		ReflectUtils.invokeSetField(field, target, value, accessible);
 	}
 
@@ -187,7 +183,7 @@ public class ReflectUtils {
 	public static <T> T invokeGetField(String name, Object target, Class<T> returnType, boolean accessible)
 			throws ValidateException, UtilityException {
 		ValidateUtils.notNull("invokeGetField", name, target, returnType);
-		Field field = ReflectUtils.getField(name, target, accessible);
+		Field field = ReflectUtils.getField(name, target.getClass(), accessible);
 		return ReflectUtils.invokeGetField(field, target, returnType, accessible);
 	}
 
@@ -206,5 +202,17 @@ public class ReflectUtils {
 			field.setAccessible(false);
 		}
 		return tmp == null ? null : ClassUtils.cast(tmp, returnType);
+	}
+
+	public static Type[] getActualTypeArguments(Class<?> clazz) {
+		Type type = clazz.getGenericSuperclass();
+		return ReflectUtils.getActualTypeArguments(type);
+	}
+
+	public static Type[] getActualTypeArguments(Type type) {
+		if (type instanceof ParameterizedType) {
+			return ClassUtils.cast(type, ParameterizedType.class).getActualTypeArguments();
+		}
+		return null;
 	}
 }
