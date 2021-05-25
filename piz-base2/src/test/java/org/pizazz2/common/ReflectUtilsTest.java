@@ -8,7 +8,6 @@ import org.pizazz2.test.ParentObject;
 import org.pizazz2.test.SubObject;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
