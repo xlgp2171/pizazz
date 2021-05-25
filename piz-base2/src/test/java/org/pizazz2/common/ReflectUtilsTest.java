@@ -2,14 +2,17 @@ package org.pizazz2.common;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.pizazz2.data.LinkedObject;
 import org.pizazz2.exception.UtilityException;
 import org.pizazz2.test.ParentObject;
 import org.pizazz2.test.SubObject;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
+import java.util.*;
 
 /**
  * ReflectUtils测试
@@ -61,5 +64,16 @@ public class ReflectUtilsTest {
 	public void testGetPackageName() {
 		String result = ReflectUtils.getPackageName(ParentObject.class);
 		Assert.assertEquals("org.pizazz2.test", result);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testGetActualTypeArguments() {
+		// 实例化子类
+		LinkedObject<byte[]> object1 = new LinkedObject<byte[]>(-1L, StringUtils.EMPTY, StringUtils.EMPTY){};
+		Type type = ReflectUtils.getActualTypeArguments(object1.getClass())[0];
+		Class<byte[]> clazz = (Class<byte[]>) type;
+		Assert.assertEquals(type.getTypeName(), "byte[]");
+		Assert.assertEquals(clazz, byte[].class);
 	}
 }
