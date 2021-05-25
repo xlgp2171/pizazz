@@ -14,7 +14,7 @@ import java.util.Objects;
  * 验证工具
  *
  * @author xlgp2171
- * @version 2.0.210512
+ * @version 2.0.210525
  */
 public class ValidateUtils {
     public static void verifyExpression(ExpressionEnum expression, String target) throws ValidateException {
@@ -184,6 +184,19 @@ public class ValidateUtils {
         }
         if (!result) {
             String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.LENGTH", method, index, tmp);
+            throw new ValidateException(BasicCodeEnum.MSG_0005, msg);
+        }
+    }
+
+    /**
+     * 验证是否是合成类
+     * @param method 验证目标方法
+     * @param target 验证目标
+     * @throws ValidateException 目标不为合成类
+     */
+    public static void isSyntheticClass(String method, Object target) throws ValidateException {
+        if (target == null || !target.getClass().isSynthetic()) {
+            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.MUST", method, "Synthetic Class");
             throw new ValidateException(BasicCodeEnum.MSG_0005, msg);
         }
     }
