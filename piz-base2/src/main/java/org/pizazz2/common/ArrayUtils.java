@@ -1,12 +1,16 @@
 package org.pizazz2.common;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 数组工具
  *
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.0.210525
  */
 public class ArrayUtils {
 
@@ -125,5 +129,15 @@ public class ArrayUtils {
         System.arraycopy(left, 0, tmp, 0, left.length);
         System.arraycopy(right, 0, tmp, left.length, right.length);
         return tmp;
+    }
+
+    @SafeVarargs
+    public static <T> List<T> asList(T... arr) {
+        return Stream.of(arr).collect(Collectors.toList());
+    }
+
+    @SafeVarargs
+    public static <T> Set<T> asSet(T... arr) {
+        return Stream.of(arr).collect(Collectors.toSet());
     }
 }

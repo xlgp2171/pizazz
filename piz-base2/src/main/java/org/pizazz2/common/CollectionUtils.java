@@ -1,14 +1,6 @@
 package org.pizazz2.common;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.pizazz2.exception.UtilityException;
 import org.pizazz2.exception.ValidateException;
@@ -17,7 +9,7 @@ import org.pizazz2.exception.ValidateException;
  * 集合工具
  * 
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.0.210525
  */
 public class CollectionUtils {
 
@@ -47,15 +39,6 @@ public class CollectionUtils {
 
 	public static <T> Set<T> unmodifiableSet(Set<? extends T> target) {
 		return Collections.unmodifiableSet(target);
-	}
-
-	public static <E> HashSet<E> asHashSet(E[] element) {
-		if (ArrayUtils.isEmpty(element)) {
-			return new LinkedHashSet<>();
-		}
-		HashSet<E> tmp = new LinkedHashSet<>(element.length);
-		Collections.addAll(tmp, element);
-		return tmp;
 	}
 
 	public static <E> void merge(Set<E> target, E[] element) throws ValidateException {
@@ -111,5 +94,22 @@ public class CollectionUtils {
 			tmp.append(item).append(",");
 		}
 		return tmp.deleteCharAt(tmp.length() - 1).append("]").toString();
+	}
+
+	/**
+	 * 随机分布元素
+	 * @param target 目标集合
+	 * @param seed 随机种子
+	 */
+	public static void shuffle(List<?> target, long seed) {
+		Collections.shuffle(target, new Random(seed));
+	}
+
+	/**
+	 * 反转集合
+	 * @param target 目标集合
+	 */
+	public static void reverse(List<?> target) {
+		Collections.reverse(target);
 	}
 }

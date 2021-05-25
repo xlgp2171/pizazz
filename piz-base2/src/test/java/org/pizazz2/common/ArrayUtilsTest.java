@@ -3,6 +3,11 @@ package org.pizazz2.common;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * ArrayUtils测试
  *
@@ -53,5 +58,19 @@ public class ArrayUtilsTest {
         String[] left = new String[] { "A", "B", "C" };
         String[] result = ArrayUtils.merge(left, right);
         Assert.assertArrayEquals(result, new String[] { "A", "B", "C", "1", "2" });
+    }
+
+    @Test
+    public void testAsList() {
+        List<String> list = ArrayUtils.asList("A", "B");
+        Assert.assertEquals(list.size(), 2);
+        Assert.assertEquals(list.getClass(), ArrayList.class);
+    }
+
+    @Test
+    public void testAsSet() {
+        Set<String> set = ArrayUtils.asSet("A", "B", "A");
+        Assert.assertEquals(set.size(), 2);
+        Assert.assertEquals(set.getClass(), HashSet.class);
     }
 }
