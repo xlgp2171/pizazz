@@ -8,7 +8,7 @@ import org.pizazz2.exception.ValidateException;
  * 数值工具
  *
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.0.210610
  */
 public class NumberUtils {
     /**
@@ -121,18 +121,18 @@ public class NumberUtils {
         return new BigDecimal(target).setScale(scale, BigDecimal.ROUND_HALF_UP).toPlainString();
     }
 
-    public static double round(double target, int scale) {
+    public static Double round(double target, int scale) {
         return new BigDecimal(target).setScale(scale, BigDecimal.ROUND_HALF_UP).doubleValue();
     }
 
-    public static long random(long min, long max) {
+    public static Long random(long min, long max) {
         if (min >= max) {
             return max;
         }
         return min + new Double(Math.random() * (max - min)).longValue();
     }
 
-    public static double random(double min, double max) {
+    public static Double random(double min, double max) {
         if (min >= max) {
             return max;
         }
