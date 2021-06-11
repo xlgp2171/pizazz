@@ -11,17 +11,20 @@ import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
  * 文件工具
  *
  * @author xlgp2171
- * @version 2.0.210425
+ * @version 2.0.210610
  */
 public class PathUtils {
 
@@ -116,27 +119,71 @@ public class PathUtils {
         }
     }
 
+    static Path[] paths(Stream<Path> stream, Predicate<Path> filter, boolean includeDir) {
+        Stream<Path> tmp = stream;
+
+        if (includeDir) {
+            if (filter != null) {
+                tmp = tmp.filter(filter);
+            }
+        } else {
+            if (filter != null) {
+                tmp = tmp.filter(item -> Files.isRegularFile(item) && Files.isReadable(item) && filter.test(item));
+            } else {
+                tmp = tmp.filter(item -> Files.isRegularFile(item) && Files.isReadable(item));
+            }
+        }
+        return tmp.toArray(Path[]::new);
+    }
+
+    /**
+     * 遍历文件夹下所有文件和文件夹
+     * @param dir 目标文件夹
+     * @param filter 过滤器
+     * @param includeDir 输出路径是否包含文件夹
+     * @return 所有的路径
+     * @throws UtilityException 遍历异常
+     * @throws ValidateException 参数验证异常
+     */
     public static Path[] listPaths(Path dir, Predicate<Path> filter, boolean includeDir) throws UtilityException,
-			ValidateException {
+            ValidateException {
         ValidateUtils.notNull("listPaths", dir);
 
-        try (Stream<Path> stream = Files.walk(dir)) {
-            Stream<Path> tmp = stream;
-
-            if (includeDir) {
-                if (filter != null) {
-					tmp = tmp.filter(filter);
-                }
-            } else {
-                if (filter != null) {
-                    tmp = tmp.filter(item -> Files.isRegularFile(item) && Files.isReadable(item) && filter.test(item));
-                } else {
-                    tmp = tmp.filter(item -> Files.isRegularFile(item) && Files.isReadable(item));
-                }
-            }
-            return tmp.toArray(Path[]::new);
+        try (Stream<Path> stream = Files.list(dir)) {
+            return PathUtils.paths(stream, filter, includeDir);
         } catch (IOException e) {
             String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO.PATH", dir.toAbsolutePath(), e.getMessage());
+            throw new UtilityException(BasicCodeEnum.MSG_0003, msg, e);
+        }
+    }
+
+    /**
+     * 深层遍历文件夹下所有文件和文件夹
+     * @param dir 目标文件夹
+     * @param filter 过滤器
+     * @param includeDir 输出路径是否包含文件夹
+     * @return 所有的路径
+     * @throws UtilityException 遍历异常
+     * @throws ValidateException 参数验证异常
+     */
+    public static Path[] walkPaths(Path dir, Predicate<Path> filter, boolean includeDir) throws UtilityException,
+			ValidateException {
+        ValidateUtils.notNull("walkPaths", dir);
+
+        try (Stream<Path> stream = Files.walk(dir)) {
+            return PathUtils.paths(stream, filter, includeDir);
+        } catch (IOException e) {
+            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO.PATH", dir.toAbsolutePath(), e.getMessage());
+            throw new UtilityException(BasicCodeEnum.MSG_0003, msg, e);
+        }
+    }
+
+    public static List<String> readLine(Path path, Charset charset) throws UtilityException {
+        ValidateUtils.notNull("readLine", path, charset);
+        try {
+            return Files.lines(path, charset).collect(Collectors.toList());
+        } catch (IOException e) {
+            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.IO.PATH", path.toAbsolutePath(), e.getMessage());
             throw new UtilityException(BasicCodeEnum.MSG_0003, msg, e);
         }
     }
