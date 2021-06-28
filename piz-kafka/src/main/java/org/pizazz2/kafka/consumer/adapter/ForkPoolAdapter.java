@@ -8,6 +8,7 @@ import org.pizazz2.IObject;
 import org.pizazz2.common.JSONUtils;
 import org.pizazz2.common.NumberUtils;
 import org.pizazz2.common.StringUtils;
+import org.pizazz2.common.ThreadUtils;
 import org.pizazz2.data.TupleObject;
 import org.pizazz2.exception.BaseException;
 import org.pizazz2.helper.TupleObjectHelper;
@@ -64,7 +65,7 @@ public class ForkPoolAdapter implements IProcessAdapter {
 				LOGGER.error("consume:" + bridge.getId(), e);
 			}
 		});
-		pool.submit(task);
+		pool.execute(task);
 	}
 
 	@Override
@@ -88,11 +89,7 @@ public class ForkPoolAdapter implements IProcessAdapter {
 
 	@Override
 	public void destroy(Duration timeout) {
-		if (timeout == null || timeout.isNegative() || timeout.isZero()) {
-			pool.shutdownNow();
-		} else {
-			pool.shutdown();
-		}
+		ThreadUtils.shutdown(pool, timeout);
 		LOGGER.info("adapter ForkPoolAdapter destroyed,timeout=" + timeout);
 	}
 }
