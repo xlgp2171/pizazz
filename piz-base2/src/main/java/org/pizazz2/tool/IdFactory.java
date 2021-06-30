@@ -16,7 +16,7 @@ import org.pizazz2.tool.ref.IdObject;
  * 参考vesta-id实现 60位[1(占位符)][3(识别码)][40(时间戳)][10(顺序号)][6(自定义)]<br>
  * 
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.0.210630
  */
 public class IdFactory implements IIdFactory {
 	public static final byte BIT_TOP = 1;
@@ -24,6 +24,8 @@ public class IdFactory implements IIdFactory {
 	public static final byte BIT_CUSTOM = 6;
 	public static final byte BIT_SEQUENCE = 10;
 	public static final byte BIT_TIMESTAMP = 40;
+
+	public static IdBuilder DEFAULT = IdFactory.newInstance();
 
 	private final AtomicReference<Sequence> cache = new AtomicReference<>(new Sequence());
 
@@ -152,7 +154,7 @@ public class IdFactory implements IIdFactory {
 		long timestamp = -1;
 	}
 
-	public static enum Singleton {
+	public enum Singleton {
 		/**
 		 * 单例
 		 */
@@ -160,7 +162,7 @@ public class IdFactory implements IIdFactory {
 
 		private final IdFactory factory;
 
-		private Singleton() {
+		Singleton() {
 			factory = new IdFactory();
 		}
 
