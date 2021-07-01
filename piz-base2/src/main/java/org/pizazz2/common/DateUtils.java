@@ -6,7 +6,6 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -20,9 +19,14 @@ import org.pizazz2.message.TypeEnum;
  * 时间日期工具
  * 
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.0.210701
  */
 public class DateUtils {
+	/**
+	 * 默认时间格式，格式化后如"2021-07-01 09:30:00"
+	 */
+	public static final String DEFAULT_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
 	public Date toDate(LocalDateTime dateTime, ZoneId zoneId) throws ValidateException {
 		ValidateUtils.notNull("toDate", dateTime);
 
