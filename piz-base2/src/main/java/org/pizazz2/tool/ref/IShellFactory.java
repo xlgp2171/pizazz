@@ -1,21 +1,21 @@
 package org.pizazz2.tool.ref;
 
+import org.pizazz2.IMessageOutput;
+import org.pizazz2.exception.BaseException;
+
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
-
-import org.pizazz2.IMessageOutput;
-import org.pizazz2.exception.BaseException;
+import java.util.function.Function;
 
 /**
  * SHELL工厂接口
  * 
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.1.210720
  */
 public interface IShellFactory {
 
@@ -23,10 +23,12 @@ public interface IShellFactory {
 	 * 新创建进程
 	 * @param builder 进程构造器
 	 * @param timeout 超时时间
-	 * @return 进程
+	 * @param function 处理process
+	 * @return 任意类型
 	 * @throws BaseException 构建异常
 	 */
-	Process newProcess(ProcessBuilder builder, Duration timeout) throws BaseException;
+	<T>T newProcess(ProcessBuilder builder, Duration timeout,
+					   Function<Process, T> function) throws BaseException;
 
 	/**
 	 * 输出方式匹配
