@@ -22,13 +22,14 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
  * SHELL工厂组件
  *
  * @author xlgp2171
- * @version 2.0.210512
+ * @version 2.0.210719
  */
 public final class ShellFactory implements IShellFactory, ICloseable {
     public static final int POOL_SIZE = 8;
@@ -46,7 +47,8 @@ public final class ShellFactory implements IShellFactory, ICloseable {
     }
 
     @Override
-    public Process newProcess(ProcessBuilder builder, Duration timeout) throws BaseException {
+    public <T>T newProcess(ProcessBuilder builder, Duration timeout,
+                              Function<Process, T> function) throws BaseException {
         Process process;
         try {
             process = builder.start();
@@ -54,6 +56,7 @@ public final class ShellFactory implements IShellFactory, ICloseable {
             String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PROCESS.START", e.getMessage());
             throw new ToolException(BasicCodeEnum.MSG_0003, msg, e);
         }
+        T completableFuture = function.apply(process);
         try {
             if (timeout.isZero()) {
                 process.waitFor();
@@ -64,7 +67,7 @@ public final class ShellFactory implements IShellFactory, ICloseable {
             String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PROCESS.WAIT", e.getMessage());
             throw new ToolException(BasicCodeEnum.MSG_0003, msg, e);
         }
-        return process;
+        return completableFuture;
     }
 
     @Override

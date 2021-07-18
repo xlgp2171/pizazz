@@ -1,5 +1,15 @@
 package org.pizazz2.tool;
 
+import org.pizazz2.ICloseable;
+import org.pizazz2.IMessageOutput;
+import org.pizazz2.PizContext;
+import org.pizazz2.common.ArrayUtils;
+import org.pizazz2.common.StringUtils;
+import org.pizazz2.common.ValidateUtils;
+import org.pizazz2.exception.BaseException;
+import org.pizazz2.exception.ValidateException;
+import org.pizazz2.tool.ref.IShellFactory;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -8,33 +18,21 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.pizazz2.ICloseable;
-import org.pizazz2.IMessageOutput;
-import org.pizazz2.IObject;
-import org.pizazz2.PizContext;
-import org.pizazz2.common.ArrayUtils;
-import org.pizazz2.common.StringUtils;
-import org.pizazz2.common.ValidateUtils;
-import org.pizazz2.common.SystemUtils;
-import org.pizazz2.exception.ValidateException;
-import org.pizazz2.exception.BaseException;
-import org.pizazz2.tool.ref.IShellFactory;
-
 /**
  * SHELL运行组件
  * 
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.1.210720
  */
 public class ShellBuilder implements ICloseable {
 
 	private final IdBuilder idBuilder = IdFactory.newInstance();
 	private final AtomicLong id = new AtomicLong(-1L);
+	private final ThreadLocal<Process> cache = new ThreadLocal<>();
 	private final IShellFactory factory;
 	private final ProcessBuilder builder;
 	private Charset charset = StandardCharsets.UTF_8;
 	private Duration timeout = Duration.ZERO;
-	private Process tmpProcess;
 
 	public ShellBuilder(IShellFactory factory, String[] command) throws ValidateException {
 		ValidateUtils.notNull("ShellBuilder", factory);
@@ -92,35 +90,45 @@ public class ShellBuilder implements ICloseable {
 		if (this.id.get() != id) {
 			return;
 		}
-		if (tmpProcess != null && tmpProcess.isAlive()) {
+		if (cache.get() != null && cache.get().isAlive()) {
 			if (force) {
-				tmpProcess.destroyForcibly();
+				cache.get().destroyForcibly();
 			} else {
-				tmpProcess.destroy();
+				cache.get().destroy();
 			}
+			cache.remove();
 		}
 		this.id.set(idBuilder.generate());
-		tmpProcess = process;
+		cache.set(process);
 	}
 
 	public FutureResult<List<String>> execute(IMessageOutput<String> outputS, IMessageOutput<String> outputE)
 			throws BaseException {
 		builder.redirectErrorStream(false);
-		turn(this.id.get(), factory.newProcess(builder, timeout), true);
-		FutureResult<List<String>> result = new FutureResult<>(
-				factory.apply(tmpProcess.getInputStream(), charset, outputS),
-				factory.apply(tmpProcess.getErrorStream(), charset, outputE));
-		CompletableFuture.allOf(result.getInputFuture(), result.getErrorFuture())
-				.whenCompleteAsync((v, e) -> turn(this.id.get(), null, false), factory.getThreadPool());
-		return result;
+		// 运行一个新的子进程
+		return factory.newProcess(builder, timeout, process -> {
+			// 强制关闭上一个执行子进程，将当前进程设置为临时进程
+			turn(ShellBuilder.this.id.get(), process, true);
+			FutureResult<List<String>> result = new FutureResult<>(
+					factory.apply(process.getInputStream(), charset, outputS),
+					factory.apply(process.getErrorStream(), charset, outputE));
+			CompletableFuture.allOf(result.getInputFuture(), result.getErrorFuture()).whenCompleteAsync((v, e) ->
+					turn(ShellBuilder.this.id.get(), null, false), factory.getThreadPool());
+			return result;
+		});
 	}
 
 	public CompletableFuture<List<String>> execute(IMessageOutput<String> output) throws BaseException {
 		builder.redirectErrorStream(true);
-		turn(this.id.get(), factory.newProcess(builder, timeout), true);
-		return factory.apply(tmpProcess.getInputStream(), charset, output).thenApply(v -> {
-			turn(this.id.get(), null, false);
-			return v;
+		// 运行一个新的子进程
+		return factory.newProcess(builder, timeout, process -> {
+			// 强制关闭上一个执行子进程，将当前进程设置为临时进程
+			turn(ShellBuilder.this.id.get(), process, true);
+			return factory.apply(process.getInputStream(), charset, output).thenApply(v -> {
+				// 执行完成后关闭当前子进程
+				turn(ShellBuilder.this.id.get(), null, false);
+				return v;
+			});
 		});
 	}
 
