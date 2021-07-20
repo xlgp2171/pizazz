@@ -19,7 +19,7 @@ import org.pizazz2.message.TypeEnum;
  * 时间日期工具
  * 
  * @author xlgp2171
- * @version 2.0.210701
+ * @version 2.0.210720
  */
 public class DateUtils {
 	/**
@@ -27,7 +27,7 @@ public class DateUtils {
 	 */
 	public static final String DEFAULT_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-	public Date toDate(LocalDateTime dateTime, ZoneId zoneId) throws ValidateException {
+	public static Date toDate(LocalDateTime dateTime, ZoneId zoneId) throws ValidateException {
 		ValidateUtils.notNull("toDate", dateTime);
 
 		if (zoneId == null) {
@@ -36,13 +36,13 @@ public class DateUtils {
 		return Date.from(dateTime.atZone(zoneId).toInstant());
 	}
 
-	public LocalDateTime toLocalDateTime(Date date, ZoneId zoneId) throws ValidateException {
+	public static LocalDateTime toLocalDateTime(Date date, ZoneId zoneId) throws ValidateException {
 		ValidateUtils.notNull("toLocalDateTime", date);
 
 		if (zoneId == null) {
 			zoneId = ZoneId.systemDefault();
 		}
-		return LocalDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), zoneId);
+		return LocalDateTime.ofInstant(date.toInstant(), zoneId);
 	}
 
 	public static Date parse(String time, String pattern) throws ValidateException {
