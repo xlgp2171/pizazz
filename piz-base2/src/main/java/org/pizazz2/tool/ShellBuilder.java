@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * SHELL运行组件
@@ -28,7 +29,7 @@ public class ShellBuilder implements ICloseable {
 
 	private final IdBuilder idBuilder = IdFactory.newInstance();
 	private final AtomicLong id = new AtomicLong(-1L);
-	private final ThreadLocal<Process> cache = new ThreadLocal<>();
+	private final AtomicReference<Process> cache = new AtomicReference<>();
 	private final IShellFactory factory;
 	private final ProcessBuilder builder;
 	private Charset charset = StandardCharsets.UTF_8;
@@ -96,7 +97,6 @@ public class ShellBuilder implements ICloseable {
 			} else {
 				cache.get().destroy();
 			}
-			cache.remove();
 		}
 		this.id.set(idBuilder.generate());
 		cache.set(process);
