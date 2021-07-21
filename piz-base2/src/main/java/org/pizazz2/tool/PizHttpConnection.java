@@ -42,7 +42,7 @@ import org.pizazz2.tool.ref.ResponseObject;
  * HTTP连接组件
  *
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.0.210720
  */
 public class PizHttpConnection {
     public static final String PROTOCOL_HTTPS = "https";
@@ -125,12 +125,16 @@ public class PizHttpConnection {
             String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.HTTP.CONNECTION", connection.getURL(), e.getMessage());
             throw new ToolException(BasicCodeEnum.MSG_0016, msg, e);
         }
-        if (code == httpStatus) {
+        if (code == httpStatus || httpStatus == -1) {
             Map<String, List<String>> properties = connection.getHeaderFields();
-            byte[] data;
+            byte[] data = ArrayUtils.EMPTY_BYTE;
 
-            try (InputStream stream = connection.getInputStream()) {
-                data = IOUtils.toByteArray(stream);
+            try (InputStream stream1 = connection.getErrorStream();InputStream stream2 = connection.getErrorStream()) {
+                if (stream1 != null) {
+                    data = IOUtils.toByteArray(stream1);
+                } else if (stream2 != null) {
+                    data = IOUtils.toByteArray(stream2);
+                }
             } catch (IOException | ValidateException | UtilityException e) {
                 String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.HTTP.INPUT", e.getMessage());
                 throw new ToolException(BasicCodeEnum.MSG_0003, msg, e);
