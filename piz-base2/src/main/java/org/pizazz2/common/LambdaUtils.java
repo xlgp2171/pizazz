@@ -5,15 +5,17 @@ import org.pizazz2.exception.ValidateException;
 
 import java.io.Serializable;
 import java.lang.invoke.SerializedLambda;
-import java.util.Locale;
 
 /**
  * Lambda表达式反射处理
  *
  * @author xlgp2171
- * @version 2.0.210525
+ * @version 2.0.210804
  */
 public class LambdaUtils {
+    static final String PREFIX_IS = "is";
+    static final String PREFIX_GET = "get";
+    static final String PREFIX_SET = "set";
     /**
      * 序列化为Lambda对象详情
      *
@@ -28,10 +30,12 @@ public class LambdaUtils {
     }
 
     public static String methodToProperty(String name) {
-        if (name.startsWith("is")) {
-            name = name.substring(2);
-        } else if (name.startsWith("get") || name.startsWith("set")) {
-            name = name.substring(3);
+        String methodName = name.toLowerCase();
+
+        if (methodName.startsWith(LambdaUtils.PREFIX_IS)) {
+            name = name.substring(LambdaUtils.PREFIX_IS.length());
+        } else if (methodName.startsWith(LambdaUtils.PREFIX_GET) || methodName.startsWith(LambdaUtils.PREFIX_SET)) {
+            name = name.substring(LambdaUtils.PREFIX_GET.length());
         }
         // 若没有is/get/set则不作修改
         // 将第一个字符小写
