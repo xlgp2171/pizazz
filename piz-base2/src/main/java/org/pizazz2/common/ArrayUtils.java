@@ -10,7 +10,7 @@ import java.util.stream.Stream;
  * 数组工具
  *
  * @author xlgp2171
- * @version 2.0.210525
+ * @version 2.0.210804
  */
 public class ArrayUtils {
 
@@ -131,13 +131,40 @@ public class ArrayUtils {
         return tmp;
     }
 
+    /**
+     * 将数组转换为ArrayList
+     * @param target 数组对象
+     * @param <T> 统一的对象类型
+     * @return List对象
+     */
     @SafeVarargs
-    public static <T> List<T> asList(T... arr) {
-        return Stream.of(arr).collect(Collectors.toList());
+    public static <T> List<T> asList(T... target) {
+        return Stream.of(target).collect(Collectors.toList());
     }
 
+    /**
+     * 将数组转换为HashSet
+     * @param target 数组对象
+     * @param <T> 统一的对象类型
+     * @return Set对象
+     */
     @SafeVarargs
-    public static <T> Set<T> asSet(T... arr) {
-        return Stream.of(arr).collect(Collectors.toSet());
+    public static <T> Set<T> asSet(T... target) {
+        return Stream.of(target).collect(Collectors.toSet());
+    }
+
+    public static int getMinimumLength(String[] target) {
+        if (ArrayUtils.isEmpty(target)) {
+            return NumberUtils.NEGATIVE_ONE.intValue();
+        }
+        int tmp = Integer.MAX_VALUE;
+
+        for (String item : target) {
+            if (item == null) {
+                continue;
+            }
+            tmp = Math.min(tmp, item.length());
+        }
+        return tmp == Integer.MAX_VALUE ? NumberUtils.NEGATIVE_ONE.intValue() : tmp;
     }
 }
