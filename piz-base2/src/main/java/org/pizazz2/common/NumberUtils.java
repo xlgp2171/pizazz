@@ -1,6 +1,7 @@
 package org.pizazz2.common;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import org.pizazz2.exception.ValidateException;
 
@@ -8,22 +9,15 @@ import org.pizazz2.exception.ValidateException;
  * 数值工具
  *
  * @author xlgp2171
- * @version 2.0.210610
+ * @version 2.0.210804
  */
 public class NumberUtils {
-    /**
-     * int判断最大位数
-     */
-    public static final int PRECISION_INT = 9;
-    /**
-     * 0
-     */
+    /** 0 */
     public static final Number ZERO = 0;
-    /**
-     * 1
-     */
+    /** 1 */
     public static final Number ONE = 1;
-
+    /** -1 */
+    public static final Number NEGATIVE_ONE = -1;
     /**
      * 验证长度大小
      *
@@ -103,13 +97,27 @@ public class NumberUtils {
         }
     }
 
-    public static Number valueOf(BigDecimal target) throws ValidateException {
+    public static Class<?> getType(BigDecimal target) throws ValidateException {
         ValidateUtils.notNull("valueOf", target);
 
         if (target.scale() == 0) {
-            return target.precision() > PRECISION_INT ? target.longValue() : target.intValue();
+            long tmp;
+            try {
+                tmp = target.longValueExact();
+            } catch (ArithmeticException e) {
+                return BigInteger.class;
+            }
+            if (tmp <= Byte.MAX_VALUE) {
+                return Byte.TYPE;
+            } else if (tmp <= Short.MAX_VALUE) {
+                return Short.TYPE;
+            } else if (tmp <= Integer.MAX_VALUE) {
+                return Integer.TYPE;
+            } else {
+                return Long.TYPE;
+            }
         } else {
-            return target.doubleValue();
+            return Double.TYPE;
         }
     }
 
