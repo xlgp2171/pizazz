@@ -9,7 +9,7 @@ import java.math.BigDecimal;
  * NumberUtils测试
  *
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.0.210804
  */
 public class NumberUtilsTest {
 
@@ -26,9 +26,9 @@ public class NumberUtilsTest {
 	}
 
 	@Test
-	public void testValueOf() {
-		Number result = NumberUtils.valueOf(new BigDecimal(1097110568869782150L));
-		Assert.assertEquals(1097110568869782150L, result);
+	public void testGetType() {
+		Class<?> result = NumberUtils.getType(new BigDecimal(1097110568869782150L));
+		Assert.assertEquals(Long.TYPE, result);
 	}
 
 	@Test
