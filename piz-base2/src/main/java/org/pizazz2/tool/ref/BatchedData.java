@@ -1,22 +1,22 @@
 package org.pizazz2.tool.ref;
 
-import org.pizazz2.common.ArrayUtils;
 import org.pizazz2.common.NumberUtils;
-import org.pizazz2.data.LinkedObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 数据对象
+ * 批量数据对象
  *
  * @author xlgp2171
- * @version 2.0.2105012
+ * @version 2.0.210827
+ *
+ * @param <T> 处理类
  */
-public class BatchedData<T extends LinkedObject<byte[]>> {
+public class BatchedData<T extends IData> {
     private final int capacity;
     private final Object lock = new Object();
-    private long bytes = 0;
+    private long bytes;
     private List<T> data;
 
     /**
@@ -25,16 +25,13 @@ public class BatchedData<T extends LinkedObject<byte[]>> {
      */
     public BatchedData(int capacity) {
         this.capacity = capacity;
-        data = new ArrayList<>(Math.max(capacity, 10));
+        reset();
     }
 
     public void add(T data) {
         synchronized (lock) {
             this.data.add(data);
-
-            if (!ArrayUtils.isEmpty(data.getData())) {
-                bytes += data.getData().length;
-            }
+            bytes += data.length();
         }
     }
 
@@ -60,7 +57,7 @@ public class BatchedData<T extends LinkedObject<byte[]>> {
         List<T> tmp = data;
 
         synchronized (lock) {
-            data = new ArrayList<>(Math.max(capacity, 10));
+            data = new ArrayList<>(capacity);
             bytes = NumberUtils.ZERO.longValue();
         }
         return tmp;

@@ -2,24 +2,25 @@ package org.pizazz2.tool;
 
 import org.pizazz2.ICloseable;
 import org.pizazz2.common.ThreadUtils;
-import org.pizazz2.data.LinkedObject;
 import org.pizazz2.data.TupleObject;
 import org.pizazz2.tool.ref.IDataflowListener;
 
 import java.time.Duration;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
 /**
- * 流式处理操作
+ * 流式处理操作<br>
+ * 参考elasticsearch
  *
  * @author xlgp2171
- * @version 2.0.210512
+ * @version 2.0.210827
+ *
+ * @param <T> 元数据
  */
-public class DataflowHandler<T extends LinkedObject<byte[]>> implements ICloseable {
+public class DataflowHandler<T> implements ICloseable {
     protected final BiConsumer<Collection<T>, TupleObject> consumer;
     protected final IDataflowListener<T> listener;
     protected final TupleObject config;
@@ -41,7 +42,7 @@ public class DataflowHandler<T extends LinkedObject<byte[]>> implements ICloseab
         executor = ThreadUtils.newDaemonThreadPool(tmp, "-dataflow-execute");
     }
 
-    protected Runnable toRunnable(long executionId, List<T> data) {
+    protected Runnable toRunnable(long executionId, Collection<T> data) {
         return () -> {
             try {
                 if (!isClosed()) {
@@ -67,9 +68,9 @@ public class DataflowHandler<T extends LinkedObject<byte[]>> implements ICloseab
         }
     }
 
-    public void execute(long executionId, List<T> data) {
+    public void execute(long executionId, Collection<T> data) {
         Runnable toRelease = () -> {};
-        boolean bulkRequestSetupSuccessful = false;
+        boolean successful = false;
         try {
             listener.before(executionId, data);
             // 只允许单一处理进行通过
@@ -77,14 +78,14 @@ public class DataflowHandler<T extends LinkedObject<byte[]>> implements ICloseab
             toRelease = semaphore::release;
             Runnable runnable = toRunnable(executionId, data);
             executeRunnable(runnable);
-            bulkRequestSetupSuccessful = true;
+            successful = true;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             listener.exception(executionId, data, e);
         } catch (Exception e) {
             listener.exception(executionId, data, e);
         } finally {
-            if (!bulkRequestSetupSuccessful) {
+            if (!successful) {
                 toRelease.run();
             }
         }

@@ -5,23 +5,21 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.pizazz2.common.ArrayUtils;
 import org.pizazz2.common.DateUtils;
-import org.pizazz2.common.StringUtils;
 import org.pizazz2.common.SystemUtils;
-import org.pizazz2.data.LinkedObject;
 import org.pizazz2.exception.ValidateException;
+import org.pizazz2.tool.ref.IData;
 import org.pizazz2.tool.ref.IDataflowListener;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * DataflowProcessor测试
  *
  * @author xlgp2171
- * @version 2.0.210512
+ * @version 2.0.210827
  */
 public class DataflowProcessorTest {
 
@@ -46,7 +44,7 @@ public class DataflowProcessorTest {
     @Test
     public void testActions() throws InterruptedException {
         for (int i = 0; i < 9; i++) {
-            PROCESSOR.add(new ContentObject(-1, "A" + i, ArrayUtils.EMPTY_BYTE));
+            PROCESSOR.add(new ContentObject("A" + i, ArrayUtils.EMPTY_BYTE));
         }
         Thread.sleep(1000);
     }
@@ -54,7 +52,7 @@ public class DataflowProcessorTest {
     @Test
     public void testSize() throws InterruptedException {
         for (int i = 0; i < 5; i++) {
-            PROCESSOR.add(new ContentObject(-1, "B" + i, "XXX".getBytes()));
+            PROCESSOR.add(new ContentObject("B" + i, "XXX".getBytes()));
         }
         Thread.sleep(1000);
     }
@@ -62,7 +60,7 @@ public class DataflowProcessorTest {
     @Test
     public void testInterval() throws InterruptedException {
         for (int i = 0; i < 3; i++) {
-            PROCESSOR.add(new ContentObject(-1, "C" + i, ArrayUtils.EMPTY_BYTE));
+            PROCESSOR.add(new ContentObject("C" + i, ArrayUtils.EMPTY_BYTE));
             Thread.sleep(700);
         }
         Thread.sleep(1000);
@@ -73,20 +71,32 @@ public class DataflowProcessorTest {
         SystemUtils.destroy(PROCESSOR, null);
     }
 
-    static class ContentObject extends LinkedObject<byte[]> {
+    static class ContentObject implements IData {
 
         private Charset charset = StandardCharsets.UTF_8;
+        private final String name;
+        private final byte[] data;
 
-        public ContentObject(long id, String name, byte[] data) throws ValidateException {
-            super(id, name, StringUtils.EMPTY, data);
+        public ContentObject(String name, byte[] data) throws ValidateException {
+            this.name = name;
+            this.data = data;
         }
 
         public void setCharset(Charset charset) {
             this.charset = charset;
         }
 
+        public String getName() {
+            return name;
+        }
+
         public String getContent() {
-            return new String(getData(), charset);
+            return new String(data, charset);
+        }
+
+        @Override
+        public int length() {
+            return data.length;
         }
     }
 }

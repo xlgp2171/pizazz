@@ -1,13 +1,12 @@
 package org.pizazz2.tool.ref;
 
-import javax.swing.*;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * 流式处理监听
  *
  * @author xlgp2171
- * @version 2.0.210512
+ * @version 2.0.210827
  *
  * @param <T> 处理类
  */
@@ -19,7 +18,7 @@ public interface IDataflowListener<T> {
      * @param executionId 运行ID
      * @param dataList 数据组
      */
-    default void before(long executionId, List<T> dataList) {
+    default void before(long executionId, Collection<T> dataList) {
     }
 
     /**
@@ -28,7 +27,7 @@ public interface IDataflowListener<T> {
      * @param executionId 运行ID
      * @param dataList 数据组
      */
-    void after(long executionId, List<T> dataList);
+    void after(long executionId, Collection<T> dataList);
 
     /**
      * 异常处理
@@ -37,7 +36,7 @@ public interface IDataflowListener<T> {
      * @param dataList 数据组
      * @param e 处理异常
      */
-    default void exception(long executionId, List<T> dataList, Exception e) {
+    default void exception(long executionId, Collection<T> dataList, Exception e) {
     }
 
     /**
@@ -53,17 +52,17 @@ public interface IDataflowListener<T> {
         }
 
         @Override
-        public void before(long executionId, List<T> dataList) {
+        public void before(long executionId, Collection<T> dataList) {
             listener.before(executionId, dataList);
         }
 
         @Override
-        public void after(long executionId, List<T> dataList) {
+        public void after(long executionId, Collection<T> dataList) {
             listener.after(executionId, dataList);
         }
 
         @Override
-        public void exception(long executionId, List<T> dataList, Exception e) {
+        public void exception(long executionId, Collection<T> dataList, Exception e) {
             listener.exception(executionId, dataList, e);
         }
     }
