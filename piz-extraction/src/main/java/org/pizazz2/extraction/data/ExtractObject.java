@@ -3,10 +3,12 @@ package org.pizazz2.extraction.data;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MediaType;
 import org.pizazz2.common.ArrayUtils;
+import org.pizazz2.common.NumberUtils;
 import org.pizazz2.common.StringUtils;
 import org.pizazz2.data.LinkedObject;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.extraction.support.ExtractHelper;
+import org.pizazz2.tool.ref.IData;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -15,9 +17,9 @@ import java.util.LinkedList;
  * 文档链接流转对象
  *
  * @author xlgp2171
- * @version 2.0.210512
+ * @version 2.0.210827
  */
-public class ExtractObject extends LinkedObject<byte[]> {
+public class ExtractObject extends LinkedObject<byte[]> implements IData {
     /**
      * 文档属性
      */
@@ -199,6 +201,11 @@ public class ExtractObject extends LinkedObject<byte[]> {
 
     public String getContent() {
         return content;
+    }
+
+    @Override
+    public int length() {
+        return ArrayUtils.isEmpty(super.getData()) ? NumberUtils.ZERO.intValue() : getData().length;
     }
 
     public enum StatusEnum {
