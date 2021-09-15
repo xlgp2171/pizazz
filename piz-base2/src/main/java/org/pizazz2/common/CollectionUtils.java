@@ -9,7 +9,7 @@ import org.pizazz2.exception.ValidateException;
  * 集合工具
  * 
  * @author xlgp2171
- * @version 2.0.210525
+ * @version 2.0.210914
  */
 public class CollectionUtils {
 
@@ -100,16 +100,35 @@ public class CollectionUtils {
 	 * 随机分布元素
 	 * @param target 目标集合
 	 * @param seed 随机种子
+	 * @throws ValidateException 验证参数为空
 	 */
-	public static void shuffle(List<?> target, long seed) {
+	public static void shuffle(List<?> target, long seed) throws ValidateException {
+		ValidateUtils.notNull("shuffle", target);
 		Collections.shuffle(target, new Random(seed));
 	}
 
 	/**
 	 * 反转集合
 	 * @param target 目标集合
+	 * @throws ValidateException 验证参数为空
 	 */
-	public static void reverse(List<?> target) {
+	public static void reverse(List<?> target) throws ValidateException {
+		ValidateUtils.notNull("reverse", target);
 		Collections.reverse(target);
+	}
+
+	/**
+	 * 将数Map换为Properties<br>
+	 * 若要正确使用，值需为String类型
+	 * @param target 目标对象
+	 * @return Properties对象
+	 */
+	public static Properties asProperties(Map<String, ?> target) {
+		Properties tmp = new Properties();
+
+		if (!CollectionUtils.isEmpty(target)) {
+			tmp.putAll(target);
+		}
+		return tmp;
 	}
 }
