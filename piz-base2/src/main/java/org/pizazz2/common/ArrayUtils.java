@@ -1,5 +1,7 @@
 package org.pizazz2.common;
 
+import org.pizazz2.exception.ValidateException;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -10,7 +12,7 @@ import java.util.stream.Stream;
  * 数组工具
  *
  * @author xlgp2171
- * @version 2.0.210804
+ * @version 2.0.210914
  */
 public class ArrayUtils {
 
@@ -136,9 +138,11 @@ public class ArrayUtils {
      * @param target 数组对象
      * @param <T> 统一的对象类型
      * @return List对象
+     * @throws ValidateException 验证异常
      */
     @SafeVarargs
-    public static <T> List<T> asList(T... target) {
+    public static <T> List<T> asList(T... target) throws ValidateException {
+        ValidateUtils.notNull("asList", (Object) target);
         return Stream.of(target).collect(Collectors.toList());
     }
 
@@ -147,9 +151,11 @@ public class ArrayUtils {
      * @param target 数组对象
      * @param <T> 统一的对象类型
      * @return Set对象
+     * @throws ValidateException 验证异常
      */
     @SafeVarargs
-    public static <T> Set<T> asSet(T... target) {
+    public static <T> Set<T> asSet(T... target) throws ValidateException {
+        ValidateUtils.notNull("asSet", (Object) target);
         return Stream.of(target).collect(Collectors.toSet());
     }
 
