@@ -7,6 +7,7 @@ import org.pizazz2.message.BasicCodeEnum;
 import org.pizazz2.message.ExpressionEnum;
 import org.pizazz2.message.TypeEnum;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -14,10 +15,12 @@ import java.util.Objects;
  * 验证工具
  *
  * @author xlgp2171
- * @version 2.0.210525
+ * @version 2.1.210914
  */
 public class ValidateUtils {
     public static void verifyExpression(ExpressionEnum expression, String target) throws ValidateException {
+        ValidateUtils.notNull("verifyExpression", expression, target);
+
         if (!ExpressionEnum.getPattern(expression).matcher(target).matches()) {
             String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.EXPRESSION.MATCHES", target,
 					expression.name());
@@ -81,17 +84,20 @@ public class ValidateUtils {
     }
 
     public static void notNull(String method, Object... arguments) throws ValidateException {
-        if (!ArrayUtils.isEmpty(arguments)) {
-            for (int i = 0; i < arguments.length; i++) {
-                if (arguments[i] == null) {
-                    String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, i + 1);
-                    throw new ValidateException(BasicCodeEnum.MSG_0001, msg);
-                }
+        String msg = null;
+
+        if (ArrayUtils.isEmpty(arguments)) {
+            msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, 1);
+        }
+        for (int i = 0; i < arguments.length; i++) {
+            if (arguments[i] == null) {
+                msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, i + 1);
             }
         }
+        if (msg != null) {
+            throw new ValidateException(BasicCodeEnum.MSG_0001, msg);
+        }
     }
-
-
 
     public static void isTrue(String method, boolean target) throws ValidateException {
         if (!target) {
@@ -189,7 +195,7 @@ public class ValidateUtils {
     }
 
     /**
-     * 验证是否是合成类
+     * 验证应为合成类
      * @param method 验证目标方法
      * @param target 验证目标
      * @throws ValidateException 目标不为合成类
@@ -198,6 +204,49 @@ public class ValidateUtils {
         if (target == null || !target.getClass().isSynthetic()) {
             String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.MUST", method, "Synthetic Class");
             throw new ValidateException(BasicCodeEnum.MSG_0005, msg);
+        }
+    }
+
+    /**
+     * 验证应为日期格式字符串<br>
+     * 默认验证格式{@link DateUtils#DEFAULT_FORMAT}
+     * @param target 验证目标
+     * @throws ValidateException 目标不为日期格式
+     */
+    public static void isDateTimeFormat(String target) throws ValidateException {
+        ValidateUtils.isDateTimeFormat(target, DateUtils.DEFAULT_FORMAT);
+    }
+
+    /**
+     * 验证应为日期格式字符串
+     * @param target 验证目标
+     * @param pattern 日期格式组
+     * @throws ValidateException 目标不为日期格式
+     */
+    public static void isDateTimeFormat(String target, String... pattern) throws ValidateException {
+        ValidateUtils.notEmpty("isDate", pattern, 2);
+        boolean ignore = false;
+        ValidateException tmp = new ValidateException(StringUtils.EMPTY, null);
+
+        for (String item : pattern) {
+            DateTimeFormatter formatter;
+            try {
+                formatter = DateTimeFormatter.ofPattern(item);
+            } catch (NullPointerException | IllegalArgumentException e) {
+                String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.MUST", item, "Date Pattern");
+                tmp = new ValidateException(BasicCodeEnum.MSG_0028, msg);
+                continue;
+            }
+            try {
+                DateUtils.parse(target, formatter);
+                ignore = true;
+            } catch (ValidateException e) {
+                String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.MUST", item, "Date Format");
+                tmp = new ValidateException(BasicCodeEnum.MSG_0017, msg);
+            }
+        }
+        if (!ignore) {
+            throw tmp;
         }
     }
 }

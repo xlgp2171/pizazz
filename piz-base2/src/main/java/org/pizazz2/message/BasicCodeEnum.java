@@ -6,7 +6,7 @@ import org.pizazz2.message.ref.IMessageCode;
  * 消息识别码
  * 
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.0.210914
  */
 public enum BasicCodeEnum implements IMessageCode {
 	/** 预留 */
@@ -64,12 +64,14 @@ public enum BasicCodeEnum implements IMessageCode {
 	/** 数据匹配异常: MatchException */
 	MSG_0026("MSG0026#"),
 	/** 查找目标无法找到异常: TargetNotFoundException */
-	MSG_0027("MSG0027#");
+	MSG_0027("MSG0027#"),
+	/** 格式转换异常: FormatException */
+	MSG_0028("MSG0028#");
 	
 
 	private final String code;
 
-	private BasicCodeEnum(String code) {
+	BasicCodeEnum(String code) {
 		this.code = code;
 	}
 
