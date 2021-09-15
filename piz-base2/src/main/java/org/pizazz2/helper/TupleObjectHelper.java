@@ -14,7 +14,7 @@ import org.pizazz2.exception.UtilityException;
  * 通用对象工具
  *
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.0.210914
  */
 public class TupleObjectHelper {
 
@@ -40,6 +40,15 @@ public class TupleObjectHelper {
 
     public static boolean isEmpty(TupleObject target) {
         return target == null || target.isEmpty();
+    }
+
+    /**
+     * 保证目标对象非空值
+     * @param target 目标对象
+     * @return 有效非空的TupleObject对象
+     */
+    public static TupleObject nullToEmpty(TupleObject target) {
+        return target == null ? TupleObjectHelper.emptyObject() : target;
     }
 
     public static byte[] serialize(TupleObject target) throws ValidateException, UtilityException {
