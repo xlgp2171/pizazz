@@ -7,7 +7,7 @@ import org.pizazz2.message.ref.IMessageCode;
  * 基础异常
  * 
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.1.210917
  * 
  * @see IMessageCode
  */
@@ -48,6 +48,7 @@ public class BaseException extends Exception implements IException {
 
 	@Override
 	public String getMessage() {
-		return code == null ? getNativeMessage() : code.append(getNativeMessage()).toString();
+		return code == null || code == BasicCodeEnum.MSG_0000 ?
+				getNativeMessage() : code.append(getNativeMessage()).toString();
 	}
 }
