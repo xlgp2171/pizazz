@@ -1,6 +1,7 @@
 package org.pizazz2.tool;
 
 import org.pizazz2.ICloseable;
+import org.pizazz2.PizContext;
 import org.pizazz2.common.SystemUtils;
 import org.pizazz2.common.ThreadUtils;
 import org.pizazz2.common.ValidateUtils;
@@ -26,7 +27,7 @@ import java.util.function.BiConsumer;
  * 参考elasticsearch
  *
  * @author xlgp2171
- * @version 2.0.210827
+ * @version 2.1.211013
  *
  * @param <E> 元数据
  */
@@ -43,7 +44,7 @@ public class DataflowProcessor<E extends IData> implements ICloseable {
 
     DataflowProcessor(BiConsumer<Collection<E>, TupleObject> consumer, IDataflowListener<E> listener,
                       DataflowHandler<E> handler, TupleObject config, boolean sync, int threads, int actions,
-                      long size, long interval) throws ValidateException {
+                      long size, long interval, boolean daemon) throws ValidateException {
         if (actions <= 0 && size <= 0 && interval <= 0) {
             String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.MULTI", "DataflowProcessor");
             throw new ValidateException(BasicCodeEnum.MSG_0005, msg);
@@ -59,7 +60,8 @@ public class DataflowProcessor<E extends IData> implements ICloseable {
         // 若小于10个就10个
         batchedData = new BatchedData<>(Math.max(actions, 10));
         // 定时任务线程池
-        scheduler = ThreadUtils.newDaemonScheduledThreadPool(1, "-dataflow");
+        scheduler = ThreadUtils.newScheduledThreadPool(1,
+                new PizThreadFactory(PizContext.NAMING_SHORT + "-dataflow", daemon));
         scheduler.setRemoveOnCancelPolicy(true);
         // 按照设定时间启动任务
         startFlushTask();
@@ -129,6 +131,8 @@ public class DataflowProcessor<E extends IData> implements ICloseable {
     @Override
     public void destroy(Duration timeout) {
         if (closed.compareAndSet(false, true)) {
+            // 将余下缓存数据提交
+            execute();
             SystemUtils.destroy(handler, timeout);
             ThreadUtils.shutdown(scheduler, null);
         }
@@ -147,6 +151,8 @@ public class DataflowProcessor<E extends IData> implements ICloseable {
         private long size = 1024 * 1024 * 10;
         /** 触发周期(ms) */
         private long interval = 1000;
+        /** 线程池是否守护线程 */
+        private boolean daemon = true;
 
         private DataflowHandler<E> handler;
         private TupleObject config;
@@ -228,6 +234,11 @@ public class DataflowProcessor<E extends IData> implements ICloseable {
             return this;
         }
 
+        public Builder<E> setDaemon(boolean daemon) {
+            this.daemon = daemon;
+            return this;
+        }
+
         public Builder<E> setConfig(TupleObject config) {
             this.config = config;
             return this;
@@ -239,7 +250,8 @@ public class DataflowProcessor<E extends IData> implements ICloseable {
          * @return 流式处理器实现
          */
         public DataflowProcessor<E> build() {
-            return new DataflowProcessor<>(consumer, listener, handler, config, sync, threads, actions, size, interval);
+            return new DataflowProcessor<>(
+                    consumer, listener, handler, config, sync, threads, actions, size, interval, daemon);
         }
     }
 
@@ -250,11 +262,10 @@ public class DataflowProcessor<E extends IData> implements ICloseable {
                 if (isClosed()) {
                     return;
                 }
-                if (batchedData.total() == 0) {
-                    return;
-                }
                 try {
-                    execute();
+                    if (batchedData.total() > 0) {
+                        execute();
+                    }
                 } finally {
                     scheduler.schedule(Flush.this, interval, TimeUnit.MILLISECONDS);
                 }
