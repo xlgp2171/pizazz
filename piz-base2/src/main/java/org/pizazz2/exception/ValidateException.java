@@ -4,14 +4,15 @@ import org.pizazz2.message.BasicCodeEnum;
 import org.pizazz2.message.ref.IMessageCode;
 
 /**
- * 断言验证异常
+ * 断言验证运行时异常
  * 
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.1.210917
  * 
  * @see IMessageCode
  */
 public class ValidateException extends RuntimeException implements IException {
+
 	private static final long serialVersionUID = 7710998580948211094L;
 	private final IMessageCode code;
 
@@ -47,6 +48,7 @@ public class ValidateException extends RuntimeException implements IException {
 
 	@Override
 	public String getMessage() {
-		return code == null ? getNativeMessage() : code.append(getNativeMessage()).toString();
+		return code == null || code == BasicCodeEnum.MSG_0000 ?
+				getNativeMessage() : code.append(getNativeMessage()).toString();
 	}
 }
