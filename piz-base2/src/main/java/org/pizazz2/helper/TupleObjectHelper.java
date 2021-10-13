@@ -7,6 +7,7 @@ import java.util.Map;
 import org.pizazz2.common.*;
 import org.pizazz2.common.ref.IKryoConfig;
 import org.pizazz2.data.TupleObject;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.exception.UtilityException;
 
@@ -14,7 +15,7 @@ import org.pizazz2.exception.UtilityException;
  * 通用对象工具
  *
  * @author xlgp2171
- * @version 2.0.210914
+ * @version 2.1.210917
  */
 public class TupleObjectHelper {
 
@@ -60,7 +61,8 @@ public class TupleObjectHelper {
     }
 
     @SuppressWarnings("unchecked")
-    public static TupleObject toObject(Map<String, ?> target) {
+    public static TupleObject toObject(Map<String, ?> target) throws ValidateException {
+        ValidateUtils.notNull("toObject", target);
         TupleObject tmp = TupleObjectHelper.newObject(target.size());
 
         for (Map.Entry<String, ?> item : target.entrySet()) {
@@ -71,6 +73,20 @@ public class TupleObjectHelper {
             }
         }
         return tmp;
+    }
+
+    /**
+     * 将JSON转换为通用对象<br>
+     * 嵌套内容不会被转换
+     * @param jsonString 规范的JSON
+     * @return 通用对象
+     * @throws IllegalException JSON格式异常
+     */
+    public static TupleObject toObject(String jsonString) throws IllegalException {
+        if (!StringUtils.isEmpty(jsonString) && !JSONUtils.EMPTY_JSON.equals(jsonString)) {
+            return JSONUtils.fromJSON(jsonString, TupleObject.class);
+        }
+        return TupleObjectHelper.emptyObject();
     }
 
     public static TupleObject merge(TupleObject left, TupleObject right) {
