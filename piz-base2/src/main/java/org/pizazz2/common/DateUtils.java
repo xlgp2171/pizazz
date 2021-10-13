@@ -19,7 +19,7 @@ import org.pizazz2.message.TypeEnum;
  * 时间日期工具
  * 
  * @author xlgp2171
- * @version 2.0.210720
+ * @version 2.1.211008
  */
 public class DateUtils {
 	/**
@@ -27,22 +27,25 @@ public class DateUtils {
 	 */
 	public static final String DEFAULT_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
+	static ZoneId nullToDefault(ZoneId zoneId) {
+		return zoneId == null ? ZoneId.systemDefault() : zoneId;
+	}
+
 	public static Date toDate(LocalDateTime dateTime, ZoneId zoneId) throws ValidateException {
 		ValidateUtils.notNull("toDate", dateTime);
-
-		if (zoneId == null) {
-			zoneId = ZoneId.systemDefault();
-		}
+		zoneId = DateUtils.nullToDefault(zoneId);
 		return Date.from(dateTime.atZone(zoneId).toInstant());
 	}
 
 	public static LocalDateTime toLocalDateTime(Date date, ZoneId zoneId) throws ValidateException {
 		ValidateUtils.notNull("toLocalDateTime", date);
-
-		if (zoneId == null) {
-			zoneId = ZoneId.systemDefault();
-		}
+		zoneId = DateUtils.nullToDefault(zoneId);
 		return LocalDateTime.ofInstant(date.toInstant(), zoneId);
+	}
+
+	public static LocalDateTime toLocalDateTime(long timestamp, ZoneId zoneId) throws ValidateException {
+		zoneId = DateUtils.nullToDefault(zoneId);
+		return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), zoneId);
 	}
 
 	public static Date parse(String time, String pattern) throws ValidateException {
@@ -65,8 +68,9 @@ public class DateUtils {
 		}
 	}
 
-	public static String format(long timestamp, String pattern, ZoneId zoneId) {
-		return DateUtils.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), zoneId), pattern, null);
+	public static String format(long timestamp, String pattern, ZoneId zoneId) throws ValidateException {
+		zoneId = DateUtils.nullToDefault(zoneId);
+		return DateUtils.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), zoneId), pattern, zoneId);
 	}
 
 	public static String format(long timestamp, String pattern) {
@@ -95,10 +99,7 @@ public class DateUtils {
 
 	public static LocalDateTime addDays(LocalDateTime dateTime, int amount, ZoneId zoneId) throws ValidateException {
 		ValidateUtils.notNull("addDays", dateTime);
-
-		if (zoneId == null) {
-			zoneId = ZoneId.systemDefault();
-		}
+		zoneId = DateUtils.nullToDefault(zoneId);
 		return dateTime.atZone(zoneId).plusDays(amount).toLocalDateTime();
 	}
 
@@ -109,10 +110,7 @@ public class DateUtils {
 
 	public static LocalDateTime addHours(LocalDateTime dateTime, int amount, ZoneId zoneId) throws ValidateException {
 		ValidateUtils.notNull("addHours", dateTime);
-
-		if (zoneId == null) {
-			zoneId = ZoneId.systemDefault();
-		}
+		zoneId = DateUtils.nullToDefault(zoneId);
 		return dateTime.atZone(zoneId).plusHours(amount).toLocalDateTime();
 	}
 
@@ -123,10 +121,7 @@ public class DateUtils {
 
 	public static LocalDateTime addMonths(LocalDateTime dateTime, int amount, ZoneId zoneId) throws ValidateException {
 		ValidateUtils.notNull("addMonths", dateTime);
-
-		if (zoneId == null) {
-			zoneId = ZoneId.systemDefault();
-		}
+		zoneId = DateUtils.nullToDefault(zoneId);
 		return dateTime.atZone(zoneId).plusMonths(amount).toLocalDateTime();
 	}
 
@@ -137,10 +132,7 @@ public class DateUtils {
 
 	public static LocalDateTime addSeconds(LocalDateTime dateTime, int amount, ZoneId zoneId) throws ValidateException {
 		ValidateUtils.notNull("addSeconds", dateTime);
-
-		if (zoneId == null) {
-			zoneId = ZoneId.systemDefault();
-		}
+		zoneId = DateUtils.nullToDefault(zoneId);
 		return dateTime.atZone(zoneId).plusSeconds(amount).toLocalDateTime();
 	}
 
@@ -151,10 +143,7 @@ public class DateUtils {
 
 	public static LocalDateTime addMinutes(LocalDateTime dateTime, int amount, ZoneId zoneId) throws ValidateException {
 		ValidateUtils.notNull("addMinutes", dateTime);
-
-		if (zoneId == null) {
-			zoneId = ZoneId.systemDefault();
-		}
+		zoneId = DateUtils.nullToDefault(zoneId);
 		return dateTime.atZone(zoneId).plusMinutes(amount).toLocalDateTime();
 	}
 
