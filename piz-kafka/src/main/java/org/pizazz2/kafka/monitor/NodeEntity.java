@@ -4,13 +4,14 @@ import org.apache.kafka.clients.admin.ConsumerGroupListing;
 import org.apache.kafka.common.ConsumerGroupState;
 import org.apache.kafka.common.Node;
 import org.pizazz2.IObject;
+import org.pizazz2.common.NumberUtils;
 import org.pizazz2.common.StringUtils;
 
 /**
  * 节点信息实体
  *
  * @author xlgp2171
- * @version 2.0.210301
+ * @version 2.0.211028
  */
 public final class NodeEntity implements IObject, Comparable<NodeEntity> {
 
@@ -56,7 +57,7 @@ public final class NodeEntity implements IObject, Comparable<NodeEntity> {
 	}
 
 	public int getPort() {
-		return node == null ? -1 : node.port();
+		return node == null ? NumberUtils.NEGATIVE_ONE.intValue() : node.port();
 	}
 
 	public String getRack() {
@@ -71,7 +72,7 @@ public final class NodeEntity implements IObject, Comparable<NodeEntity> {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof NodeEntity) {
-			if (compareTo((NodeEntity) obj) == 0) {
+			if (compareTo((NodeEntity) obj) == NumberUtils.ZERO.intValue()) {
 				return true;
 			}
 		}
@@ -89,17 +90,18 @@ public final class NodeEntity implements IObject, Comparable<NodeEntity> {
 	public int compareTo(NodeEntity o) {
 		int result = getHost().compareTo(o.getHost());
 
-		if (result != 0) {
+		if (result != NumberUtils.ZERO.intValue()) {
 			return result;
 		} else if (getPort() == o.getPort()) {
 			return getGroupId().compareTo(o.getGroupId());
 		}
-		return getPort() < o.getPort() ? -1 : 1;
+		return getPort() < o.getPort() ? NumberUtils.NEGATIVE_ONE.intValue() : NumberUtils.ONE.intValue();
 	}
 
 	@Override
 	public String toString() {
 		// (1@127.0.0.1:80/rack)GROUP[STATE]
-		return "(" + getId() + "@" + getHost() + ":" + getPort() + "/" + getRack() + ")" + getGroupId() + "[" + getState() + "]";
+		return "(" + getId() + "@" + getHost() + ":" + getPort() + "/" + getRack() + ")" + getGroupId() +
+				"[" + getState() + "]";
 	}
 }

@@ -6,6 +6,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.KafkaFuture;
 import org.apache.kafka.common.TopicPartition;
+import org.pizazz2.common.NumberUtils;
 import org.pizazz2.data.TupleObject;
 import org.pizazz2.exception.BaseException;
 import org.pizazz2.exception.ValidateException;
@@ -24,7 +25,7 @@ import java.util.concurrent.ExecutionException;
  * @param <V> 消息Value
  *
  * @author xlgp2171
- * @version 2.0.210301
+ * @version 2.1.211028
  */
 public class Management<K, V> extends AbstractClient {
     private AdminClient admin;
@@ -45,7 +46,7 @@ public class Management<K, V> extends AbstractClient {
         List<TopicPartition> tmp = Collections.singletonList(tp);
         consumer.assign(tmp);
 
-        if (offset == -1) {
+        if (offset == NumberUtils.NEGATIVE_ONE.intValue()) {
             consumer.seekToEnd(tmp);
         } else {
             consumer.seek(tp, offset);
