@@ -13,6 +13,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.pizazz2.ICloseable;
+import org.pizazz2.common.NumberUtils;
 import org.pizazz2.common.ValidateUtils;
 import org.pizazz2.common.StringUtils;
 import org.pizazz2.exception.ValidateException;
@@ -22,7 +23,7 @@ import org.pizazz2.exception.ValidateException;
  * 代码参考DataX
  *
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.1.211014
  */
 public class DoubleQueue<E> extends AbstractQueue<E> implements BlockingQueue<E>, Serializable, ICloseable {
     private static final long serialVersionUID = 4691370136164853873L;
@@ -126,7 +127,7 @@ public class DoubleQueue<E> extends AbstractQueue<E> implements BlockingQueue<E>
             if (writeCount.get() <= 0) {
                 if (isInfinite && timeout <= 0) {
                     awake.await();
-                    return -1;
+                    return NumberUtils.NEGATIVE_ONE.longValue();
                 } else {
                     return awake.awaitNanos(timeout);
                 }
@@ -139,7 +140,7 @@ public class DoubleQueue<E> extends AbstractQueue<E> implements BlockingQueue<E>
                 writeCount.set(0);
                 writeIndex = 0;
                 notFull.signal();
-                return 0;
+                return NumberUtils.ZERO.longValue();
             }
         } finally {
             writeLock.unlock();

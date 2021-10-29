@@ -12,7 +12,7 @@ import java.util.stream.Stream;
  * 数组工具
  *
  * @author xlgp2171
- * @version 2.0.210914
+ * @version 2.1.211014
  */
 public class ArrayUtils {
 
@@ -113,7 +113,7 @@ public class ArrayUtils {
     }
 
     public static String[] newArray(int size, String fill) {
-        size = size < 0 ? 1 : size;
+        size = Math.max(NumberUtils.ONE.intValue(), size);
         String[] tmp = new String[size];
         Arrays.fill(tmp, fill);
         return tmp;

@@ -1,5 +1,6 @@
 package org.pizazz2.common;
 
+import org.pizazz2.common.ref.IFieldSerializable;
 import org.pizazz2.exception.UtilityException;
 import org.pizazz2.exception.ValidateException;
 
@@ -10,7 +11,7 @@ import java.lang.invoke.SerializedLambda;
  * Lambda表达式反射处理
  *
  * @author xlgp2171
- * @version 2.0.210804
+ * @version 2.1.211028
  */
 public class LambdaUtils {
     static final String PREFIX_IS = "is";
@@ -39,13 +40,14 @@ public class LambdaUtils {
         }
         // 若没有is/get/set则不作修改
         // 将第一个字符小写
-        if (name.length() == 1 || (name.length() > 1 && !Character.isUpperCase(name.charAt(1)))) {
+        if (name.length() == NumberUtils.ONE.intValue() || (name.length() > 1 &&
+                !Character.isUpperCase(name.charAt(1)))) {
             name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
         }
         return name;
     }
 
-    public static String toColumnName(Serializable sFunction) throws ValidateException, UtilityException {
+    public static <T> String toFieldName(IFieldSerializable<T> sFunction) throws ValidateException, UtilityException {
         SerializedLambda lambda = LambdaUtils.resolve(sFunction);
         return LambdaUtils.methodToProperty(lambda.getImplMethodName());
     }

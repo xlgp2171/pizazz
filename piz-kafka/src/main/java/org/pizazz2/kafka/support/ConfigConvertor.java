@@ -28,14 +28,14 @@ import java.util.regex.Pattern;
  * 配置转换工具
  *
  * @author xlgp2171
- * @version 2.0.210301
+ * @version 2.1.211028
  */
 public class ConfigConvertor implements ICloseable {
 	private final TupleObject config = TupleObjectHelper.newObject(2);
 	private String template;
 
 	public ConfigConvertor(TupleObject config) throws ValidateException, UtilityException  {
-		ValidateUtils.notEmpty("ConfigConvertor", config);
+		ValidateUtils.notEmpty("ConfigConvertor", (Map<?, ?>) config);
 		parse(config);
 	}
 
@@ -90,13 +90,13 @@ public class ConfigConvertor implements ICloseable {
 				? KafkaConstant.DEF_DURATION : duration);
 	}
 
-	public ConsumerModeEnum consumerModeValue() throws ValidateException, KafkaException  {
+	public ConsumerModeEnum consumerModeValue() throws ValidateException  {
 		String value = TupleObjectHelper.getNestedString(config, StringUtils.EMPTY, KafkaConstant.KEY_CONFIG,
 				KafkaConstant.KEY_MODE);
 		return ConsumerModeEnum.from(value);
 	}
 
-	public ProducerModeEnum producerModeValue() throws ValidateException, KafkaException {
+	public ProducerModeEnum producerModeValue() throws ValidateException {
 		String value = TupleObjectHelper.getNestedString(config, StringUtils.EMPTY, KafkaConstant.KEY_CONFIG,
 				KafkaConstant.KEY_MODE);
 		return ProducerModeEnum.from(value);
@@ -109,7 +109,7 @@ public class ConfigConvertor implements ICloseable {
 		if (!StringUtils.isEmpty(value)) {
 			try {
 				return ConsumerIgnoreEnum.from(value);
-			} catch (ValidateException | KafkaException e) {
+			} catch (ValidateException e) {
 				// do nothing
 			}
 		}
@@ -141,7 +141,7 @@ public class ConfigConvertor implements ICloseable {
 				throw new KafkaException(CodeEnum.KFK_0003, "topic partition format:T#[NUM]#[NUM]");
 			}
 			for (int i = 1; i < partitions.length; i++) {
-				int partition = NumberUtils.toInt(partitions[i], -1);
+				int partition = NumberUtils.toInt(partitions[i], NumberUtils.NEGATIVE_ONE.intValue());
 
 				if (partition < 0) {
 					throw new KafkaException(CodeEnum.KFK_0003, "partition format:[NUM]");

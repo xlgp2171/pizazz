@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
 
+import org.pizazz2.IObject;
 import org.pizazz2.PizContext;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.exception.UtilityException;
@@ -16,7 +17,7 @@ import org.pizazz2.message.TypeEnum;
  * 资源工具
  * 
  * @author xlgp2171
- * @version 2.0.210425
+ * @version 2.1.211028
  */
 public class ResourceUtils {
 
@@ -61,6 +62,40 @@ public class ResourceUtils {
 				SystemUtils.close(stream);
 			}
 		}
+	}
+
+	/**
+	 * 将map转换为properties
+	 * @param target 目标map
+	 * @return properties对象
+	 */
+	public static Properties asProperties(Map<String, String> target) {
+		Properties tmp = new Properties();
+
+		if (!CollectionUtils.isEmpty(target)) {
+			tmp.putAll(target);
+		}
+		return tmp;
+	}
+
+	/**
+	 * 从资源中获取属性
+	 * @param target 资源目标（实现IObject接口）
+	 * @param key 资源对象对应的键
+	 * @param sysKey 系统变量对应的键
+	 * @param defValue 默认值
+	 * @return 资源属性
+	 * @throws ValidateException 验证异常
+	 */
+	public static String getProperty(IObject target, String key, String sysKey, String defValue)
+			throws ValidateException {
+		ValidateUtils.notNull("getString", target, key, sysKey);
+		Object value = target.get(key, StringUtils.EMPTY);
+
+		if (value == null || StringUtils.isTrimEmpty(StringUtils.of(value))) {
+			value = SystemUtils.getSystemProperty(sysKey, defValue);
+		}
+		return StringUtils.of(value);
 	}
 
 	public static String getString(Properties target, String key, String defValue) {

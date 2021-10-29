@@ -19,13 +19,15 @@ import org.pizazz2.message.TypeEnum;
  * 时间日期工具
  * 
  * @author xlgp2171
- * @version 2.1.211008
+ * @version 2.1.211020
  */
 public class DateUtils {
-	/**
-	 * 默认时间格式，格式化后如"2021-07-01 09:30:00"
-	 */
+	/** 默认时间格式，格式化后如"2021-07-01 09:30:00" */
 	public static final String DEFAULT_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
+	public static String now() {
+		return DateUtils.format(LocalDateTime.now(), DateUtils.DEFAULT_FORMAT, null);
+	}
 
 	static ZoneId nullToDefault(ZoneId zoneId) {
 		return zoneId == null ? ZoneId.systemDefault() : zoneId;

@@ -9,13 +9,14 @@ import org.pizazz2.message.TypeEnum;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 
 /**
  * 验证工具
  *
  * @author xlgp2171
- * @version 2.1.210914
+ * @version 2.1.211014
  */
 public class ValidateUtils {
     public static void verifyExpression(ExpressionEnum expression, String target) throws ValidateException {
@@ -29,7 +30,7 @@ public class ValidateUtils {
     }
 
     public static void notEmpty(String method, IObject target) throws ValidateException {
-        ValidateUtils.notEmpty(method, target, 1);
+        ValidateUtils.notEmpty(method, target, NumberUtils.ONE.intValue());
     }
 
     public static void notEmpty(String method, IObject target, int seq) {
@@ -40,7 +41,7 @@ public class ValidateUtils {
     }
 
     public static void notEmpty(String method, Collection<?> target) throws ValidateException {
-        ValidateUtils.notEmpty(method, target, 1);
+        ValidateUtils.notEmpty(method, target, NumberUtils.ONE.intValue());
     }
 
     public static void notEmpty(String method, Collection<?> target, int seq) throws ValidateException {
@@ -50,8 +51,19 @@ public class ValidateUtils {
         }
     }
 
+    public static void notEmpty(String method,  Map<?, ?> target) throws ValidateException {
+        ValidateUtils.notEmpty(method, target, NumberUtils.ONE.intValue());
+    }
+
+    public static void notEmpty(String method, Map<?, ?> target, int seq) {
+        if (CollectionUtils.isEmpty(target)) {
+            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, seq);
+            throw new ValidateException(BasicCodeEnum.MSG_0001, msg);
+        }
+    }
+
     public static void notEmpty(String method, byte[] target) throws ValidateException {
-        ValidateUtils.notEmpty(method, target, 1);
+        ValidateUtils.notEmpty(method, target, NumberUtils.ONE.intValue());
     }
 
     public static void notEmpty(String method, byte[] target, int seq) throws ValidateException {
@@ -62,7 +74,7 @@ public class ValidateUtils {
     }
 
     public static void notEmpty(String method, String[] target) throws ValidateException {
-        ValidateUtils.notEmpty(method, target, 1);
+        ValidateUtils.notEmpty(method, target, NumberUtils.ONE.intValue());
     }
 
     public static void notEmpty(String method, String[] target, int seq) throws ValidateException {
@@ -87,7 +99,8 @@ public class ValidateUtils {
         String msg = null;
 
         if (ArrayUtils.isEmpty(arguments)) {
-            msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, 1);
+            msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method,
+                    NumberUtils.ONE.intValue());
         }
         for (int i = 0; i < arguments.length; i++) {
             if (arguments[i] == null) {
@@ -176,7 +189,7 @@ public class ValidateUtils {
     }
 
     public static void limit(String method, int index, Number target, Number min, Number max) throws ValidateException {
-        ValidateUtils.notNull("limit", 1, 1, target);
+        ValidateUtils.notNull("limit", true, true, target);
         boolean result = true;
         String tmp = "";
 

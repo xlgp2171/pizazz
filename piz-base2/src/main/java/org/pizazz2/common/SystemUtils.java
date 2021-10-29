@@ -20,7 +20,7 @@ import java.util.UUID;
  * 系统工具
  *
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.1.211014
  */
 public class SystemUtils {
     public static String getSystemProperty(String property, String defValue) {
@@ -71,7 +71,7 @@ public class SystemUtils {
         ValidateUtils.notNull("getComputerName", runtime);
         String name = runtime.getName();
         int index = name.indexOf("@");
-        return index != -1 ? name.substring(index + 1) : name;
+        return index != NumberUtils.NEGATIVE_ONE.intValue() ? name.substring(index + 1) : name;
     }
 
     /**
@@ -116,7 +116,8 @@ public class SystemUtils {
     public static int getProcessId(RuntimeMXBean runtime) {
         String name = runtime.getName();
         int index = name.indexOf("@");
-        return NumberUtils.toInt(index != -1 ? name.substring(0, index) : name, -1);
+        return NumberUtils.toInt(index != NumberUtils.NEGATIVE_ONE.intValue() ?
+                name.substring(0, index) : name, NumberUtils.NEGATIVE_ONE.intValue());
     }
 
     /**

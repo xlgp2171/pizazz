@@ -10,13 +10,14 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import org.pizazz2.ICloseable;
 import org.pizazz2.IPlugin;
 import org.pizazz2.common.CollectionUtils;
+import org.pizazz2.common.NumberUtils;
 import org.pizazz2.common.ObjectUtils;
 
 /**
  * 插件环境组件
  *
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.1.211028
  */
 public final class PluginContext implements ICloseable {
 	/**
@@ -27,16 +28,16 @@ public final class PluginContext implements ICloseable {
     private final Comparator<WeakReference<IPlugin>> cr = (o1, o2) -> {
         if (!ObjectUtils.isNull(o1) && !ObjectUtils.isNull(o2)) {
             if (o1.get().hashCode() > o2.get().hashCode()) {
-                return 1;
+                return NumberUtils.ONE.intValue();
             } else if (o1.get().hashCode() < o2.get().hashCode()) {
-                return -1;
+                return NumberUtils.NEGATIVE_ONE.intValue();
             }
         } else if (ObjectUtils.isNull(o1)) {
-            return -1;
+            return NumberUtils.NEGATIVE_ONE.intValue();
         } else if (ObjectUtils.isNull(o2)) {
-            return 1;
+            return NumberUtils.ONE.intValue();
         }
-        return 0;
+        return NumberUtils.ZERO.intValue();
     };
 
     private PluginContext() {

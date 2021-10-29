@@ -3,6 +3,7 @@ package org.pizazz2.extraction;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MediaType;
 import org.pizazz2.ICloseable;
+import org.pizazz2.common.NumberUtils;
 import org.pizazz2.common.SystemUtils;
 import org.pizazz2.common.ValidateUtils;
 import org.pizazz2.data.TupleObject;
@@ -27,7 +28,7 @@ import java.util.function.Predicate;
  * 文本提取
  *
  * @author xlgp2171
- * @version 2.0.210501
+ * @version 2.1.211014
  */
 public class TextExtraction implements ICloseable {
     private final ExtractProcessor extract;
@@ -36,7 +37,7 @@ public class TextExtraction implements ICloseable {
     private BiFunction<TupleObject, MediaType, TupleObject> modify;
 
     public TextExtraction() throws ValidateException {
-        this(-1);
+        this(NumberUtils.NEGATIVE_ONE.intValue());
     }
 
     /**
@@ -57,7 +58,7 @@ public class TextExtraction implements ICloseable {
             MediaType, TupleObject> defaultModify, IExtractListener listener) throws ValidateException {
         extract = new ExtractProcessor(extractConfig = new ExtractConfig(), defaultCheck, defaultModify, listener);
         // 至少并行数为2
-        if (parallelism > 1) {
+        if (parallelism > NumberUtils.ONE.intValue()) {
             concurrent = new ConcurrentProcessor(extract, parallelism);
         } else {
             concurrent = null;

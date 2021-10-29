@@ -19,10 +19,7 @@ import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.mime.MediaType;
 import org.apache.tika.parser.mail.MailUtil;
 import org.pizazz2.PizContext;
-import org.pizazz2.common.CollectionUtils;
-import org.pizazz2.common.DateUtils;
-import org.pizazz2.common.IOUtils;
-import org.pizazz2.common.StringUtils;
+import org.pizazz2.common.*;
 import org.pizazz2.data.TupleObject;
 import org.pizazz2.exception.UtilityException;
 import org.pizazz2.exception.ValidateException;
@@ -53,7 +50,7 @@ import java.util.function.BiConsumer;
  * 解析属性Metadata包括：
  *
  * @author xlgp2171
- * @version 2.0.210501
+ * @version 2.1.211028
  */
 public class Rfc822Parser extends AbstractParser {
     static final String KEY_MULTIPART_ALTERNATIVE = "multipart/alternative";
@@ -98,7 +95,8 @@ public class Rfc822Parser extends AbstractParser {
             this.htmlFormat = "html".equals(TupleObjectHelper.getString(config, "textFormat", "text"));
             this.extractAll = TupleObjectHelper.getBoolean(config, "extractAll", false);
             this.mimeConfig = new MimeConfig.Builder()
-                    .setMaxLineLen(TupleObjectHelper.getInt(config, "maxLineLen", -1)).build();
+                    .setMaxLineLen(TupleObjectHelper
+                            .getInt(config, "maxLineLen", NumberUtils.NEGATIVE_ONE.intValue())).build();
         }
 
         public boolean htmlFormat() {

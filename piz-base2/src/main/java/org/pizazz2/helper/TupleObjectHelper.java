@@ -15,12 +15,12 @@ import org.pizazz2.exception.UtilityException;
  * 通用对象工具
  *
  * @author xlgp2171
- * @version 2.1.210917
+ * @version 2.1.211028
  */
 public class TupleObjectHelper {
 
     public static TupleObject emptyObject() {
-        return TupleObjectHelper.newObject(1);
+        return TupleObjectHelper.newObject(NumberUtils.ONE.intValue());
     }
 
     public static TupleObject newObject() {
@@ -115,7 +115,7 @@ public class TupleObjectHelper {
         if (target == null || ArrayUtils.isEmpty(keys)) {
             return defValue;
         }
-        if (keys.length == 1) {
+        if (keys.length == NumberUtils.ONE.intValue()) {
             return TupleObjectHelper.getString(target, keys[0], defValue);
         }
         String[] tmp = new String[keys.length - 1];
@@ -153,7 +153,7 @@ public class TupleObjectHelper {
         if (target == null || ArrayUtils.isEmpty(keys)) {
             return defValue;
         }
-        if (keys.length == 1) {
+        if (keys.length == NumberUtils.ONE.intValue()) {
             return TupleObjectHelper.getInt(target, keys[0], defValue);
         }
         String[] tmp = Arrays.copyOfRange(keys, 0, keys.length - 1);
@@ -172,7 +172,7 @@ public class TupleObjectHelper {
         if (target == null || ArrayUtils.isEmpty(keys)) {
             return defValue;
         }
-        if (keys.length == 1) {
+        if (keys.length == NumberUtils.ONE.intValue()) {
             return TupleObjectHelper.getLong(target, keys[0], defValue);
         }
         String[] tmp = Arrays.copyOfRange(keys, 0, keys.length - 1);
@@ -191,7 +191,7 @@ public class TupleObjectHelper {
         if (target == null || ArrayUtils.isEmpty(keys)) {
             return defValue;
         }
-        if (keys.length == 1) {
+        if (keys.length == NumberUtils.ONE.intValue()) {
             return TupleObjectHelper.getDouble(target, keys[0], defValue);
         }
         String[] tmp = Arrays.copyOfRange(keys, 0, keys.length - 1);
@@ -210,7 +210,7 @@ public class TupleObjectHelper {
         if (target == null || ArrayUtils.isEmpty(keys)) {
             return defValue;
         }
-        if (keys.length == 1) {
+        if (keys.length == NumberUtils.ONE.intValue()) {
             return TupleObjectHelper.getBoolean(target, keys[0], defValue);
         }
         String[] tmp = Arrays.copyOfRange(keys, 0, keys.length - 1);
@@ -242,7 +242,7 @@ public class TupleObjectHelper {
         if (target == null || ArrayUtils.isEmpty(keys)) {
             return emptyObject();
         }
-        if (keys.length == 1) {
+        if (keys.length == NumberUtils.ONE.intValue()) {
             return TupleObjectHelper.getTupleObject(target, keys[0]);
         }
         for (String key : keys) {
@@ -271,7 +271,7 @@ public class TupleObjectHelper {
         if (target == null || ArrayUtils.isEmpty(keys)) {
             return CollectionUtils.emptyList();
         }
-        if (keys.length == 1) {
+        if (keys.length == NumberUtils.ONE.intValue()) {
             return TupleObjectHelper.getList(target, keys[0]);
         }
         String[] tmp = Arrays.copyOfRange(keys, 0, keys.length - 1);

@@ -1,6 +1,7 @@
 package org.pizazz2.tool;
 
 import org.pizazz2.ICloseable;
+import org.pizazz2.common.NumberUtils;
 import org.pizazz2.common.ThreadUtils;
 import org.pizazz2.data.TupleObject;
 import org.pizazz2.tool.ref.IDataflowListener;
@@ -16,7 +17,7 @@ import java.util.function.BiConsumer;
  * 参考elasticsearch
  *
  * @author xlgp2171
- * @version 2.0.210827
+ * @version 2.1.211014
  *
  * @param <T> 元数据
  */
@@ -37,7 +38,7 @@ public class DataflowHandler<T> implements ICloseable {
         this.config = config;
         this.sync = sync;
         this.threads = threads;
-        int tmp = Math.max(threads, 1);
+        int tmp = Math.max(threads, NumberUtils.ONE.intValue());
         this.semaphore = new Semaphore(tmp);
         executor = ThreadUtils.newDaemonThreadPool(tmp, "-dataflow-execute");
     }

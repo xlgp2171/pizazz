@@ -22,7 +22,7 @@ import org.pizazz2.message.TypeEnum;
  * 输入输出工具
  * 
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.1.211028
  */
 public class IOUtils {
 
@@ -127,7 +127,7 @@ public class IOUtils {
 		long count = 0L;
 		int len;
 		try {
-			while (-1 != (len = input.read(buffer))) {
+			while (NumberUtils.NEGATIVE_ONE.intValue() != (len = input.read(buffer))) {
 				output.write(buffer, 0, len);
 				count += len;
 			}
@@ -147,7 +147,7 @@ public class IOUtils {
 		long count = 0L;
 		int len;
 		try {
-			while (-1 != (len = reader.read(buffer))) {
+			while (NumberUtils.NEGATIVE_ONE.intValue() != (len = reader.read(buffer))) {
 				writer.write(buffer, 0, len);
 				count += len;
 			}
@@ -162,8 +162,8 @@ public class IOUtils {
 	}
 
 	public static int copy(InputStream input, OutputStream output) throws ValidateException, UtilityException {
-		Long count = IOUtils.copyLarge(input, output, 4096);
-		return count > Integer.MAX_VALUE ? -1 : count.intValue();
+		long count = IOUtils.copyLarge(input, output, 4096);
+		return count > Integer.MAX_VALUE ? NumberUtils.NEGATIVE_ONE.intValue() : (int) count;
 	}
 
 	public static long copy(FileInputStream in, FileOutputStream out) throws ValidateException, UtilityException {
@@ -182,8 +182,8 @@ public class IOUtils {
 	}
 
 	public static int copy(Reader reader, Writer writer) throws ValidateException, UtilityException {
-		Long count = IOUtils.copyLarge(reader, writer, 4096);
-		return count > Integer.MAX_VALUE ? -1 : count.intValue();
+		long count = IOUtils.copyLarge(reader, writer, 4096);
+		return count > Integer.MAX_VALUE ? NumberUtils.NEGATIVE_ONE.intValue() : (int) count;
 	}
 
 	public static byte[] toByteArray(InputStream input) throws ValidateException, UtilityException {

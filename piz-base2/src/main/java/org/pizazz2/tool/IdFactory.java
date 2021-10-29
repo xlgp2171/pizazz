@@ -16,7 +16,7 @@ import org.pizazz2.tool.ref.IdObject;
  * 参考vesta-id实现 60位[1(占位符)][3(识别码)][40(时间戳)][10(顺序号)][6(自定义)]<br>
  * 
  * @author xlgp2171
- * @version 2.0.210630
+ * @version 2.1.211028
  */
 public class IdFactory implements IIdFactory {
 	public static final byte BIT_TOP = 1;
@@ -66,7 +66,7 @@ public class IdFactory implements IIdFactory {
 		byte top = parse(id, offset -= BIT_TOP, BIT_TOP).byteValue();
 		byte version = parse(id, offset -= BIT_VERSION, BIT_VERSION).byteValue();
 
-		if (top != 1) {
+		if (top != NumberUtils.ONE.byteValue()) {
 			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.EQUALS", "top", "BIT(" + BIT_TOP + ")");
 			throw new ValidateException(BasicCodeEnum.MSG_0005, msg);
 		} else if (version != PizContext.VERSION) {
@@ -150,8 +150,8 @@ public class IdFactory implements IIdFactory {
 	}
 
 	private static class Sequence {
-		short sequence = 0;
-		long timestamp = -1;
+		short sequence = NumberUtils.ZERO.shortValue();
+		long timestamp = NumberUtils.NEGATIVE_ONE.longValue();
 	}
 
 	public enum Singleton {

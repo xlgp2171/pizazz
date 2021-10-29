@@ -11,7 +11,7 @@ import java.util.concurrent.*;
  * 线程工具
  *
  * @author xlgp2171
- * @version 2.0.210512
+ * @version 2.0.211028
  */
 public class ThreadUtils {
 
@@ -49,6 +49,17 @@ public class ThreadUtils {
     public static ThreadPoolExecutor newSingleThreadPool() {
         return ThreadUtils.newThreadPool(1, new PizThreadFactory(PizContext.NAMING_SHORT + "-single",
                 true));
+    }
+
+    /**
+     * 运行一个线程
+     * @param runnable 线程内运行实现
+     * @return Future对象
+     */
+    public static CompletableFuture<Void> executeThread(Runnable runnable) {
+        ThreadPoolExecutor executor = ThreadUtils.newSingleThreadPool();
+        return CompletableFuture.runAsync(runnable, executor)
+                .whenComplete((item, throwable) -> executor.shutdownNow());
     }
 
     /**

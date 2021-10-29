@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.poi.util.LittleEndian;
+import org.pizazz2.common.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +67,7 @@ public class HwpStreamReader {
      */
     public short uint8() throws IOException {
         if (ensure(1) == 0) {
-            return -1;
+            return NumberUtils.NEGATIVE_ONE.shortValue();
         }
         return LittleEndian.getUByte(buf);
     }
@@ -80,7 +81,7 @@ public class HwpStreamReader {
      */
     public int uint16() throws IOException {
         if (ensure(2) == 0) {
-            return -1;
+            return NumberUtils.NEGATIVE_ONE.intValue();
         }
         return LittleEndian.getUShort(buf);
     }
@@ -117,7 +118,7 @@ public class HwpStreamReader {
      */
     public long uint32() throws IOException {
         if (ensure(4) == 0) {
-            return -1;
+            return NumberUtils.NEGATIVE_ONE.longValue();
         }
         return LittleEndian.getUInt(buf);
     }

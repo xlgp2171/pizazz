@@ -1,15 +1,15 @@
 package org.pizazz2.kafka.consumer;
 
 import org.pizazz2.common.ValidateUtils;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.kafka.exception.CodeEnum;
-import org.pizazz2.kafka.exception.KafkaException;
 
 /**
  * 消费忽略异常枚举
  *
  * @author xlgp2171
- * @version 2.0.210301
+ * @version 2.0.211015
  */
 public enum ConsumerIgnoreEnum {
     /**
@@ -45,7 +45,7 @@ public enum ConsumerIgnoreEnum {
         return consume;
     }
 
-    public static ConsumerIgnoreEnum from(String mode) throws ValidateException, KafkaException {
+    public static ConsumerIgnoreEnum from(String mode) throws ValidateException {
         ValidateUtils.notNull("from", mode);
         mode = mode.trim().toUpperCase();
 
@@ -54,6 +54,6 @@ public enum ConsumerIgnoreEnum {
                 return item;
             }
         }
-        throw new KafkaException(CodeEnum.KFK_0008, mode);
+        throw new IllegalException(CodeEnum.KFK_0008, mode);
     }
 }

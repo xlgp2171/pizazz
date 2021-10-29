@@ -21,13 +21,9 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import org.pizazz2.common.ArrayUtils;
-import org.pizazz2.common.ValidateUtils;
-import org.pizazz2.common.ClassUtils;
+import org.pizazz2.common.*;
 import org.pizazz2.helper.ConfigureHelper;
-import org.pizazz2.common.IOUtils;
 import org.pizazz2.helper.LocaleHelper;
-import org.pizazz2.common.StringUtils;
 import org.pizazz2.helper.TupleObjectHelper;
 import org.pizazz2.data.TupleObject;
 import org.pizazz2.exception.ValidateException;
@@ -42,7 +38,7 @@ import org.pizazz2.tool.ref.ResponseObject;
  * HTTP连接组件
  *
  * @author xlgp2171
- * @version 2.0.210720
+ * @version 2.1.211014
  */
 public class PizHttpConnection {
     public static final String PROTOCOL_HTTPS = "https";
@@ -125,11 +121,11 @@ public class PizHttpConnection {
             String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.HTTP.CONNECTION", connection.getURL(), e.getMessage());
             throw new ToolException(BasicCodeEnum.MSG_0016, msg, e);
         }
-        if (code == httpStatus || httpStatus == -1) {
+        if (code == httpStatus || httpStatus == NumberUtils.NEGATIVE_ONE.intValue()) {
             Map<String, List<String>> properties = connection.getHeaderFields();
             byte[] data = ArrayUtils.EMPTY_BYTE;
 
-            try (InputStream stream1 = connection.getErrorStream();InputStream stream2 = connection.getErrorStream()) {
+            try (InputStream stream1 = connection.getErrorStream();InputStream stream2 = connection.getInputStream()) {
                 if (stream1 != null) {
                     data = IOUtils.toByteArray(stream1);
                 } else if (stream2 != null) {

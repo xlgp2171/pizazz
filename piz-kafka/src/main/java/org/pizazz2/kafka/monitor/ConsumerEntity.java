@@ -4,13 +4,14 @@ import org.apache.kafka.clients.admin.ConsumerGroupListing;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.pizazz2.IObject;
+import org.pizazz2.common.NumberUtils;
 import org.pizazz2.common.StringUtils;
 
 /**
  * 消费者实体
  *
  * @author xlgp2171
- * @version 2.0.210301
+ * @version 2.1.211028
  */
 public final class ConsumerEntity implements IObject, Comparable<ConsumerEntity> {
     /**
@@ -49,7 +50,8 @@ public final class ConsumerEntity implements IObject, Comparable<ConsumerEntity>
         this.topicPartition = topicPartition;
     }
 
-    public ConsumerEntity(ConsumerGroupListing group, TopicPartition topicPartition, OffsetAndMetadata metadata, long endOffset) {
+    public ConsumerEntity(
+            ConsumerGroupListing group, TopicPartition topicPartition, OffsetAndMetadata metadata, long endOffset) {
         this(group, topicPartition);
         setOffsetAndMetadata(metadata);
         setEndOffset(endOffset);
@@ -78,7 +80,7 @@ public final class ConsumerEntity implements IObject, Comparable<ConsumerEntity>
     }
 
     public int getPartition() {
-        return topicPartition == null ? -1 : topicPartition.partition();
+        return topicPartition == null ? NumberUtils.NEGATIVE_ONE.intValue() : topicPartition.partition();
     }
 
     public String getTopic() {
@@ -119,7 +121,7 @@ public final class ConsumerEntity implements IObject, Comparable<ConsumerEntity>
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof ConsumerEntity) {
-            if (compareTo((ConsumerEntity) obj) == 0) {
+            if (compareTo((ConsumerEntity) obj) == NumberUtils.ZERO.intValue()) {
                 return true;
             }
         }
@@ -129,7 +131,8 @@ public final class ConsumerEntity implements IObject, Comparable<ConsumerEntity>
     @Override
     public ConsumerEntity clone() {
         synchronized (this) {
-            return new ConsumerEntity(id, host, group, topicPartition).setOffsetAndMetadata(metadata).setEndOffset(endOffset);
+            return new ConsumerEntity(id, host, group, topicPartition).setOffsetAndMetadata(metadata)
+                    .setEndOffset(endOffset);
         }
     }
 
@@ -137,22 +140,23 @@ public final class ConsumerEntity implements IObject, Comparable<ConsumerEntity>
     public int compareTo(ConsumerEntity o) {
         int result = getGroupId().compareTo(o.getGroupId());
 
-        if (result != 0) {
+        if (result != NumberUtils.ZERO.intValue()) {
             return result;
         }
         result = getTopic().compareTo(o.getTopic());
 
-        if (result != 0) {
+        if (result != NumberUtils.ZERO.intValue()) {
             return result;
         } else if (getPartition() == o.getPartition()) {
-            return 0;
+            return NumberUtils.ZERO.intValue();
         }
-        return getPartition() < o.getPartition() ? -1 : 1;
+        return getPartition() < o.getPartition() ? NumberUtils.NEGATIVE_ONE.intValue() : NumberUtils.ONE.intValue();
     }
 
     @Override
     public String toString() {
         // ID/127.0.0.1[GROUP-TOPIC-0](0/1)metadata
-        return getId() + getHost() + "[" + getGroupId() + "-" + getTopic() + "-" + getPartition() + "](" + getOffset() + "/" + getEndOffset() + ")" + getMetadata();
+        return getId() + getHost() + "[" + getGroupId() + "-" + getTopic() + "-" + getPartition() +
+                "](" + getOffset() + "/" + getEndOffset() + ")" + getMetadata();
     }
 }

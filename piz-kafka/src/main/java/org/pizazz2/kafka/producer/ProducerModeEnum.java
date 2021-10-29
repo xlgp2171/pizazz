@@ -1,15 +1,15 @@
 package org.pizazz2.kafka.producer;
 
 import org.pizazz2.common.ValidateUtils;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.kafka.exception.CodeEnum;
-import org.pizazz2.kafka.exception.KafkaException;
 
 /**
  * 发布模式枚举
  *
  * @author xlgp2171
- * @version 2.0.210301
+ * @version 2.0.211015
  */
 public enum ProducerModeEnum {
     /**
@@ -45,7 +45,7 @@ public enum ProducerModeEnum {
         return isTransaction;
     }
 
-    public static ProducerModeEnum from(String mode) throws ValidateException, KafkaException {
+    public static ProducerModeEnum from(String mode) throws ValidateException {
         ValidateUtils.notNull("from", mode);
         mode = mode.trim().toUpperCase();
 
@@ -54,6 +54,6 @@ public enum ProducerModeEnum {
                 return item;
             }
         }
-        throw new KafkaException(CodeEnum.KFK_0011, mode);
+        throw new IllegalException(CodeEnum.KFK_0011, mode);
     }
 }

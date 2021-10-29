@@ -24,7 +24,7 @@ import org.pizazz2.tool.ref.ContainerStatusEnum;
  *
  * @param <T> 输出类型
  * @author xlgp2171
- * @version 2.0.210512
+ * @version 2.1.211028
  */
 public abstract class AbstractContainer<T> implements IPlugin {
     public static final String CONTAINER_TIMEOUT = "timeout";
@@ -75,6 +75,7 @@ public abstract class AbstractContainer<T> implements IPlugin {
             }
             return ContainerStatusEnum.DESTROYED;
         };
+        String tag = LocaleHelper.toLocaleText(TypeEnum.BASIC, "TAG.CONSOLE");
 		ContainerStatusEnum status = ContainerStatusEnum.DESTROYED;
 
         if (timeout == null || timeout.isNegative()) {
@@ -88,7 +89,7 @@ public abstract class AbstractContainer<T> implements IPlugin {
         // 超时时间为0 立即销毁
         if (timeout.isZero()) {
             String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "CONTAINER.DESTROY");
-            SystemUtils.println(System.out, new StringBuffer(msg));
+            SystemUtils.println(System.out, new StringBuffer(tag).append(msg));
             log(msg, null);
             try {
                 status = callable.call();
@@ -97,7 +98,7 @@ public abstract class AbstractContainer<T> implements IPlugin {
             }
         } else {
             String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "CONTAINER.DESTROY.TIMEOUT", timeout.toMillis());
-            SystemUtils.println(System.out, new StringBuffer(msg));
+            SystemUtils.println(System.out, new StringBuffer(tag).append(msg));
             log(msg, null);
             ThreadPoolExecutor pool = null;
             try {
@@ -105,7 +106,7 @@ public abstract class AbstractContainer<T> implements IPlugin {
                 status = pool.submit(callable).get(timeout.toMillis(), TimeUnit.MILLISECONDS);
             } catch (TimeoutException e) {
                 msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CONTAINER.TIMEOUT", timeout);
-                SystemUtils.println(System.err, new StringBuffer(msg));
+                SystemUtils.println(System.err, new StringBuffer(tag).append(msg));
                 log(msg, e);
                 status = ContainerStatusEnum.DESTROY_TIMEOUT;
             } catch (Exception e) {

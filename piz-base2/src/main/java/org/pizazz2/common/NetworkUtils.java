@@ -17,10 +17,12 @@ import java.util.Set;
  * 网络工具
  * 
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.1.211028
  */
 public class NetworkUtils {
 	public static String IP_SEPARATOR = "\\.";
+	public static final String LOCAL_HOST = "localhost";
+	public static final String LOCAL_IP = "127.0.0.1";
 
 	public static InetAddress[] getAddressesByNetwork(NetworkEnum.Inet type) {
 		Enumeration<NetworkInterface> network;
@@ -59,7 +61,7 @@ public class NetworkUtils {
 				return InetAddress.getLocalHost();
 			} catch (UnknownHostException e) {
 				try {
-					return InetAddress.getByName(NetworkEnum.LOCAL_IP);
+					return InetAddress.getByName(LOCAL_IP);
 				} catch (UnknownHostException e1) {
 					String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.NETWORK.FOUND", e.getMessage());
 					throw new UtilityException(BasicCodeEnum.MSG_0027, msg, e);
@@ -89,7 +91,7 @@ public class NetworkUtils {
 		for (InetAddress item : address) {
 			NetworkUtils.hostFilter(item, filterS, tmp);
 		}
-		return tmp.toArray(new String[0]);
+		return tmp.toArray(new String[NumberUtils.ZERO.intValue()]);
 	}
 
 	public static void hostFilter(InetAddress address, Set<String> filter, Set<String> hosts) {
@@ -215,7 +217,7 @@ public class NetworkUtils {
 		ValidateUtils.notNull("getIpAddressTypeByIP4", ip);
 		ValidateUtils.verifyExpression(ExpressionEnum.IP_ADDRESS, ip);
 		String[] ipArray = ip.split(NetworkUtils.IP_SEPARATOR);
-		int netAddress = NumberUtils.toInt(ipArray[0], 0);
+		int netAddress = NumberUtils.toInt(ipArray[0], NumberUtils.ZERO.intValue());
 
 		if (netAddress >= 1 && netAddress <= 126) {
 			return NetworkEnum.IpAddressType.A;

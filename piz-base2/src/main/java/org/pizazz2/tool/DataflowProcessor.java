@@ -2,6 +2,7 @@ package org.pizazz2.tool;
 
 import org.pizazz2.ICloseable;
 import org.pizazz2.PizContext;
+import org.pizazz2.common.NumberUtils;
 import org.pizazz2.common.SystemUtils;
 import org.pizazz2.common.ThreadUtils;
 import org.pizazz2.common.ValidateUtils;
@@ -27,7 +28,7 @@ import java.util.function.BiConsumer;
  * 参考elasticsearch
  *
  * @author xlgp2171
- * @version 2.1.211013
+ * @version 2.1.211014
  *
  * @param <E> 元数据
  */
@@ -60,7 +61,7 @@ public class DataflowProcessor<E extends IData> implements ICloseable {
         // 若小于10个就10个
         batchedData = new BatchedData<>(Math.max(actions, 10));
         // 定时任务线程池
-        scheduler = ThreadUtils.newScheduledThreadPool(1,
+        scheduler = ThreadUtils.newScheduledThreadPool(NumberUtils.ONE.intValue(),
                 new PizThreadFactory(PizContext.NAMING_SHORT + "-dataflow", daemon));
         scheduler.setRemoveOnCancelPolicy(true);
         // 按照设定时间启动任务
@@ -107,10 +108,10 @@ public class DataflowProcessor<E extends IData> implements ICloseable {
     }
 
     private boolean isOverTheLimit() {
-        if (actions != -1 && batchedData.total() >= actions) {
+        if (actions != NumberUtils.NEGATIVE_ONE.intValue() && batchedData.total() >= actions) {
             return true;
         } else {
-            return size != -1 && batchedData.bytes() >= size;
+            return size != NumberUtils.NEGATIVE_ONE.intValue() && batchedData.bytes() >= size;
         }
     }
 
@@ -144,7 +145,7 @@ public class DataflowProcessor<E extends IData> implements ICloseable {
         /** 同步执行 */
         private boolean sync = false;
         /** 运行线程数 */
-        private int threads = 1;
+        private int threads = NumberUtils.ONE.intValue();
         /** 触发个数(个) */
         private int actions = 20;
         /** 触发大小(byte) */

@@ -5,10 +5,7 @@ import org.apache.kafka.clients.admin.ConsumerGroupListing;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.pizazz2.ICloseable;
-import org.pizazz2.common.ArrayUtils;
-import org.pizazz2.common.CollectionUtils;
-import org.pizazz2.common.SystemUtils;
-import org.pizazz2.common.ThreadUtils;
+import org.pizazz2.common.*;
 import org.pizazz2.data.TupleObject;
 import org.pizazz2.exception.BaseException;
 import org.pizazz2.kafka.KafkaConstant;
@@ -28,7 +25,7 @@ import java.util.function.BiConsumer;
  * 简单的kafka监控组件
  *
  * @author xlgp2171
- * @version 2.0.210512
+ * @version 2.1.211028
  */
 public class SimpleMonitor<K, V> implements ICloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleMonitor.class);
@@ -113,7 +110,7 @@ public class SimpleMonitor<K, V> implements ICloseable {
             ConsumerEntity source = new ConsumerEntity(group, tp);
             ConsumerEntity target = consumers.ceiling(source);
 
-            if (target != null && source.compareTo(target) == 0) {
+            if (target != null && source.compareTo(target) == NumberUtils.ZERO.intValue()) {
                 target.setOffsetAndMetadata(data.get(tp)).setEndOffset(l);
             }
         });
@@ -175,7 +172,7 @@ public class SimpleMonitor<K, V> implements ICloseable {
         consumers.forEach(item -> {
             ConsumerEntity target = consumerSet.ceiling(item);
 
-            if (target != null && item.compareTo(target) == 0) {
+            if (target != null && item.compareTo(target) == NumberUtils.ZERO.intValue()) {
                 consumer.accept(item, target);
             } else {
                 consumers.remove(item);

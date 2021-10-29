@@ -28,7 +28,7 @@ import java.util.function.Predicate;
  * 提取处理器
  *
  * @author xlgp2171
- * @version 2.0.210501
+ * @version 2.1.211014
  */
 public class ExtractProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtractProcessor.class);
@@ -73,7 +73,7 @@ public class ExtractProcessor {
     public ExtractProcessor(ExtractConfig extractConfig, Predicate<MediaType> defaultCheck, BiFunction<TupleObject,
             MediaType, TupleObject> defaultModify, IExtractListener listener, MediaType defaultType)
             throws ValidateException {
-        ValidateUtils.notNull("ExtractProcessor", extractConfig, defaultCheck, defaultModify, 1,
+        ValidateUtils.notNull("ExtractProcessor", extractConfig, defaultCheck, defaultModify, true,
                 defaultType);
         this.extractConfig = extractConfig;
         this.defaultCheck = defaultCheck;
