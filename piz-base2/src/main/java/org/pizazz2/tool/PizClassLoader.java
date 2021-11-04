@@ -24,13 +24,10 @@ import org.pizazz2.common.ValidateUtils;
 import org.pizazz2.common.ClassUtils;
 import org.pizazz2.common.IOUtils;
 import org.pizazz2.context.ClassContext;
+import org.pizazz2.exception.*;
 import org.pizazz2.helper.LocaleHelper;
 import org.pizazz2.common.PathUtils;
 import org.pizazz2.common.SystemUtils;
-import org.pizazz2.exception.ValidateException;
-import org.pizazz2.exception.BaseException;
-import org.pizazz2.exception.ToolException;
-import org.pizazz2.exception.UtilityException;
 import org.pizazz2.message.BasicCodeEnum;
 import org.pizazz2.message.TypeEnum;
 
@@ -38,7 +35,7 @@ import org.pizazz2.message.TypeEnum;
  * 类加载组件
  * 
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.1.211103
  */
 public class PizClassLoader extends URLClassLoader {
 	/**
@@ -194,8 +191,9 @@ public class PizClassLoader extends URLClassLoader {
 	 * @param url URL
 	 * @throws ToolException 重复加载异常或链接加载异常
 	 * @throws ValidateException 参数验证异常
+	 * @throws IllegalException 类型转换异常
 	 */
-	public synchronized PizClassLoader linkJar(URL url) throws ValidateException, ToolException {
+	public synchronized PizClassLoader linkJar(URL url) throws ValidateException, IllegalException, ToolException {
 		ValidateUtils.notNull("linkJar", url);
 
 		if (ArrayUtils.contains(super.getURLs(), url)) {

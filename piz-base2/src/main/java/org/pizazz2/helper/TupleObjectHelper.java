@@ -15,7 +15,7 @@ import org.pizazz2.exception.UtilityException;
  * 通用对象工具
  *
  * @author xlgp2171
- * @version 2.1.211028
+ * @version 2.1.211103
  */
 public class TupleObjectHelper {
 
@@ -52,11 +52,11 @@ public class TupleObjectHelper {
         return target == null ? TupleObjectHelper.emptyObject() : target;
     }
 
-    public static byte[] serialize(TupleObject target) throws ValidateException, UtilityException {
+    public static byte[] serialize(TupleObject target) throws ValidateException, IllegalException {
         return SerializationUtils.serialize(target, IKryoConfig.EMPTY);
     }
 
-    public static TupleObject deserialize(byte[] target) throws ValidateException, UtilityException {
+    public static TupleObject deserialize(byte[] target) throws ValidateException, IllegalException {
         return SerializationUtils.deserialize(target, TupleObject.class, IKryoConfig.EMPTY);
     }
 
@@ -135,7 +135,7 @@ public class TupleObjectHelper {
         } else if (tmp instanceof String[]) {
             try {
                 return ClassUtils.cast(tmp, String[].class);
-            } catch (ValidateException e) {
+            } catch (ValidateException | IllegalException e) {
                 return defValue;
             }
         }
@@ -226,12 +226,13 @@ public class TupleObjectHelper {
         Object item = target.get(key);
         try {
             return ClassUtils.cast(item, TupleObject.class);
-        } catch (ValidateException e1) {
+        } catch (ValidateException | IllegalException e1) {
             TupleObject tmp;
             try {
+                // 若是只实现了Map接口，则将对象中类型重置为TupleObject
                 tmp = TupleObjectHelper.newObject(ClassUtils.cast(item, Map.class));
                 target.put(key, tmp);
-            } catch (ValidateException e2) {
+            } catch (ValidateException | IllegalException e2) {
                 tmp = TupleObjectHelper.emptyObject();
             }
             return tmp;
@@ -252,7 +253,7 @@ public class TupleObjectHelper {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<Object> getList(TupleObject target, String key) throws ValidateException {
+    public static List<Object> getList(TupleObject target, String key) throws  ValidateException, IllegalException {
         if (target == null || !target.containsKey(key)) {
             return CollectionUtils.emptyList();
         }

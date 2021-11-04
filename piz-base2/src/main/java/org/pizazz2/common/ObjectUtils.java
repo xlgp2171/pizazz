@@ -4,7 +4,7 @@ import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 
 import org.pizazz2.ISerializable;
-import org.pizazz2.exception.ValidateException;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.helper.LocaleHelper;
 import org.pizazz2.message.BasicCodeEnum;
 import org.pizazz2.message.TypeEnum;
@@ -13,11 +13,11 @@ import org.pizazz2.message.TypeEnum;
  * 对象工具
  * 
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.1.21104
  */
 public class ObjectUtils {
 
-	public static long getObjectsLength(Object... data) throws ValidateException {
+	public static long getObjectsLength(Object... data) throws IllegalException {
 		long length = 0;
 		data = ArrayUtils.nullToEmpty(data);
 
@@ -29,7 +29,7 @@ public class ObjectUtils {
 		return length;
 	}
 
-	public static long getObjectLength(Object target) throws ValidateException {
+	public static long getObjectLength(Object target) throws IllegalException {
 		long length;
 
 		if (target == null) {
@@ -59,7 +59,7 @@ public class ObjectUtils {
 		}else {
 			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.SUPPORT", "getObjectLength",
 					target.getClass().getName());
-			throw new ValidateException(BasicCodeEnum.MSG_0005, msg);
+			throw new IllegalException(BasicCodeEnum.MSG_0005, msg);
 		}
 		return length;
 	}

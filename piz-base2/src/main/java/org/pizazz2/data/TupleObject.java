@@ -4,6 +4,8 @@ import org.pizazz2.PizContext;
 import org.pizazz2.IObject;
 import org.pizazz2.common.ClassUtils;
 import org.pizazz2.common.SystemUtils;
+import org.pizazz2.exception.IllegalException;
+import org.pizazz2.exception.ValidateException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -12,7 +14,8 @@ import java.util.Map;
  * 通用对象
  *
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.1.211103
+ *
  * @see IObject
  */
 public class TupleObject extends LinkedHashMap<String, Object> implements IObject {
@@ -86,7 +89,7 @@ public class TupleObject extends LinkedHashMap<String, Object> implements IObjec
     }
 
     @Override
-    public TupleObject clone() {
+    public TupleObject clone() throws ValidateException, IllegalException {
         TupleObject tmp = ClassUtils.cast(super.clone(), TupleObject.class);
         tmp.id = this.id;
         return tmp;

@@ -3,6 +3,7 @@ package org.pizazz2.common;
 import org.pizazz2.ICloseable;
 import org.pizazz2.common.ref.IMXBean;
 import org.pizazz2.common.ref.OSTypeEnum;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.UtilityException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.helper.LocaleHelper;
@@ -20,7 +21,7 @@ import java.util.UUID;
  * 系统工具
  *
  * @author xlgp2171
- * @version 2.1.211014
+ * @version 2.1.211104
  */
 public class SystemUtils {
     public static String getSystemProperty(String property, String defValue) {
@@ -36,9 +37,9 @@ public class SystemUtils {
      * 获取当前操作系统
      * @param osType 操作系统字符串（获取os.name）
      * @return 操作系统类型
-     * @throws ValidateException 验证异常
+     * @throws IllegalException 验证异常
      */
-    public static OSTypeEnum getOSType(String osType) throws ValidateException {
+    public static OSTypeEnum getOSType(String osType) throws IllegalException {
         if (!StringUtils.isTrimEmpty(osType)) {
             OSTypeEnum[] tmp = OSTypeEnum.values();
 
@@ -48,7 +49,7 @@ public class SystemUtils {
                 }
             }
         }
-        throw new ValidateException(BasicCodeEnum.MSG_0023, osType);
+        throw new IllegalException(BasicCodeEnum.MSG_0023, osType);
     }
 
     public static void println(PrintStream target, StringBuffer message) {

@@ -1,6 +1,7 @@
 package org.pizazz2.common;
 
 import org.pizazz2.common.ref.IKryoConfig;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.helper.LocaleHelper;
 import org.pizazz2.message.BasicCodeEnum;
@@ -11,11 +12,11 @@ import org.pizazz2.message.TypeEnum;
  * <li/>序列化采用kryo实现
  * 
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.1.211103
  */
 public class SerializationUtils {
 
-	public static byte[] serialize(Object target, IKryoConfig config) throws ValidateException {
+	public static byte[] serialize(Object target, IKryoConfig config) throws ValidateException, IllegalException {
 		ValidateUtils.notNull("serialize", target);
 
 		if (config == null) {
@@ -32,11 +33,12 @@ public class SerializationUtils {
 			return output.toBytes();
 		} catch (Exception e) {
 			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.KRYO.PROCESS", e.getMessage());
-			throw new ValidateException(BasicCodeEnum.MSG_0013, msg, e);
+			throw new IllegalException(BasicCodeEnum.MSG_0013, msg, e);
 		}
 	}
 
-	public static <T> T deserialize(byte[] target, Class<T> type, IKryoConfig config) throws ValidateException {
+	public static <T> T deserialize(byte[] target, Class<T> type, IKryoConfig config)
+			throws ValidateException, IllegalException {
 		ValidateUtils.notNull("deserialize", target, type);
 		com.esotericsoftware.kryo.Kryo kryo = new com.esotericsoftware.kryo.Kryo();
 
@@ -47,7 +49,7 @@ public class SerializationUtils {
 			return kryo.readObject(input, type);
 		} catch (Exception e) {
 			String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.KRYO.PROCESS", e.getMessage());
-			throw new ValidateException(BasicCodeEnum.MSG_0013, msg, e);
+			throw new IllegalException(BasicCodeEnum.MSG_0013, msg, e);
 		}
 	}
 

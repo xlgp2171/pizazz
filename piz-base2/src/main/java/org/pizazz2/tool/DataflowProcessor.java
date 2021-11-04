@@ -28,7 +28,7 @@ import java.util.function.BiConsumer;
  * 参考elasticsearch
  *
  * @author xlgp2171
- * @version 2.1.211014
+ * @version 2.1.211104
  *
  * @param <E> 元数据
  */
@@ -250,7 +250,7 @@ public class DataflowProcessor<E extends IData> implements ICloseable {
          *
          * @return 流式处理器实现
          */
-        public DataflowProcessor<E> build() {
+        public DataflowProcessor<E> build() throws ValidateException {
             return new DataflowProcessor<>(
                     consumer, listener, handler, config, sync, threads, actions, size, interval, daemon);
         }

@@ -7,10 +7,7 @@ import org.pizazz2.common.StringUtils;
 import org.pizazz2.common.SystemUtils;
 import org.pizazz2.common.ValidateUtils;
 import org.pizazz2.context.PluginContext;
-import org.pizazz2.exception.BaseException;
-import org.pizazz2.exception.ToolException;
-import org.pizazz2.exception.UtilityException;
-import org.pizazz2.exception.ValidateException;
+import org.pizazz2.exception.*;
 import org.pizazz2.helper.LocaleHelper;
 import org.pizazz2.message.BasicCodeEnum;
 import org.pizazz2.message.TypeEnum;
@@ -24,7 +21,7 @@ import java.util.ServiceLoader;
  *
  * @param <C> 配置文件类型
  * @author xlgp2171
- * @version 2.0.210425
+ * @version 2.1.211103
  */
 public abstract class AbstractClassPlugin<C extends IObject> {
     private final C configure;
@@ -71,8 +68,10 @@ public abstract class AbstractClassPlugin<C extends IObject> {
      *
      * @throws UtilityException 类型转换失败
      * @throws ValidateException 若参数任意为null时
+     * @throws IllegalException 类型转换异常
      */
-    public <T extends IPlugin> T cast(IPlugin plugin, Class<T> clazz) throws ValidateException, UtilityException {
+    public <T extends IPlugin> T cast(IPlugin plugin, Class<T> clazz)
+            throws ValidateException, IllegalException, UtilityException {
         ValidateUtils.notNull("cast", plugin, clazz);
         return ClassUtils.cast(plugin, clazz);
     }
@@ -132,7 +131,7 @@ public abstract class AbstractClassPlugin<C extends IObject> {
     }
 
     protected IPlugin load(String classpath, String defClass, IPlugin defPlugin, ClassLoader loader, boolean initialize,
-                           BaseException e) throws BaseException, ValidateException {
+                           BaseException e) throws BaseException, IllegalException {
         if (StringUtils.isTrimEmpty(classpath)) {
             if (defPlugin != null) {
                 log(LocaleHelper.toLocaleText(TypeEnum.BASIC, "PLUGIN.LOAD", defPlugin.getId()), null);
@@ -142,7 +141,7 @@ public abstract class AbstractClassPlugin<C extends IObject> {
                     throw e;
                 } else {
                     String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PLUGIN.LOAD", StringUtils.EMPTY);
-                    throw new ValidateException(BasicCodeEnum.MSG_0014, msg);
+                    throw new IllegalException(BasicCodeEnum.MSG_0014, msg);
                 }
             }
             classpath = defClass;

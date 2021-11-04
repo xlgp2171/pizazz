@@ -22,6 +22,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.pizazz2.common.*;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.helper.ConfigureHelper;
 import org.pizazz2.helper.LocaleHelper;
 import org.pizazz2.helper.TupleObjectHelper;
@@ -38,7 +39,7 @@ import org.pizazz2.tool.ref.ResponseObject;
  * HTTP连接组件
  *
  * @author xlgp2171
- * @version 2.1.211014
+ * @version 2.1.211103
  */
 public class PizHttpConnection {
     public static final String PROTOCOL_HTTPS = "https";
@@ -148,7 +149,8 @@ public class PizHttpConnection {
         connection.disconnect();
     }
 
-    protected HttpURLConnection createHttpConnection(String method, IHttpConfig config) throws ValidateException, ToolException {
+    protected HttpURLConnection createHttpConnection(String method, IHttpConfig config)
+            throws ValidateException, IllegalException, ToolException {
         config = config == null ? new DefaultHttpConfig() : config;
         HttpURLConnection connection;
 

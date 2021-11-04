@@ -13,6 +13,7 @@ import org.pizazz2.IObject;
 import org.pizazz2.common.ClassUtils;
 import org.pizazz2.common.CryptoUtils;
 import org.pizazz2.common.ValidateUtils;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.exception.UtilityException;
 
@@ -20,7 +21,7 @@ import org.pizazz2.exception.UtilityException;
  * 加密解密工厂
  * 
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.1.211104
  */
 public class CryptoFactory {
 
@@ -39,16 +40,16 @@ public class CryptoFactory {
 			return algorithm;
 		}
 
-		public byte[] digest() throws ValidateException {
+		public byte[] digest() throws IllegalException {
 			try {
 				return CryptoUtils.digest(getId(), target);
 			} catch(UtilityException e) {
-				throw new ValidateException(e.getMessage(), e);
+				throw new IllegalException(e.getMessage(), e);
 			}
 		}
 
 		@Override
-		public String toString() throws ValidateException {
+		public String toString() throws IllegalException {
 			byte[] data = digest();
 			return CryptoUtils.encodeBase64ToString(data);
 		}

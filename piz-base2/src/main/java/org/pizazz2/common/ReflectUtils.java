@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.pizazz2.data.TupleObject;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.exception.UtilityException;
 import org.pizazz2.helper.LocaleHelper;
@@ -17,7 +18,7 @@ import org.pizazz2.message.TypeEnum;
  * 反射工具
  * 
  * @author xlgp2171
- * @version 2.0.210525
+ * @version 2.1.211003
  */
 public class ReflectUtils {
 
@@ -65,7 +66,7 @@ public class ReflectUtils {
 	}
 
 	public static <T> T invokeMethod(Object target, String methodName, Class<?>[] types, Object[] arguments,
-			Class<T> returnType, boolean accessible) throws ValidateException, UtilityException {
+			Class<T> returnType, boolean accessible) throws ValidateException, IllegalException, UtilityException {
 		ValidateUtils.notNull("invokeMethod", target);
 		Method method = ReflectUtils.getMethod(target instanceof Class ? (Class<?>) target : target.getClass(),
 				methodName, types, accessible);
@@ -188,7 +189,7 @@ public class ReflectUtils {
 	}
 
 	public static <T> T invokeGetField(Field field, Object target, Class<T> returnType, boolean accessible)
-			throws ValidateException, UtilityException {
+			throws ValidateException, IllegalException, UtilityException {
 		ValidateUtils.notNull("invokeGetField", field, target, returnType);
 		field.setAccessible(accessible);
 		Object tmp;
@@ -209,7 +210,7 @@ public class ReflectUtils {
 		return ReflectUtils.getActualTypeArguments(type);
 	}
 
-	public static Type[] getActualTypeArguments(Type type) {
+	public static Type[] getActualTypeArguments(Type type) throws IllegalException {
 		if (type instanceof ParameterizedType) {
 			return ClassUtils.cast(type, ParameterizedType.class).getActualTypeArguments();
 		}

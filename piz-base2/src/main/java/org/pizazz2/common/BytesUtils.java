@@ -3,6 +3,7 @@ package org.pizazz2.common;
 import java.nio.ByteBuffer;
 
 import org.pizazz2.ISerializable;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.helper.LocaleHelper;
 import org.pizazz2.message.BasicCodeEnum;
@@ -12,7 +13,7 @@ import org.pizazz2.message.TypeEnum;
  * 字节工具
  *
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.1.211104
  */
 public class BytesUtils {
 
@@ -79,7 +80,7 @@ public class BytesUtils {
         return ByteBuffer.wrap(target).get() == NumberUtils.ONE.byteValue();
     }
 
-    static void addObject(Object target, ByteBuffer buffer) throws ValidateException {
+    static void addObject(Object target, ByteBuffer buffer) throws IllegalException {
         if (target instanceof ByteBuffer) {
             buffer.put((ByteBuffer) target);
         } else if (target instanceof Integer) {
@@ -103,12 +104,13 @@ public class BytesUtils {
         } else if (target instanceof ISerializable) {
             buffer.put(((ISerializable) target).serialize());
         } else {
-            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.SUPPORT", "addObject", target.getClass().getName());
-            throw new ValidateException(BasicCodeEnum.MSG_0005, msg);
+            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.SUPPORT",
+                    "addObject", target.getClass().getName());
+            throw new IllegalException(BasicCodeEnum.MSG_0005, msg);
         }
     }
 
-    public static byte[] buffer(Object... data) throws ValidateException {
+    public static byte[] buffer(Object... data) throws ValidateException, IllegalException {
         if (ArrayUtils.isEmpty(data)) {
             return ArrayUtils.EMPTY_BYTE;
         }

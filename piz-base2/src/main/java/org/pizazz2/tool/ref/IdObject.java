@@ -6,7 +6,7 @@ import org.pizazz2.PizContext;
  * ID生成组件对象
  * 
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.1.211103
  */
 public class IdObject {
 	/**
@@ -60,8 +60,7 @@ public class IdObject {
 		try {
 			return org.pizazz2.common.JSONUtils.toJSON(this);
 		} catch (Exception e) {
-			return new StringBuilder("version=").append(version).append(",timestamp=").append(timestamp)
-					.append(",sequence=").append(sequence).append(",custom=").append(custom).toString();
+			return "version=" + version + ",timestamp=" + timestamp + ",sequence=" + sequence + ",custom=" + custom;
 		}
 	}
 }

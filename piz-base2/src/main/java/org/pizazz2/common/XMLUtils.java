@@ -11,6 +11,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.exception.UtilityException;
 import org.pizazz2.helper.LocaleHelper;
@@ -25,7 +26,7 @@ import org.w3c.dom.NodeList;
  * XML操作工具
  * 
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.1.211103
  */
 public class XMLUtils {
 
@@ -57,7 +58,8 @@ public class XMLUtils {
 		}
 	}
 
-	public static NodeList selectNodes(String expression, Object parent) throws ValidateException, UtilityException {
+	public static NodeList selectNodes(String expression, Object parent)
+			throws ValidateException, IllegalException, UtilityException {
 		ValidateUtils.notNull("selectNodes", expression, parent);
 		XPath xpath = XPathFactory.newInstance().newXPath();
 		try {
@@ -108,13 +110,13 @@ public class XMLUtils {
 		return tmp;
 	}
 
-	public static Element withElement(Node node) throws ValidateException {
+	public static Element withElement(Node node) throws ValidateException, IllegalException {
 		ValidateUtils.notNull("withElement", node);
 
 		if (node instanceof Element) {
 			return ClassUtils.cast(node, Element.class);
 		}
 		String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.W3C.UNKNOWN", node.getClass().getName());
-		throw new ValidateException(BasicCodeEnum.MSG_0005, msg);
+		throw new IllegalException(BasicCodeEnum.MSG_0005, msg);
 	}
 }

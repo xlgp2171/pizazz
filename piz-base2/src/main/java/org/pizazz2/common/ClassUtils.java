@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.pizazz2.PizContext;
 import org.pizazz2.data.TupleObject;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.exception.BaseException;
 import org.pizazz2.exception.UtilityException;
@@ -118,7 +119,8 @@ public class ClassUtils {
      * @throws UtilityException 类加载异常
      * @throws ValidateException classpath空异常
      */
-    public static <T> T newClass(String classpath, ClassLoader loader, Class<T> type) throws ValidateException, UtilityException {
+    public static <T> T newClass(String classpath, ClassLoader loader, Class<T> type)
+            throws ValidateException, UtilityException {
         Class<?> clazz = ClassUtils.loadClass(classpath, loader, true);
         return ClassUtils.newAndCast(clazz, type);
     }
@@ -289,13 +291,14 @@ public class ClassUtils {
         }
     }
 
-    public static <T> T cast(Object target, Class<T> type) throws ValidateException {
+    public static <T> T cast(Object target, Class<T> type) throws ValidateException, IllegalException {
         ValidateUtils.notNull("cast", target, type);
         try {
             return type.cast(target);
         } catch (ClassCastException e) {
-            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CLASS.CAST", target.getClass().getName(), type.getName());
-            throw new ValidateException(BasicCodeEnum.MSG_0004, msg, e);
+            String msg = LocaleHelper.toLocaleText(
+                    TypeEnum.BASIC, "ERR.CLASS.CAST", target.getClass().getName(), type.getName());
+            throw new IllegalException(BasicCodeEnum.MSG_0004, msg, e);
         }
     }
 

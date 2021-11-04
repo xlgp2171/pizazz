@@ -7,11 +7,11 @@ import org.pizazz2.message.ref.IMessageCode;
  * 包括非法参数、非法状态、非法格式、非法使用等
  * 
  * @author xlgp2171
- * @version 2.1.210917
+ * @version 2.1.211103
  * 
  * @see IMessageCode
  */
-public class IllegalException extends ValidateException {
+public class IllegalException extends BaseRuntimeException {
 
 	private static final long serialVersionUID = 5719654786413369117L;
 
