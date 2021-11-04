@@ -7,6 +7,7 @@ import org.pizazz2.common.NumberUtils;
 import org.pizazz2.common.SystemUtils;
 import org.pizazz2.common.ValidateUtils;
 import org.pizazz2.data.TupleObject;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.extraction.config.ExtractConfig;
 import org.pizazz2.extraction.data.ExtractObject;
@@ -28,7 +29,7 @@ import java.util.function.Predicate;
  * 文本提取
  *
  * @author xlgp2171
- * @version 2.1.211014
+ * @version 2.1.211103
  */
 public class TextExtraction implements ICloseable {
     private final ExtractProcessor extract;
@@ -81,22 +82,22 @@ public class TextExtraction implements ICloseable {
     }
 
     public ExtractObject extract(String name, String source, byte[] data, TupleObject config, boolean includeAttachment)
-            throws DetectionException, ParseException, ValidateException {
+            throws DetectionException, ParseException, ValidateException, IllegalException {
         return extract(new ExtractObject(ExtractHelper.generateId(), name, source, data), config, includeAttachment);
     }
 
     public ExtractObject extract(ExtractObject object, boolean includeAttachment) throws DetectionException,
-            ParseException, ValidateException {
+            ParseException, ValidateException, IllegalException {
         return extract(object, TupleObjectHelper.emptyObject(), includeAttachment);
     }
 
     public ExtractObject extract(ExtractObject object, TupleObject config) throws DetectionException,
-            ParseException, ValidateException {
+            ParseException, ValidateException, IllegalException {
         return extract(object, config, true);
     }
 
     public ExtractObject extract(ExtractObject object, TupleObject config, boolean includeAttachment)
-            throws DetectionException, ParseException, ValidateException {
+            throws DetectionException, ParseException, ValidateException, IllegalException {
         extract.extract(object, config, modify);
 
         if (object.hasAttachment() && includeAttachment) {

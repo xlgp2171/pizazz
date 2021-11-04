@@ -7,6 +7,7 @@ import org.pizazz2.common.PathUtils;
 import org.pizazz2.common.StringUtils;
 import org.pizazz2.common.ValidateUtils;
 import org.pizazz2.data.TupleObject;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.UtilityException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.extraction.data.ExtractObject;
@@ -18,7 +19,7 @@ import java.nio.file.Path;
  * 导出处理器
  *
  * @author xlgp2171
- * @version 2.0.210512
+ * @version 2.1.211103
  */
 public class ExportProcessor {
 
@@ -72,7 +73,7 @@ public class ExportProcessor {
         return StringUtils.isTrimEmpty(object.getName()) ? object.getId() : object.getName();
     }
 
-    public String toJSON(Metadata metadata, boolean prettyFormat) {
+    public String toJSON(Metadata metadata, boolean prettyFormat) throws IllegalException {
         if (metadata == null || metadata.size() == 0) {
             return JSONUtils.EMPTY_JSON;
         }

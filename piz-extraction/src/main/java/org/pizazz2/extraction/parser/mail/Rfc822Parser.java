@@ -21,6 +21,7 @@ import org.apache.tika.parser.mail.MailUtil;
 import org.pizazz2.PizContext;
 import org.pizazz2.common.*;
 import org.pizazz2.data.TupleObject;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.UtilityException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.extraction.process.IExtractListener;
@@ -50,7 +51,7 @@ import java.util.function.BiConsumer;
  * 解析属性Metadata包括：
  *
  * @author xlgp2171
- * @version 2.1.211028
+ * @version 2.1.211103
  */
 public class Rfc822Parser extends AbstractParser {
     static final String KEY_MULTIPART_ALTERNATIVE = "multipart/alternative";
@@ -63,7 +64,7 @@ public class Rfc822Parser extends AbstractParser {
 
     @Override
     protected void doParse(ExtractObject object, IConfig config, IExtractListener listener) throws ParseException,
-            ValidateException, DetectionException {
+            ValidateException, IllegalException, DetectionException {
         Config tmp = config.getTarget(Config.class);
         MimeStreamParser parser = new MimeStreamParser(tmp.mineConfig(), null,
                 new DefaultBodyDescriptorBuilder());
@@ -90,7 +91,7 @@ public class Rfc822Parser extends AbstractParser {
         private final boolean extractAll;
         private final MimeConfig mimeConfig;
 
-        public Config(TupleObject config) {
+        public Config(TupleObject config) throws IllegalException {
             super(config);
             this.htmlFormat = "html".equals(TupleObjectHelper.getString(config, "textFormat", "text"));
             this.extractAll = TupleObjectHelper.getBoolean(config, "extractAll", false);
@@ -425,7 +426,7 @@ public class Rfc822Parser extends AbstractParser {
             ExtractObject object = ExtractHelper.newTempObject().setTypeString(contentType).setData(part.bytes);
             try {
                 tmp = Rfc822Parser.super.extract(object, TupleObjectHelper.emptyObject());
-            } catch (DetectionException | ParseException e) {
+            } catch (DetectionException | ParseException | ValidateException | IllegalException e) {
                 // do nothing
             }
             if (!StringUtils.isTrimEmpty(tmp)) {

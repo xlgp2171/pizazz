@@ -3,6 +3,7 @@ package org.pizazz2.extraction.config;
 import org.pizazz2.PizContext;
 import org.pizazz2.common.ClassUtils;
 import org.pizazz2.data.TupleObject;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.helper.TupleObjectHelper;
 
@@ -13,7 +14,7 @@ import java.nio.charset.UnsupportedCharsetException;
  * 配置基类
  *
  * @author xlgp2171
- * @version 2.0.210501
+ * @version 2.1.211104
  */
 public class ParseConfig implements IConfig {
     private final boolean ignoreException;
@@ -22,7 +23,7 @@ public class ParseConfig implements IConfig {
     private final boolean cleanLine;
     private final Charset charset;
 
-    public ParseConfig(TupleObject config) {
+    public ParseConfig(TupleObject config) throws IllegalException {
         // 默认不忽略异常
         this.ignoreException = TupleObjectHelper.getBoolean(config, "ignoreException", Boolean.FALSE);
         // 默认最多检查1MB()
@@ -35,14 +36,14 @@ public class ParseConfig implements IConfig {
         this.charset = toCharset(config);
     }
 
-    private Charset toCharset(TupleObject config) {
+    private Charset toCharset(TupleObject config) throws IllegalException {
         String encoding = TupleObjectHelper.getString(config, "encoding", PizContext.LOCAL_ENCODING.name());
         Charset tmp;
         try {
             tmp = Charset.forName(encoding);
         } catch (UnsupportedCharsetException e) {
             if (!ignoreException()) {
-                throw new ValidateException("UNSUPPORTED CHARSET:" + encoding, e);
+                throw new IllegalException("UNSUPPORTED CHARSET:" + encoding, e);
             } else {
                 tmp = PizContext.LOCAL_ENCODING;
             }
@@ -77,7 +78,7 @@ public class ParseConfig implements IConfig {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T getTarget(Class<? extends IConfig> type) throws ValidateException {
+    public <T> T getTarget(Class<? extends IConfig> type) throws ValidateException, IllegalException {
         return (T) ClassUtils.cast(this, type);
     }
 }

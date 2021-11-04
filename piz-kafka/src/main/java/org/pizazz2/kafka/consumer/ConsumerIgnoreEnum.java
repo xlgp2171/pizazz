@@ -2,14 +2,13 @@ package org.pizazz2.kafka.consumer;
 
 import org.pizazz2.common.ValidateUtils;
 import org.pizazz2.exception.IllegalException;
-import org.pizazz2.exception.ValidateException;
 import org.pizazz2.kafka.exception.CodeEnum;
 
 /**
  * 消费忽略异常枚举
  *
  * @author xlgp2171
- * @version 2.0.211015
+ * @version 2.1.211103
  */
 public enum ConsumerIgnoreEnum {
     /**
@@ -45,7 +44,7 @@ public enum ConsumerIgnoreEnum {
         return consume;
     }
 
-    public static ConsumerIgnoreEnum from(String mode) throws ValidateException {
+    public static ConsumerIgnoreEnum from(String mode) throws IllegalException {
         ValidateUtils.notNull("from", mode);
         mode = mode.trim().toUpperCase();
 

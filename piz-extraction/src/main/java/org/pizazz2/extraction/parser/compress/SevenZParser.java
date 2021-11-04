@@ -5,6 +5,7 @@ import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
 import org.apache.commons.compress.archivers.sevenz.SevenZFile;
 import org.apache.commons.compress.utils.SeekableInMemoryByteChannel;
 import org.pizazz2.common.StringUtils;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.extraction.process.IExtractListener;
 import org.pizazz2.extraction.config.IConfig;
@@ -23,13 +24,13 @@ import java.nio.file.Paths;
  * 可设置外部密码
  *
  * @author xlgp2
- * @version 2.0.210501
+ * @version 2.1.211103
  */
 public class SevenZParser extends AbstractCompressParser {
 
 	@Override
 	protected void doParse(ExtractObject object, IConfig config, IExtractListener listener) throws ParseException,
-			ValidateException, DetectionException {
+			ValidateException, IllegalException, DetectionException {
 		AbstractCompressParser.Config tmp = config.getTarget(AbstractCompressParser.Config.class);
 		try {
 			doUncompress(object, tmp.password(), tmp.includeDirectory());

@@ -14,6 +14,7 @@ import org.apache.tika.mime.MediaType;
 import org.pizazz2.PizContext;
 import org.pizazz2.common.IOUtils;
 import org.pizazz2.common.StringUtils;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.UtilityException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.extraction.process.IExtractListener;
@@ -28,13 +29,13 @@ import org.pizazz2.extraction.support.ExtractHelper;
  * 无解析属性Metadata
  *
  * @author xlgp2171
- * @version 2.0.210501
+ * @version 2.1.211103
  */
 public class TarParser extends AbstractCompressParser {
 
     @Override
     protected void doParse(ExtractObject object, IConfig config, IExtractListener listener) throws ParseException,
-            ValidateException, DetectionException {
+            ValidateException, IllegalException, DetectionException {
         AbstractCompressParser.Config tmp = config.getTarget(AbstractCompressParser.Config.class);
         try {
             try {

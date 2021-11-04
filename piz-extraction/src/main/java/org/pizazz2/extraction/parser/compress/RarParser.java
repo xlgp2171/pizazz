@@ -10,6 +10,7 @@ import org.pizazz2.common.StringUtils;
 import org.pizazz2.common.SystemUtils;
 import org.pizazz2.data.TupleObject;
 import org.pizazz2.exception.BaseException;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.UtilityException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.extraction.process.IExtractListener;
@@ -40,7 +41,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * 无解析属性Metadata
  *
  * @author xlgp2171
- * @version 2.0.210512
+ * @version 2.1.211103
  */
 public class RarParser extends AbstractCompressParser {
 	@Override
@@ -50,7 +51,7 @@ public class RarParser extends AbstractCompressParser {
 
 	@Override
 	protected void doParse(ExtractObject object, IConfig config, IExtractListener listener) throws ParseException,
-			ValidateException, DetectionException {
+			ValidateException, IllegalException, DetectionException {
 		RARVersion version = getVersion(object.getData());
 
 		if (version != null) {

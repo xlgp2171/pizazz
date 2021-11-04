@@ -10,6 +10,7 @@ import org.pizazz2.common.CollectionUtils;
 import org.pizazz2.common.SystemUtils;
 import org.pizazz2.data.TupleObject;
 import org.pizazz2.exception.BaseException;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.kafka.consumer.DataProcessor;
 import org.pizazz2.kafka.consumer.IDataExecutor;
@@ -46,7 +47,7 @@ import java.util.regex.Pattern;
  * @param <K> 消息Key
  * @param <V> 消息Value
  * @author xlgp2171
- * @version 2.0.210301
+ * @version 2.1.211103
  */
 public class Subscription<K, V> extends AbstractClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(Subscription.class);
@@ -62,14 +63,16 @@ public class Subscription<K, V> extends AbstractClient {
     }
 
     @Override
-    protected void setUpConfig() throws BaseException {
+    protected void setUpConfig() throws BaseException, IllegalException {
         super.setUpConfig();
         // 创建Offset处理类
         updateConfig(getConvertor().offsetProcessorConfig());
-        offset = cast(loadPlugin("classpath", new OffsetProcessor(), null, true), IOffsetProcessor.class);
+        offset = cast(loadPlugin("classpath", new OffsetProcessor(), null, true),
+                IOffsetProcessor.class);
         offset.set(getConvertor().consumerModeValue(), getConvertor().consumerIgnoreValue());
         // 数据处理类
-        processor = new DataProcessor<>(offset, getConvertor().consumerModeValue(), getConvertor().consumerIgnoreValue(), getConvertor().dataProcessorConfig());
+        processor = new DataProcessor<>(offset, getConvertor().consumerModeValue(),
+                getConvertor().consumerIgnoreValue(), getConvertor().dataProcessorConfig());
         // 创建Kafka消费类
         Map<String, Object> config = offset.optimizeKafkaConfig(getConvertor().kafkaConfig());
         consumer = new KafkaConsumer<>(processor.optimizeKafkaConfig(config));
@@ -86,7 +89,8 @@ public class Subscription<K, V> extends AbstractClient {
         subscribe(pattern, executor, null);
     }
 
-    public void subscribe(Pattern pattern, IDataExecutor<K, V> executor, ConsumerRebalanceListener listener) throws KafkaException {
+    public void subscribe(Pattern pattern, IDataExecutor<K, V> executor, ConsumerRebalanceListener listener)
+            throws KafkaException {
         if (pattern == null) {
             pattern = getConvertor().topicPatternConfig();
         }
@@ -99,7 +103,8 @@ public class Subscription<K, V> extends AbstractClient {
         subscribe(executor, null, topics);
     }
 
-    public void subscribe(IDataExecutor<K, V> executor, ConsumerRebalanceListener listener, String... topics) throws KafkaException {
+    public void subscribe(IDataExecutor<K, V> executor, ConsumerRebalanceListener listener, String... topics)
+            throws KafkaException {
         Collection<String> tmp = ArrayUtils.isEmpty(topics) ? getConvertor().topicConfig() : Arrays.asList(topics);
         consumer.subscribe(tmp, offset.getRebalanceListener(consumer, listener));
         LOGGER.info("subscription:subscribe,topics=" + tmp);

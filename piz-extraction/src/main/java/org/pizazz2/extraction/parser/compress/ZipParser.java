@@ -7,6 +7,7 @@ import org.apache.commons.compress.utils.SeekableInMemoryByteChannel;
 import org.pizazz2.PizContext;
 import org.pizazz2.common.IOUtils;
 import org.pizazz2.common.StringUtils;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.UtilityException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.extraction.process.IExtractListener;
@@ -28,13 +29,13 @@ import java.util.Enumeration;
  * 无解析属性Metadata<br>
  * 若要采用zip加密，推荐使用zip4j，但zip4j无法通过内存加载
  *
- * @author xlgp2
- * @version 2.0.210501
+ * @author xlgp2171
+ * @version 2.1.211103
  */
 public class ZipParser extends AbstractCompressParser {
     @Override
     protected void doParse(ExtractObject object, IConfig config, IExtractListener listener)
-			throws ParseException, ValidateException, DetectionException {
+			throws ParseException, ValidateException, IllegalException, DetectionException {
 		AbstractCompressParser.Config tmp = config.getTarget(AbstractCompressParser.Config.class);
 		try {
 			if (encrypted(object.getData())) {

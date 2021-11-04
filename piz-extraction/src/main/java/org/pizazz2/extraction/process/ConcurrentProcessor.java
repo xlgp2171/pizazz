@@ -6,6 +6,8 @@ import org.pizazz2.common.CollectionUtils;
 import org.pizazz2.common.NumberUtils;
 import org.pizazz2.common.ThreadUtils;
 import org.pizazz2.data.TupleObject;
+import org.pizazz2.exception.IllegalException;
+import org.pizazz2.exception.ValidateException;
 import org.pizazz2.extraction.data.ExtractObject;
 import org.pizazz2.extraction.exception.DetectionException;
 import org.pizazz2.extraction.exception.ParseException;
@@ -24,7 +26,7 @@ import java.util.stream.Collectors;
  * 并发处理器
  *
  * @author xlgp2171
- * @version 2.0.210512
+ * @version 2.1.211103
  */
 public class ConcurrentProcessor implements ICloseable {
     private final Logger logger = LoggerFactory.getLogger(ConcurrentProcessor.class);
@@ -73,7 +75,7 @@ public class ConcurrentProcessor implements ICloseable {
                 ExtractObject tmp = objectList.iterator().next();
                 try {
                     processor.extract(tmp, config, modify);
-                } catch (DetectionException | ParseException e) {
+                } catch (DetectionException | ParseException | ValidateException | IllegalException e) {
                     logger.error(e.getMessage());
                     return;
                 }

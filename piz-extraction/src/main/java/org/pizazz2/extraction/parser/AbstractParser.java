@@ -4,6 +4,7 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MediaType;
 import org.pizazz2.common.ArrayUtils;
 import org.pizazz2.data.TupleObject;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.extraction.process.IExtractListener;
 import org.pizazz2.extraction.config.ExtractConfig;
@@ -25,7 +26,7 @@ import java.nio.charset.Charset;
  * 执行器基类
  *
  * @author xlgp2171
- * @version 2.0.210501
+ * @version 2.1.211103
  */
 public abstract class AbstractParser implements IParser {
     protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractParser.class);
@@ -47,7 +48,7 @@ public abstract class AbstractParser implements IParser {
 
     @Override
     public final void parse(ExtractObject object, IConfig config, IExtractListener listener)
-            throws ParseException, ValidateException, DetectionException {
+            throws ParseException, ValidateException, IllegalException, DetectionException {
         if (object.processed()) {
             return;
         } else if (ArrayUtils.isEmpty(object.getData())) {
@@ -57,7 +58,7 @@ public abstract class AbstractParser implements IParser {
         try {
             doParse(object, config, listener);
             listener.parsed(object, config);
-        } catch(ParseException | ValidateException | DetectionException e) {
+        } catch(ParseException | DetectionException e) {
             listener.exception(object, e);
             throw e;
         } catch (Exception e) {
@@ -70,7 +71,7 @@ public abstract class AbstractParser implements IParser {
     }
 
     @Override
-    public IConfig toConfig(TupleObject config) {
+    public IConfig toConfig(TupleObject config) throws IllegalException {
         return new ParseConfig(config);
     }
 
@@ -84,7 +85,7 @@ public abstract class AbstractParser implements IParser {
     }
 
     protected String extract(ExtractObject object, TupleObject config) throws DetectionException, ParseException,
-            ValidateException {
+            ValidateException, IllegalException {
         return processor.extract(object, config);
     }
 

@@ -20,6 +20,7 @@ import org.apache.tika.parser.pkg.ZipContainerDetector;
 import org.apache.tika.utils.ExceptionUtils;
 import org.pizazz2.common.*;
 import org.pizazz2.data.TupleObject;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.UtilityException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.extraction.process.IExtractListener;
@@ -51,7 +52,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * 解析属性Metadata包括：
  *
  * @author xlgp2171
- * @version 2.0.210501
+ * @version 2.1.211103
  */
 public class OutlookParser extends AbstractParser {
 
@@ -68,7 +69,7 @@ public class OutlookParser extends AbstractParser {
 
     @Override
     protected void doParse(ExtractObject object, IConfig config, IExtractListener listener) throws ParseException,
-            ValidateException, DetectionException {
+            ValidateException, IllegalException, DetectionException {
         MAPIMessage message = null;
 
         try (InputStream in = new ByteArrayInputStream(object.getData())) {
@@ -83,7 +84,7 @@ public class OutlookParser extends AbstractParser {
     }
 
     private void doParse(ExtractObject object, DirectoryNode node, IConfig config, IExtractListener listener)
-            throws ParseException {
+            throws ParseException, IllegalException, ValidateException {
         MAPIMessage message = null;
         try {
             message = new MAPIMessage(node);
@@ -159,7 +160,7 @@ public class OutlookParser extends AbstractParser {
                 try {
                     handleEmbeddedOfficeDoc(parent, source, item.getAttachmentDirectory().getDirectory(), config,
                            listener);
-                } catch (IOException | DetectionException | ParseException e) {
+                } catch (IOException | DetectionException | ParseException | ValidateException | IllegalException e) {
                     LOGGER.error(e.getMessage());
                     parent.setStatus(ExtractObject.StatusEnum.BROKEN);
                 }
@@ -328,7 +329,7 @@ public class OutlookParser extends AbstractParser {
      */
     protected void handleEmbeddedOfficeDoc(ExtractObject parent, String source, DirectoryNode dir, Config config,
                                            IExtractListener listener) throws IOException, DetectionException,
-            ParseException {
+            ParseException, ValidateException, IllegalException {
         // Is it an embedded OLE2 document, or an embedded OOXML document?
         if (dir.hasEntry("Package")) {
             // It's OOXML (has a ZipFile):
@@ -365,7 +366,8 @@ public class OutlookParser extends AbstractParser {
     }
 
     private void handleEmbeddedOfficeDoc0(ExtractObject parent, String source, DirectoryNode dir, Config config,
-                                          IExtractListener listener) throws ParseException {
+                                          IExtractListener listener) throws ParseException, IllegalException,
+            ValidateException {
         // It's regular OLE2:
         // What kind of document is it?
         Metadata metadata = new Metadata();
@@ -637,7 +639,7 @@ public class OutlookParser extends AbstractParser {
          */
         private final boolean htmlFormat;
 
-        public Config(TupleObject config) {
+        public Config(TupleObject config) throws IllegalException {
             super(config);
             this.htmlFormat = "html".equals(TupleObjectHelper.getString(config, "textFormat", "text"));
         }

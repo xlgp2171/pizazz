@@ -6,6 +6,7 @@ import org.pizazz2.ICloseable;
 import org.pizazz2.PizContext;
 import org.pizazz2.common.*;
 import org.pizazz2.data.TupleObject;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.UtilityException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.helper.TupleObjectHelper;
@@ -28,7 +29,7 @@ import java.util.regex.Pattern;
  * 配置转换工具
  *
  * @author xlgp2171
- * @version 2.1.211028
+ * @version 2.1.211103
  */
 public class ConfigConvertor implements ICloseable {
 	private final TupleObject config = TupleObjectHelper.newObject(2);
@@ -90,13 +91,13 @@ public class ConfigConvertor implements ICloseable {
 				? KafkaConstant.DEF_DURATION : duration);
 	}
 
-	public ConsumerModeEnum consumerModeValue() throws ValidateException  {
+	public ConsumerModeEnum consumerModeValue() throws IllegalException  {
 		String value = TupleObjectHelper.getNestedString(config, StringUtils.EMPTY, KafkaConstant.KEY_CONFIG,
 				KafkaConstant.KEY_MODE);
 		return ConsumerModeEnum.from(value);
 	}
 
-	public ProducerModeEnum producerModeValue() throws ValidateException {
+	public ProducerModeEnum producerModeValue() throws IllegalException {
 		String value = TupleObjectHelper.getNestedString(config, StringUtils.EMPTY, KafkaConstant.KEY_CONFIG,
 				KafkaConstant.KEY_MODE);
 		return ProducerModeEnum.from(value);
@@ -109,7 +110,7 @@ public class ConfigConvertor implements ICloseable {
 		if (!StringUtils.isEmpty(value)) {
 			try {
 				return ConsumerIgnoreEnum.from(value);
-			} catch (ValidateException e) {
+			} catch (IllegalException e) {
 				// do nothing
 			}
 		}

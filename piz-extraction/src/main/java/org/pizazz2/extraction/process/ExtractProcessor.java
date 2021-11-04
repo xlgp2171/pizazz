@@ -6,6 +6,7 @@ import org.pizazz2.common.CollectionUtils;
 import org.pizazz2.common.StringUtils;
 import org.pizazz2.common.ValidateUtils;
 import org.pizazz2.data.TupleObject;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.extraction.config.ExtractConfig;
 import org.pizazz2.extraction.config.IConfig;
@@ -28,7 +29,7 @@ import java.util.function.Predicate;
  * 提取处理器
  *
  * @author xlgp2171
- * @version 2.1.211014
+ * @version 2.1.211103
  */
 public class ExtractProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtractProcessor.class);
@@ -97,12 +98,13 @@ public class ExtractProcessor {
         return object.getType();
     }
 
-    public String extract(ExtractObject object, TupleObject config) throws DetectionException, ParseException {
+    public String extract(ExtractObject object, TupleObject config) throws DetectionException, ParseException,
+            ValidateException, IllegalException {
         return extract(object, config, null);
     }
 
     public String extract(ExtractObject object, TupleObject config, BiFunction<TupleObject, MediaType,
-            TupleObject> modify) throws DetectionException, ParseException, ValidateException {
+            TupleObject> modify) throws DetectionException, ParseException, ValidateException, IllegalException {
         ValidateUtils.notNull("extract", object);
 
         if (detect(object) != null) {

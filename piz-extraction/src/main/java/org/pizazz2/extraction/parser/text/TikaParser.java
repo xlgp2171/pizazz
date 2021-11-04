@@ -4,6 +4,7 @@ import org.apache.tika.mime.MediaType;
 import org.pizazz2.common.CollectionUtils;
 import org.pizazz2.common.StringUtils;
 import org.pizazz2.data.TupleObject;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.extraction.process.IExtractListener;
 import org.pizazz2.extraction.config.IConfig;
@@ -28,7 +29,7 @@ import java.util.Set;
  * 解析属性Metadata由数据类型决定
  *
  * @author xlgp2171
- * @version 2.0.210501
+ * @version 2.1.211103
  */
 public class TikaParser extends AbstractParser {
     static final MediaType TYPE_DEFAULT = MediaType.parse("text/plain");
@@ -46,7 +47,7 @@ public class TikaParser extends AbstractParser {
 
     @Override
     protected void doParse(ExtractObject object, IConfig config, IExtractListener listener) throws ParseException,
-            ValidateException, DetectionException {
+            ValidateException, IllegalException, DetectionException {
         Config tmp = config.getTarget(Config.class);
         TikaProcessor.HandlerEnum handler = TikaProcessor.HandlerEnum.from(tmp.textFormat());
         String content = null;
@@ -86,7 +87,7 @@ public class TikaParser extends AbstractParser {
         private final String textFormat;
         private final Set<String> discoverEncoding;
 
-        public Config(TupleObject config) {
+        public Config(TupleObject config) throws IllegalException {
             super(config);
             this.textFormat = TupleObjectHelper.getString(config, "textFormat", "text");
             String discover = TupleObjectHelper.getString(config, "discoverEncoding",

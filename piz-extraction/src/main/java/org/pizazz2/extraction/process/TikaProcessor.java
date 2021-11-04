@@ -12,6 +12,7 @@ import org.apache.tika.sax.BodyContentHandler;
 import org.apache.tika.sax.ExpandedTitleContentHandler;
 import org.pizazz2.PizContext;
 import org.pizazz2.common.ValidateUtils;
+import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.extraction.exception.DetectionException;
 import org.pizazz2.extraction.exception.CodeEnum;
@@ -32,7 +33,7 @@ import java.nio.charset.Charset;
  * 可参考使用ForkParser
  *
  * @author xlgp2171
- * @version 2.0.210501
+ * @version 2.1.211104
  */
 public class TikaProcessor {
     private final TikaConfig config;
@@ -61,7 +62,7 @@ public class TikaProcessor {
     }
 
     public String extract(byte[] data, Metadata metadata, Charset charset, HandlerEnum format)
-            throws ParseException, ValidateException {
+            throws ParseException, IllegalException {
         // 默认初始化大小1MB
         ByteArrayOutputStream tmp = new ByteArrayOutputStream(1024 * 1024);
         ContentHandler handler = format.newHandler(tmp, charset,false);
@@ -88,9 +89,9 @@ public class TikaProcessor {
          * @param prettyPrint 按格式输出
          * @return 内容处理器
          *
-         * @throws ValidateException 内容处理器生成异常
+         * @throws IllegalException 内容处理器生成异常
          */
-        ContentHandler newHandler(OutputStream output, Charset charset, boolean prettyPrint) throws ValidateException;
+        ContentHandler newHandler(OutputStream output, Charset charset, boolean prettyPrint) throws IllegalException;
     }
 
     public static enum HandlerEnum implements IHandler {
@@ -98,7 +99,7 @@ public class TikaProcessor {
         TEXT {
             @Override
             public ContentHandler newHandler(OutputStream output, Charset charset, boolean prettyPrint)
-                    throws ValidateException {
+                    throws IllegalException {
                 return new BodyContentHandler(HandlerEnum.getOutputWriter(output, charset));
             }
         },
@@ -106,12 +107,12 @@ public class TikaProcessor {
         HTML {
             @Override
             public ContentHandler newHandler(OutputStream output, Charset charset, boolean prettyPrint)
-                    throws ValidateException {
+                    throws IllegalException {
                 try {
                     return new ExpandedTitleContentHandler(
                             HandlerEnum.getTransformerHandler(output, "html", charset, prettyPrint));
                 } catch (TransformerConfigurationException e) {
-                    throw new ValidateException("NEW HTML HANDLER:" + e.getMessage(), e);
+                    throw new IllegalException("NEW HTML HANDLER:" + e.getMessage(), e);
                 }
             }
         },
@@ -119,11 +120,11 @@ public class TikaProcessor {
         XML {
             @Override
             public ContentHandler newHandler(OutputStream output, Charset charset, boolean prettyPrint)
-                    throws ValidateException {
+                    throws IllegalException {
                 try {
                     return HandlerEnum.getTransformerHandler(output, "xml", charset, prettyPrint);
                 } catch (TransformerConfigurationException e) {
-                    throw new ValidateException("NEW XML HANDLER:" + e.getMessage(), e);
+                    throw new IllegalException("NEW XML HANDLER:" + e.getMessage(), e);
                 }
             }
         };
