@@ -12,10 +12,11 @@ public class SimpleMonitorTest {
 
     public void monitorExample() throws BaseException, InterruptedException {
         TupleObject config = YAMLUtils.fromYAML("kafka_config_template.yml");
-        SimpleMonitor<String, String> monitor = new SimpleMonitor<>(TupleObjectHelper.getTupleObject(config, "subscription"));
+        SimpleMonitor<String, String> monitor = new SimpleMonitor<>(
+                TupleObjectHelper.getTupleObject(config, "subscription"));
         monitor.activate(Duration.ofSeconds(1), true);
 
-        while (true) {
+        for (int i = 0; i < 10; i ++) {
             monitor.nodeCache();
             monitor.consumerCache();
 //

@@ -37,7 +37,7 @@ public class KafkaTest {
 		SUBSCRIPTION = new Subscription<>(TupleObjectHelper.getTupleObject(_config, KafkaConstant.KEY_SUBSCRIPTION));
 	}
 
-	@org.junit.Test
+//	@org.junit.Test
 	public void sentExample() throws KafkaException {
 		TupleObject data = TupleObjectHelper.newObject(4).append("start", "2019-07-01 19:45:00")
 				.append("end", "2019-07-30 05:15:00").append("sessionID", SystemUtils.newUUIDSimple())
@@ -63,14 +63,13 @@ public class KafkaTest {
 		System.out.println("SEND FINISHED");
 	}
 
-	@org.junit.Test
+//	@org.junit.Test
 	public void subscribeExample() throws KafkaException {
 		SUBSCRIPTION.subscribe(new ISingleDataExecutor<String, String>() {
 			@Override
 			public void execute(ConsumerRecord<String, String> record) throws Exception {
 				System.out.println(record.value());
 //				TupleObject object = JSONUtils.fromJSON(record.value(), TupleObject.class);
-//				System.out.println(object);
 			}
 
 			@Override

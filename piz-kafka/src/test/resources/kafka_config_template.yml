@@ -1,6 +1,6 @@
 subscription:
   client:
-    bootstrap.servers: 192.168.0.186:9092
+    bootstrap.servers: 127.0.0.1:9092
     group.id: GROUP_DEMO
     auto.offset.reset: earliest
     max.poll.records: 5
@@ -10,7 +10,7 @@ subscription:
   template: CONSUMER_NORMAL
 production:
   client:
-    bootstrap.servers: 192.168.0.186:9092
+    bootstrap.servers: 127.0.0.1:9092
     key.serializer: org.apache.kafka.common.serialization.StringSerializer
     value.serializer: org.apache.kafka.common.serialization.StringSerializer
   config:

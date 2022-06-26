@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
  * <li>手动 异步提交 循环处理 每个数据
  * <li>手动 同步提交 循环处理 一轮数据
  * <li>手动 同步提交 循环处理 每个数据
+ * TODO 需要参考Springboot插件的实现
  *
  * @param <K> 消息Key
  * @param <V> 消息Value

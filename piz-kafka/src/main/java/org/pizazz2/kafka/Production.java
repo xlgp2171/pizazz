@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * kafka消息发布组件
- * TODO 事务处理组件
+ * TODO 未包含事务处理API
  *
  * @param <K> 消息Key
  * @param <V> 消息Value
