@@ -1,6 +1,7 @@
 package org.pizazz2.kafka.consumer.adapter;
 
 import org.pizazz2.IPlugin;
+import org.pizazz2.data.TupleObject;
 import org.pizazz2.kafka.consumer.ConsumerIgnoreEnum;
 import org.pizazz2.kafka.consumer.ConsumerModeEnum;
 import org.pizazz2.kafka.exception.KafkaException;
@@ -9,9 +10,9 @@ import org.pizazz2.kafka.exception.KafkaException;
  * 数据接收适配接口
  *
  * @author xlgp2171
- * @version 2.0.210301
+ * @version 2.1.211201
  */
-public interface IProcessAdapter extends IPlugin {
+public interface IProcessAdapter extends IPlugin<TupleObject> {
 
 	/**
 	 * 设置消费模式

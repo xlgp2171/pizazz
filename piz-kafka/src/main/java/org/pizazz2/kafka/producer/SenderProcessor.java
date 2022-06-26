@@ -18,7 +18,7 @@ import java.util.concurrent.Future;
  * 发送消息处理组件
  *
  * @author xlgp2171
- * @version 2.0.210301
+ * @version 2.0.220625
  */
 public class SenderProcessor<K, V> {
 	private final Logger logger = LoggerFactory.getLogger(SenderProcessor.class);
@@ -36,6 +36,7 @@ public class SenderProcessor<K, V> {
 		} catch (Exception e) {
 			throw new KafkaException(CodeEnum.KFK_0012, "data send:" + e.getMessage(), e);
 		}
+		// 是否同步模式
 		if (mode.isSync()) {
 			try {
 				tmp.get();
@@ -46,6 +47,9 @@ public class SenderProcessor<K, V> {
 		return tmp;
 	}
 
+	/**
+	 * 发送代理回调
+	 */
 	private class ProxyCallback implements Callback {
 		private final Callback callback;
 
@@ -56,9 +60,9 @@ public class SenderProcessor<K, V> {
 		@Override
 		public void onCompletion(RecordMetadata metadata, Exception e) {
 			if (e != null) {
-				logger.error("data send:" + metadata, e);
+				logger.error(KafkaConstant.LOG_TAG + "data send:" + metadata, e);
 			} else if (KafkaConstant.DEBUG_MODE) {
-				logger.debug("data send:" + metadata);
+				logger.debug(KafkaConstant.LOG_TAG + "data send:" + metadata);
 			}
 			if (callback != null) {
 				callback.onCompletion(metadata, e);

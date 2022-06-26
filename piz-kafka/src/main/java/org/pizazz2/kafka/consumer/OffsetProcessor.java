@@ -3,19 +3,16 @@ package org.pizazz2.kafka.consumer;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.consumer.OffsetAndMetadata;
-import org.apache.kafka.clients.consumer.OffsetCommitCallback;
+import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.TopicPartition;
-import org.pizazz2.IObject;
 import org.pizazz2.PizContext;
 import org.pizazz2.common.CollectionUtils;
 import org.pizazz2.common.ResourceUtils;
+import org.pizazz2.data.TupleObject;
+import org.pizazz2.helper.TupleObjectHelper;
 import org.pizazz2.kafka.KafkaConstant;
 import org.pizazz2.kafka.exception.CodeEnum;
 import org.pizazz2.kafka.exception.KafkaException;
@@ -26,18 +23,21 @@ import org.slf4j.LoggerFactory;
  * 偏移量处理工具
  *
  * @author xlgp2171
- * @version 2.0.210301
+ * @version 2.1.211201
  */
 public class OffsetProcessor implements IOffsetProcessor {
-    private static final Logger LOGGER = LoggerFactory.getLogger(OffsetProcessor.class);
+    private final Logger logger = LoggerFactory.getLogger(OffsetProcessor.class);
+    /** 已经提交的offset */
     protected final Map<TopicPartition, OffsetAndMetadata> offsetCommitted;
+    /** 当前缓存的offset */
     protected final Map<TopicPartition, OffsetAndMetadata> offsetCache;
     private ConsumerModeEnum mode;
     private ConsumerIgnoreEnum ignore;
+    private int retries;
 
     private final OffsetCommitCallback callback = (offsets, e) -> {
         if (e != null) {
-            LOGGER.error("consumer commit:" + offsets, e);
+            logger.error(KafkaConstant.LOG_TAG + "consumer commit:" + offsets, e);
         } else if (offsets != null) {
             markCommitted(offsets);
         }
@@ -49,14 +49,16 @@ public class OffsetProcessor implements IOffsetProcessor {
     }
 
     @Override
-    public void initialize(IObject config) throws KafkaException {
+    public void initialize(TupleObject config) throws KafkaException {
+        retries = TupleObjectHelper.getInt(config, "retries", 1);
     }
 
-    private <K, V> void offsetCommit(KafkaConsumer<K, V> consumer, boolean force) throws KafkaException {
+    private <K, V> void offsetCommit(KafkaConsumer<K, V> consumer, boolean force, int retries) throws KafkaException {
         Map<TopicPartition, OffsetAndMetadata> tmp = getOffsetCache();
-
+        // 若同步或者强制提交
         if (mode.isSync() || force) {
             try {
+                // 非强制情况下同步每一个
                 if (mode.isEach() && !force) {
                     if (!CollectionUtils.isEmpty(tmp)) {
                         consumer.commitSync(tmp);
@@ -65,25 +67,33 @@ public class OffsetProcessor implements IOffsetProcessor {
                     consumer.commitSync();
                 }
             } catch (Exception e) {
-                if (ignore.offsetThrowable()) {
-                    throw new KafkaException(CodeEnum.KFK_0006, "consumer commit:" + tmp, e);
+                // 是否重试
+                if (retries >= this.retries) {
+                    if (ignore.offsetThrowable()) {
+                        throw new KafkaException(CodeEnum.KFK_0006, "consumer commit:" + tmp, e);
+                    } else {
+                        logger.warn(KafkaConstant.LOG_TAG + "consumer commit:" + tmp, e);
+                    }
                 } else {
-                    LOGGER.warn("consumer commit:" + tmp, e);
-                    return;
+                    // 同步情况下提交重试
+                    offsetCommit(consumer, force, retries + 1);
                 }
+                return;
             }
             markCommitted(tmp);
         } else if (mode.isEach()) {
+            // 异步情况下每一个
             consumer.commitAsync(tmp, callback);
         } else {
             consumer.commitAsync(callback);
         }
         if (KafkaConstant.DEBUG_MODE) {
-            LOGGER.debug("consumer commit:" + tmp);
+            logger.debug(KafkaConstant.LOG_TAG + "consumer commit:" + tmp);
         }
     }
 
     private void markCommitted(Map<TopicPartition, OffsetAndMetadata> offsets) {
+        // 缓存已提交的信息
         synchronized (offsetCommitted) {
             offsets.forEach((k, v) -> {
                 if (offsetCommitted.containsKey(k)) {
@@ -96,7 +106,14 @@ public class OffsetProcessor implements IOffsetProcessor {
             });
         }
         if (KafkaConstant.DEBUG_MODE) {
-            LOGGER.debug("consumer mark committed:" + offsets);
+            logger.debug(KafkaConstant.LOG_TAG + "consumer mark committed:" + offsets);
+        }
+    }
+    @Override
+    public <K, V> void batch(KafkaConsumer<K, V> consumer, Collection<ConsumerRecord<K, V>> records)
+            throws KafkaException {
+        for (ConsumerRecord<K, V> item : records) {
+            each(consumer, item);
         }
     }
 
@@ -109,19 +126,20 @@ public class OffsetProcessor implements IOffsetProcessor {
             if (record.offset() > offsetCommitted.get(tp).offset()) {
                 setAndCommit(consumer, record, tp);
             } else if (KafkaConstant.DEBUG_MODE) {
-                LOGGER.debug(tp + " consumed:" + record.offset());
+                logger.debug(KafkaConstant.LOG_TAG + tp + " consumed:" + record.offset());
             }
         } else {
             setAndCommit(consumer, record, tp);
         }
     }
 
-    private <K, V> void setAndCommit(KafkaConsumer<K, V> consumer, ConsumerRecord<K, V> record, TopicPartition tp) throws KafkaException {
+    private <K, V> void setAndCommit(KafkaConsumer<K, V> consumer, ConsumerRecord<K, V> record, TopicPartition tp)
+            throws KafkaException {
         synchronized (offsetCache) {
             offsetCache.put(tp, new OffsetAndMetadata(record.offset()));
         }
         if (mode != ConsumerModeEnum.MANUAL_NONE_NONE && !mode.isAuto() && mode.isEach()) {
-            offsetCommit(consumer, false);
+            offsetCommit(consumer, false, 0);
         }
     }
 
@@ -129,10 +147,10 @@ public class OffsetProcessor implements IOffsetProcessor {
     public <K, V> void complete(KafkaConsumer<K, V> consumer, KafkaException e) throws KafkaException {
         // 若手动提交且一轮提交且无异常
         if (mode != ConsumerModeEnum.MANUAL_NONE_NONE && !mode.isAuto() && e == null) {
-            offsetCommit(consumer, false);
+            offsetCommit(consumer, false, 0);
 
             if (KafkaConstant.DEBUG_MODE) {
-                LOGGER.debug("consumer commit sync:" + mode.isSync());
+                logger.debug(KafkaConstant.LOG_TAG + "consumer commit sync:" + mode.isSync());
             }
         }
     }
@@ -142,15 +160,18 @@ public class OffsetProcessor implements IOffsetProcessor {
         boolean commitMode = mode == null || mode.isAuto();
         // 若Kafka设置同ConsumerModeEnum设置不相同
         boolean tmp = !config.containsKey(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG) ||
-				(mode != null && commitMode != ResourceUtils.getBoolean(config, ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true));
+				(mode != null && commitMode != ResourceUtils.getBoolean(
+				        config, ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true));
 
         if (tmp) {
             config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, commitMode);
-            LOGGER.info("set subscription config:" + ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG + "=" + commitMode + ",mode=" + mode);
+            logger.info(KafkaConstant.LOG_TAG + "set subscription config:" + ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG +
+                    "=" + commitMode + ",mode=" + mode);
         }
         if (!config.containsKey(ConsumerConfig.GROUP_ID_CONFIG)) {
             config.put(ConsumerConfig.GROUP_ID_CONFIG, PizContext.NAMING);
-            LOGGER.info("set subscription config:" + ConsumerConfig.GROUP_ID_CONFIG + "=" + PizContext.NAMING);
+            logger.info(KafkaConstant.LOG_TAG + "set subscription config:" + ConsumerConfig.GROUP_ID_CONFIG + "=" +
+                    PizContext.NAMING);
         }
         return config;
     }
@@ -163,15 +184,16 @@ public class OffsetProcessor implements IOffsetProcessor {
                 // 若非自动提交且统一提交
                 if (mode != ConsumerModeEnum.MANUAL_NONE_NONE && !mode.isAuto() && !mode.isEach()) {
                     try {
-                        offsetCommit(consumer, true);
+                        offsetCommit(consumer, true, 0);
                     } catch (KafkaException e) {
-                        LOGGER.error(e.getMessage(), e);
+                        logger.error(e.getMessage(), e);
                     }
                 }
                 if (listener != null) {
                     listener.onPartitionsRevoked(partitions);
                 }
-                LOGGER.info("subscription partitions revoked:" + CollectionUtils.toString(partitions));
+                logger.info(KafkaConstant.LOG_TAG + "subscription partitions revoked:" +
+                        CollectionUtils.toString(partitions));
             }
 
             @Override
@@ -184,7 +206,8 @@ public class OffsetProcessor implements IOffsetProcessor {
                 if (listener != null) {
                     listener.onPartitionsAssigned(partitions);
                 }
-                LOGGER.info("subscription partitions assigned:" + CollectionUtils.toString(partitions));
+                logger.info(KafkaConstant.LOG_TAG + "subscription partitions assigned:" +
+                        CollectionUtils.toString(partitions));
             }
         };
     }
@@ -201,7 +224,7 @@ public class OffsetProcessor implements IOffsetProcessor {
         synchronized (offsetCommitted) {
             offsetCommitted.clear();
         }
-        LOGGER.info("consumer committed reset");
+        logger.info(KafkaConstant.LOG_TAG + "consumer committed reset");
     }
 
     @Override
@@ -222,6 +245,6 @@ public class OffsetProcessor implements IOffsetProcessor {
     public void destroy(Duration timeout) {
         restOffsetCommitted();
         offsetCache.clear();
-        LOGGER.info("subscription offset processor destroyed, timeout=" + timeout);
+        logger.info(KafkaConstant.LOG_TAG + "subscription offset processor destroyed, timeout=" + timeout);
     }
 }

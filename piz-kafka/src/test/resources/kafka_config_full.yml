@@ -1,4 +1,4 @@
-piz_kafka:
+piz-kafka:
   subscription:
     client:
       # [必要]服务地址(逗号分割)
@@ -51,20 +51,22 @@ piz_kafka:
       # poll轮询时间(默认:10*1000)
       duration: 10000
       # [特殊]指定消费topic和partition模式(参数格式:{topic}#{partition}#...)(代码未设置时必要)
-      topicPartition:
+      topic-partition:
         - TopicA#1#2
         - TopicB#2
       # [特殊]按照正则表达式订阅(配置exclude.internal.topics为false生效)(代码未设置时必要)
-      topicPattern: Topic*
+      topic-pattern: Topic*
       # [特殊]按照主题名称订阅(代码未设置时必要)
       topic:
         - TopicA
         - TopicB
       # offset处理器(默认:org.pizazz.kafka.consumer.OffsetProcessor)
-      offsetProcessor:
+      offset-processor:
+        # 提交重试次数
+        retries: 1
         classpath: org.pizazz.kafka.consumer.OffsetProcessor
       # 数据处理器,包括'ForkPoolAdapter','OrderLoopAdapter'(默认:org.pizazz.kafka.consumer.adapter.OrderLoopAdapter)
-      dataProcessor:
+      data-processor:
         threads: 8
         classpath: org.pizazz.kafka.consumer.adapter.ForkPoolAdapter
     # 配置模版,包括'CONSUMER_EFFICIENCY'(高效),'CONSUMER_NORMAL'(标准),'CONSUMER_RELIABILITY'(可靠),'NONE'
@@ -113,9 +115,9 @@ piz_kafka:
       value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
     config:
       mode:
-      transactionProcessor:
+      transaction-processor:
         classpath: org.pizazz.kafka.producer.TransactionProcessor
-      senderProcessor:
+      sender-processor:
     # template:
   
   

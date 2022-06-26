@@ -1,4 +1,4 @@
-package org.pizazz2.kafka.support;
+package org.pizazz2.kafka.core;
 
 import org.apache.kafka.clients.producer.internals.DefaultPartitioner;
 import org.apache.kafka.common.Cluster;

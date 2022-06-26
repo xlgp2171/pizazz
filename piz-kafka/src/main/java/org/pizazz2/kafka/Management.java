@@ -9,10 +9,11 @@ import org.apache.kafka.common.TopicPartition;
 import org.pizazz2.common.NumberUtils;
 import org.pizazz2.data.TupleObject;
 import org.pizazz2.exception.BaseException;
+import org.pizazz2.exception.BaseRuntimeException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.kafka.exception.CodeEnum;
 import org.pizazz2.kafka.exception.KafkaException;
-import org.pizazz2.kafka.support.AbstractClient;
+import org.pizazz2.kafka.core.AbstractClient;
 
 import java.time.Duration;
 import java.util.*;
@@ -20,24 +21,24 @@ import java.util.concurrent.ExecutionException;
 
 /**
  * kafka管理组件
+ * TODO 需要重新适应场景
  *
  * @param <K> 消息Key
  * @param <V> 消息Value
  *
  * @author xlgp2171
- * @version 2.1.211028
+ * @version 2.1.220626
  */
 public class Management<K, V> extends AbstractClient {
     private AdminClient admin;
     private KafkaConsumer<K, V> consumer;
 
-    public Management(TupleObject configure) throws ValidateException, BaseException {
+    public Management(TupleObject configure) throws BaseRuntimeException, BaseException {
         super(configure);
     }
 
     @Override
-    protected void setUpConfig() throws ValidateException, BaseException {
-        super.setUpConfig();
+    protected void initialize() throws BaseRuntimeException, BaseException {
         admin = KafkaAdminClient.create(getConvertor().kafkaConfig());
         consumer = new KafkaConsumer<>(getConvertor().kafkaConfig());
     }

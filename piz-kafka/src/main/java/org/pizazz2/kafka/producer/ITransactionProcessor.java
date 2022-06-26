@@ -6,24 +6,24 @@ import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.common.TopicPartition;
 import org.pizazz2.IPlugin;
+import org.pizazz2.data.TupleObject;
 import org.pizazz2.kafka.exception.KafkaException;
 
 /**
  * 事务处理接口
  *
  * @author xlgp2171
- * @version 2.0.210301
+ * @version 2.1.211215
  */
-public interface ITransactionProcessor extends IPlugin {
+public interface ITransactionProcessor extends IPlugin<TupleObject> {
 
 	/**
 	 * 初始化事务
 	 * @param producer kafka消息发布对象
 	 * @param <K> 消息Key
 	 * @param <V> 消息Value
-	 * @throws KafkaException 初始化事务异常
 	 */
-	<K, V> void initTransactions(KafkaProducer<K, V> producer) throws KafkaException;
+	<K, V> void initTransactions(KafkaProducer<K, V> producer);
 
 	/**
 	 * 开始事务

@@ -11,7 +11,7 @@
     <artifactId>piz-kafka</artifactId>
 
     <properties>
-        <kafka.version>2.6.1</kafka.version>
+        <kafka.version>2.8.1</kafka.version>
         <slf4j.version>1.7.30</slf4j.version>
     </properties>
 

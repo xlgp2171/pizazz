@@ -18,15 +18,15 @@ import org.slf4j.LoggerFactory;
  * 顺序适配器
  *
  * @author xlgp2171
- * @version 2.0.210301
+ * @version 2.1.220626
  */
 public class SequenceAdapter implements IProcessAdapter {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SequenceAdapter.class);
 	private ConsumerModeEnum mode;
 
 	@Override
-	public void initialize(IObject config) throws KafkaException {
-		LOGGER.info("adapter SequenceAdapter initialized,config=" + config);
+	public void initialize(TupleObject config) throws KafkaException {
+		LOGGER.info(KafkaConstant.LOG_TAG + "adapter SequenceAdapter initialized,config=" + config);
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class SequenceAdapter implements IProcessAdapter {
 			bridge.passing();
 
 			if (KafkaConstant.DEBUG_MODE) {
-				LOGGER.debug("consume:" + bridge.getId());
+				LOGGER.debug(KafkaConstant.LOG_TAG + "consume:" + bridge.getId());
 			}
 		} catch (Exception e) {
 			if (ignore.consumeThrowable()) {
@@ -59,7 +59,7 @@ public class SequenceAdapter implements IProcessAdapter {
 				}
 				throw new KafkaException(CodeEnum.KFK_0010, "consume:" + bridge.getId(), e);
 			} else {
-				LOGGER.warn("consume:" + bridge.getId(), e);
+				LOGGER.warn(KafkaConstant.LOG_TAG + "consume:" + bridge.getId(), e);
 			}
 		}
 	}
@@ -77,6 +77,6 @@ public class SequenceAdapter implements IProcessAdapter {
 
 	@Override
 	public void destroy(Duration timeout) {
-		LOGGER.info("adapter SequenceAdapter destroyed,timeout=" + timeout);
+		LOGGER.info(KafkaConstant.LOG_TAG + "adapter SequenceAdapter destroyed,timeout=" + timeout);
 	}
 }

@@ -4,9 +4,8 @@ client:
   batch.size: 128
   linger.ms: 1
   enable.idempotence: false
-  partitioner.class: org.pizazz2.kafka.support.RandomPartitioner
+  partitioner.class: org.pizazz2.kafka.core.RandomPartitioner
 config:
   mode: ASYNC
-  transactionProcessor:
-    classpath: org.pizazz2.kafka.producer.TransactionProcessor
-  senderProcessor: 
+  transaction-processor: ""
+  sender-processor: ""

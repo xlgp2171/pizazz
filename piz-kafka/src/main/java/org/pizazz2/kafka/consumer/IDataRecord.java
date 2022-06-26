@@ -1,27 +1,20 @@
 package org.pizazz2.kafka.consumer;
 
-import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.TopicPartition;
 
 /**
  * 数据消费实现接口
  *
  * @author xlgp2171
- * @version 2.0.210301
+ * @version 2.1.220626
  */
-public interface IDataExecutor<K, V> {
+public interface IDataRecord<K, V> {
 	/**
 	 * 一轮数据消费之前
-	 * @param hasRecord 接收数据数量
+	 * @param count 接收数据数量
 	 */
-	default void begin(boolean hasRecord) {
+	default void begin(int count) {
 	}
-
-	/**
-	 * 消费数据
-	 * @param record 数据体
-	 * @throws Exception 消费数据过程出现的异常
-	 */
-	void execute(ConsumerRecord<K, V> record) throws Exception;
 
 	/**
 	 * 一轮数据消费之后
@@ -35,5 +28,13 @@ public interface IDataExecutor<K, V> {
 	 * @param e 消费过程中的异常
 	 */
 	default void throwException(Exception e) {
+	}
+
+	/**
+	 * 根据TopicPartition过滤数据
+	 * @return 需要过滤数据的TopicPartition
+	 */
+	default TopicPartition topicPartitionFilter() {
+		return null;
 	}
 }

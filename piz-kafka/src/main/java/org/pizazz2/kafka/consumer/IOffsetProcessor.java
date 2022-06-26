@@ -1,5 +1,6 @@
 package org.pizazz2.kafka.consumer;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
@@ -8,20 +9,30 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.pizazz2.IPlugin;
+import org.pizazz2.data.TupleObject;
 import org.pizazz2.kafka.exception.KafkaException;
 
 /**
  * 偏移量处理接口
  *
  * @author xlgp2171
- * @version 2.0.210301
+ * @version 2.1.220626
  */
-public interface IOffsetProcessor extends IPlugin {
+public interface IOffsetProcessor extends IPlugin<TupleObject> {
 
 	/**
 	 * 处理每一个偏移量
 	 * @param consumer kafka消费对象
-	 * @param record 接收到的消息
+	 * @param records 接收到的批量消息
+	 * @param <K> 消息Key
+	 * @param <V> 消息Value
+	 * @throws KafkaException 偏移量提交异常
+	 */
+	<K, V> void batch(KafkaConsumer<K, V> consumer, Collection<ConsumerRecord<K, V>> records) throws KafkaException;
+	/**
+	 * 处理每一个偏移量
+	 * @param consumer kafka消费对象
+	 * @param record 接收到的单个消息
 	 * @param <K> 消息Key
 	 * @param <V> 消息Value
 	 * @throws KafkaException 偏移量提交异常

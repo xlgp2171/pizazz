@@ -18,8 +18,8 @@ config:
   mode: AUTO_ASYNC_ROUND
   ignore: OFFSET_CONSUME
   duration: 500
-  offsetProcessor:
-    classpath: org.pizazz2.kafka.consumer.OffsetProcessor
-  dataProcessor:
+  offset-processor:
+    retries: 0
+  data-processor:
     threads: 16
     classpath: org.pizazz2.kafka.consumer.adapter.ForkPoolAdapter

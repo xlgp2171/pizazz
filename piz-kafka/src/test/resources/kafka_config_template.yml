@@ -3,6 +3,7 @@ subscription:
     bootstrap.servers: 192.168.0.186:9092
     group.id: GROUP_DEMO
     auto.offset.reset: earliest
+    max.poll.records: 5
     key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
     value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
   config:
