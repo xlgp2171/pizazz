@@ -78,9 +78,9 @@ class Hnc2String {
 
                     for (len = 1; len < matcher.groupCount(); len++) {
                         String hex = matcher.group(len + 1);
-                        if (hex == null)
+                        if (hex == null) {
                             break;
-
+                        }
                         chars[len - 1] = (char) Integer.parseInt(hex, 16);
                     }
 

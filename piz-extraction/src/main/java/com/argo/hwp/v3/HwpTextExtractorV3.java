@@ -38,7 +38,7 @@ import com.argo.hwp.utils.HwpStreamReader;
  * @author argonet.co.kr
  * @version 1.0.update
  */
-public abstract class HwpTextExtractorV3 {
+public final class HwpTextExtractorV3 {
     private static final Logger log = LoggerFactory.getLogger(HwpTextExtractorV3.class);
 
     /**

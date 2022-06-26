@@ -51,11 +51,19 @@ import java.util.function.BiConsumer;
  * 解析属性Metadata包括：
  *
  * @author xlgp2171
- * @version 2.1.211103
+ * @version 2.1.211201
  */
 public class Rfc822Parser extends AbstractParser {
     static final String KEY_MULTIPART_ALTERNATIVE = "multipart/alternative";
-    static final String KEY_ATTACHMENT = "attachment";
+    static final String KEY_APPLICATION_RTF = "application/rtf";
+
+    public static final String KEY_ATTACHMENT = "attachment";
+    public static final String KEY_FROM = "From";
+    public static final String KEY_SUBJECT = "Subject";
+    public static final String KEY_TO = "To";
+    public static final String KEY_CC = "Cc";
+    public static final String KEY_BCC = "Bcc";
+    public static final String KEY_DATE = "Date";
 
     @Override
     public IConfig toConfig(TupleObject config) {
@@ -170,7 +178,7 @@ public class Rfc822Parser extends AbstractParser {
             String fieldName = field.getName();
             ParsedField parsedField = LenientFieldParser.getParser().parse(field, DecodeMonitor.SILENT);
 
-            if (fieldName.equalsIgnoreCase("From")) {
+            if (KEY_FROM.equalsIgnoreCase(fieldName)) {
                 MailboxListField fromField = (MailboxListField) parsedField;
                 MailboxList mailboxList = fromField.getMailboxList();
 
@@ -182,27 +190,27 @@ public class Rfc822Parser extends AbstractParser {
                         });
                     }
                 } else {
-                    String from = stripOutFieldPrefix(field, "From:");
+                    String from = stripOutFieldPrefix(field, KEY_FROM + ":");
                     MailUtil.setPersonAndEmail(from, Message.MESSAGE_FROM_NAME, Message.MESSAGE_FROM_EMAIL, metadata);
                 }
-            } else if (fieldName.equalsIgnoreCase("Subject")) {
+            } else if (KEY_SUBJECT.equalsIgnoreCase(fieldName)) {
                 metadata.set(TikaCoreProperties.TITLE, ((UnstructuredField) parsedField).getValue());
-            } else if (fieldName.equalsIgnoreCase("To")) {
-                processAddressList(parsedField, "To:", (name, address) -> {
+            } else if (KEY_TO.equalsIgnoreCase(fieldName)) {
+                processAddressList(parsedField, KEY_TO + ":", (name, address) -> {
                     metadata.add(Metadata.MESSAGE_TO_NAME, StringUtils.nullToEmpty(name));
                     metadata.add(Metadata.MESSAGE_TO_EMAIL, StringUtils.nullToEmpty(address));
                 });
-            } else if (fieldName.equalsIgnoreCase("CC")) {
-                processAddressList(parsedField, "Cc:", (name, address) -> {
+            } else if (KEY_CC.equalsIgnoreCase(fieldName)) {
+                processAddressList(parsedField, KEY_CC + ":", (name, address) -> {
                     metadata.add(Metadata.MESSAGE_CC_NAME, StringUtils.nullToEmpty(name));
                     metadata.add(Metadata.MESSAGE_CC_EMAIL, StringUtils.nullToEmpty(address));
                 });
-            } else if (fieldName.equalsIgnoreCase("BCC")) {
-                processAddressList(parsedField, "Bcc:", (name, address) -> {
+            } else if (KEY_BCC.equalsIgnoreCase(fieldName)) {
+                processAddressList(parsedField, KEY_BCC + ":", (name, address) -> {
                     metadata.add(Metadata.MESSAGE_BCC_NAME, StringUtils.nullToEmpty(name));
                     metadata.add(Metadata.MESSAGE_BCC_EMAIL, StringUtils.nullToEmpty(address));
                 });
-            } else if (fieldName.equalsIgnoreCase("Date")) {
+            } else if (KEY_DATE.equalsIgnoreCase(fieldName)) {
                 DateTimeField dateField = (DateTimeField) parsedField;
                 Date date = dateField.getDate();
 
@@ -210,7 +218,7 @@ public class Rfc822Parser extends AbstractParser {
                     date = ParseHelper.tryOtherDateFormats(field.getBody());
                 }
                 if (date != null) {
-                    metadata.set(TikaCoreProperties.CREATED, DateUtils.format(date, "yyyy-MM-dd HH:mm:ss"));
+                    metadata.set(TikaCoreProperties.CREATED, DateUtils.format(date, DateUtils.DEFAULT_FORMAT));
                 }
             }
         }
@@ -444,7 +452,7 @@ public class Rfc822Parser extends AbstractParser {
                     return 0;
                 } else if (contentType.equalsIgnoreCase(MediaType.TEXT_PLAIN.toString())) {
                     return 1;
-                } else if (contentType.equalsIgnoreCase("application/rtf")) {
+                } else if (contentType.equalsIgnoreCase(KEY_APPLICATION_RTF)) {
                     // TODO -- is this the right definition in rfc822 for rich text?!
                     return 2;
                 } else if (contentType.equalsIgnoreCase(MediaType.TEXT_HTML.toString())) {
