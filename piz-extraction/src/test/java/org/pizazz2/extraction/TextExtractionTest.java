@@ -1,5 +1,7 @@
 package org.pizazz2.extraction;
 
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.pdf.PDFParser;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.pizazz2.PizContext;
@@ -13,10 +15,12 @@ import org.pizazz2.extraction.exception.DetectionException;
 import org.pizazz2.extraction.exception.ParseException;
 import org.pizazz2.extraction.process.ExportProcessor;
 import org.pizazz2.extraction.support.ExtractHelper;
+import org.pizazz2.extraction.support.TikaHelper;
 import org.pizazz2.helper.TupleObjectHelper;
 import org.pizazz2.tool.DataflowProcessor;
 import org.pizazz2.tool.ref.IDataflowListener;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -148,5 +152,34 @@ public class TextExtractionTest extends TestBase {
         Path base = Paths.get("E:\\可以删除\\" + NAME );
         System.out.println("EXPORT:" + base);
         new ExportProcessor(base).exportAll(object);
+    }
+
+    @Test
+    public void testTemp() throws DetectionException, ParseException, UtilityException {
+        //        byte[] data = IOUtils.toByteArray(IOUtils.getResourceAsStream(NAME));
+        Path path = Paths.get("E:\\Downloads\\zjc(0A0027000011)\\supp_zbc17546_Suppl_Tables.pdf");
+        byte[] data = PathUtils.toByteArray(path);
+        TextExtraction extraction = new TextExtraction();
+        TupleObject config = TupleObjectHelper.newObject("textFormat", "xml");
+        ExtractObject object = extraction.extract(path.getFileName().toString(), "X:/extract_test/", data,
+                config, false);
+        System.out.println(object.getContent());
+//        println(object, true, 0);
+        //        Path base = PathUtils.createTempDirectory("extract_test");
+//        Path base = Paths.get("E:\\可以删除\\" + path.getFileName() );
+//        System.out.println("EXPORT:" + base);
+//        new ExportProcessor(base).exportAll(object);
+    }
+
+    @Test
+    public void testExtractByTika() throws ParseException, UtilityException {
+        Path path = Paths.get("E:\\Downloads\\zjc(0A0027000011)\\sample_3.pdf");
+        byte[] data = PathUtils.toByteArray(path);
+        Metadata metadata = new Metadata();
+        String content = TikaHelper.extractToHtml(data,metadata, StandardCharsets.UTF_8);
+        System.out.println("META: " + metadata);
+//        System.out.println("TEXT: " + content);
+        Path base = Paths.get("E:\\可以删除\\" + path.getFileName() );
+        PathUtils.copyToPath(content.getBytes(), base);
     }
 }
