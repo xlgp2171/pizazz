@@ -63,8 +63,7 @@ public class Subscription<K, V> extends AbstractClient {
     protected void initialize() throws BaseException, IllegalException {
         // 创建Offset处理类
         updateConfig(getConvertor().offsetProcessorConfig());
-        offset = cast(loadPlugin("classpath", new OffsetProcessor(), null, true),
-                IOffsetProcessor.class);
+        offset = super.loadPlugin("classpath", IOffsetProcessor.class, null, true);
         offset.set(getConvertor().consumerModeValue(), getConvertor().consumerIgnoreValue());
         // 数据处理类
         processor = new DataProcessor<>(offset, getConvertor().consumerModeValue(),

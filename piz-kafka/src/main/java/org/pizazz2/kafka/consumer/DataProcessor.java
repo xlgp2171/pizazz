@@ -41,7 +41,7 @@ public class DataProcessor<K, V> extends AbstractClassPlugin<TupleObject> implem
     }
 
     protected IProcessAdapter loadAdapter(ConsumerModeEnum mode) throws BaseException {
-        adapter = cast(loadPlugin("classpath", new SequenceAdapter(), null, true),
+        adapter = super.cast(super.loadPlugin("classpath", new SequenceAdapter(), null, true),
                 IProcessAdapter.class);
         adapter.setMode(mode);
         logger.info(KafkaConstant.LOG_TAG + "subscription data processor initialized,config=" + getConfig());
