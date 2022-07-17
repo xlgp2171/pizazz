@@ -24,9 +24,9 @@ import org.pizazz2.tool.ref.ContainerStatusEnum;
  *
  * @param <T> 输出类型
  * @author xlgp2171
- * @version 2.1.211028
+ * @version 2.1.212101
  */
-public abstract class AbstractContainer<T> implements IPlugin {
+public abstract class AbstractContainer<T> implements IPlugin<TupleObject> {
     public static final String CONTAINER_TIMEOUT = "timeout";
 
     protected final TupleObject properties;
@@ -59,7 +59,7 @@ public abstract class AbstractContainer<T> implements IPlugin {
     }
 
     @Override
-    public void initialize(IObject config) throws ToolException {
+    public void initialize(TupleObject config) throws ToolException {
         properties.append(CONTAINER_TIMEOUT, ConfigureHelper.getConfig(TypeEnum.BASIC,PizContext.NAMING_SHORT +
                 ".sc." + CONTAINER_TIMEOUT, "DEF_CONTAINER_TIMEOUT", "30000"));
     }

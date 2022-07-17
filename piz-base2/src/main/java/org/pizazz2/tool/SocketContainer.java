@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.*;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 
 import org.pizazz2.*;
 import org.pizazz2.common.*;
@@ -23,7 +22,7 @@ import org.pizazz2.message.TypeEnum;
  * 维持容器组件
  *
  * @author xlgp2171
- * @version 2.1.211028
+ * @version 2.1.211201
  */
 public class SocketContainer extends AbstractContainer<String> {
 	public static final String CONTAINER_HOST = "host";
@@ -61,17 +60,16 @@ public class SocketContainer extends AbstractContainer<String> {
 				output == null ? IMessageOutput.EMPTY_STRING : output).activate().waitForShutdown();
 	}
 
-	private SocketContainer setProperty(IObject config, String key, String defValue) {
+	private SocketContainer setProperty(TupleObject config, String key, String defValue) {
 		String value = ResourceUtils.getProperty(config, key, PizContext.NAMING_SHORT + ".sc." + key, defValue);
 		super.properties.append(PizContext.ATTRIBUTE_PREFIX + key, value);
 		return this;
 	}
 
-	private SocketContainer setProperty(IObject config, String key, String configKey, int defValue) {
-		Object value = config.get(key, StringUtils.EMPTY);
+	private SocketContainer setProperty(TupleObject config, String key, String configKey, int defValue) {
+		int value = TupleObjectHelper.getInt(config, key, NumberUtils.NEGATIVE_ONE.intValue());
 
-		if (value == null || NumberUtils.toInt(StringUtils.of(value), NumberUtils.NEGATIVE_ONE.intValue()) ==
-				NumberUtils.NEGATIVE_ONE.intValue()) {
+		if (value == NumberUtils.NEGATIVE_ONE.intValue()) {
 			value = ConfigureHelper.getConfig(TypeEnum.BASIC,
 					PizContext.NAMING_SHORT + ".sc." + key, configKey, defValue);
 		}
@@ -80,7 +78,7 @@ public class SocketContainer extends AbstractContainer<String> {
 	}
 
 	@Override
-	public void initialize(IObject config) throws ToolException {
+	public void initialize(TupleObject config) throws ToolException {
 		super.initialize(config);
 		// -Dpiz.sc.host
 		setProperty(config, CONTAINER_HOST, StringUtils.EMPTY)
@@ -109,7 +107,7 @@ public class SocketContainer extends AbstractContainer<String> {
 			int port = TupleObjectHelper.getInt(super.properties,
 					PizContext.ATTRIBUTE_PREFIX + CONTAINER_PORT, NumberUtils.NEGATIVE_ONE.intValue());
 			// port为0也可以super.waitForShutdown
-			if (port <= 1_000) {
+			if (port <= NetworkUtils.MAX_SYSTEM_PORT) {
 				if (super.output.isEnabled()) {
 					super.output.write(LocaleHelper.toLocaleText(TypeEnum.BASIC, "CONTAINER.ALIVE"));
 				}
