@@ -1,6 +1,5 @@
 package org.pizazz2.extraction.config;
 
-import org.pizazz2.common.ClassUtils;
 import org.pizazz2.exception.ValidateException;
 
 import java.nio.charset.Charset;
@@ -54,7 +53,6 @@ public interface IConfig {
      * @param type 实现IConfig接口的类
      * @param <T> 实现了IConfig接口的配置对象
      * @return 实现了IConfig接口的配置对象
-     *
      * @throws ValidateException 验证异常
      */
     <T> T getTarget(Class<? extends IConfig> type) throws ValidateException;
