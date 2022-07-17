@@ -11,7 +11,7 @@
 
 	<properties>
 		<fastjson.version>1.2.75</fastjson.version>
-		<snakeyaml.version>1.27</snakeyaml.version>
+		<snakeyaml.version>1.28</snakeyaml.version>
 		<kryo.version>5.0.1</kryo.version>
 	</properties>
 
