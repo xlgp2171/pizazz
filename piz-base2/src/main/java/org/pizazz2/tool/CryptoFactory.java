@@ -66,6 +66,12 @@ public class CryptoFactory {
 		}
 	}
 
+	public static class SHA256Coder extends BaseCoder {
+		public SHA256Coder(byte[] data) throws ValidateException {
+			super("SHA-256", data);
+		}
+	}
+
 	public static class SHA512Coder extends BaseCoder {
 		public SHA512Coder(byte[] data) throws ValidateException {
 			super("SHA-512", data);
