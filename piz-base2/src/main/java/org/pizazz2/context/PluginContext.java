@@ -17,20 +17,24 @@ import org.pizazz2.common.ObjectUtils;
  * 插件环境组件
  *
  * @author xlgp2171
- * @version 2.1.211028
+ * @version 2.1.211119
  */
 public final class PluginContext implements ICloseable {
 	/**
 	 * 插件缓存
 	 */
-    private final ConcurrentMap<Class<?>, Set<WeakReference<IPlugin>>> tree;
+    private final ConcurrentMap<Class<?>, Set<WeakReference<IPlugin<?>>>> tree;
     private final Object lock = new Object();
-    private final Comparator<WeakReference<IPlugin>> cr = (o1, o2) -> {
+    @SuppressWarnings("ConstantConditions")
+    private final Comparator<WeakReference<IPlugin<?>>> cr = (o1, o2) -> {
         if (!ObjectUtils.isNull(o1) && !ObjectUtils.isNull(o2)) {
-            if (o1.get().hashCode() > o2.get().hashCode()) {
-                return NumberUtils.ONE.intValue();
-            } else if (o1.get().hashCode() < o2.get().hashCode()) {
-                return NumberUtils.NEGATIVE_ONE.intValue();
+            // 前置判断已判断o和o.get()是否为空
+            if (o1.get() != null && o2.get() != null) {
+                if (o1.get().hashCode() > o2.get().hashCode()) {
+                    return NumberUtils.ONE.intValue();
+                } else if (o1.get().hashCode() < o2.get().hashCode()) {
+                    return NumberUtils.NEGATIVE_ONE.intValue();
+                }
             }
         } else if (ObjectUtils.isNull(o1)) {
             return NumberUtils.NEGATIVE_ONE.intValue();
@@ -58,19 +62,20 @@ public final class PluginContext implements ICloseable {
         }
     }
 
-    public void register(Class<?> type, IPlugin plugin) {
+    public void register(Class<?> type, IPlugin<?> plugin) {
         if (type != null && plugin != null) {
             getByType(type).add(new WeakReference<>(plugin));
         }
     }
 
-    public void unregister(Class<?> type, IPlugin plugin) {
+    public void  unregister(Class<?> type, IPlugin<?> plugin) {
         if (type != null && plugin != null) {
-            getByType(type).remove(new WeakReference<>(plugin));
+            WeakReference<? extends IPlugin<?>> reference = new WeakReference<>(plugin);
+            getByType(type).remove(reference);
         }
     }
 
-    public Set<WeakReference<IPlugin>> getByType(Class<?> type) {
+    public Set<WeakReference<IPlugin<?>>> getByType(Class<?> type) {
         if (type == null) {
             return CollectionUtils.emptySet();
         } else if (!tree.containsKey(type)) {
@@ -79,7 +84,7 @@ public final class PluginContext implements ICloseable {
         return tree.get(type);
     }
 
-    public Map<Class<?>, Set<WeakReference<IPlugin>>> getPluginTree() {
+    public Map<Class<?>, Set<WeakReference<IPlugin<?>>>> getPluginTree() {
         return tree;
     }
 
@@ -91,7 +96,7 @@ public final class PluginContext implements ICloseable {
         }
     }
 
-    private static enum Singleton {
+    private enum Singleton {
 		/**
 		 * 单例
 		 */
@@ -99,7 +104,7 @@ public final class PluginContext implements ICloseable {
 
         private final PluginContext context;
 
-        private Singleton() {
+        Singleton() {
             context = new PluginContext();
         }
 
