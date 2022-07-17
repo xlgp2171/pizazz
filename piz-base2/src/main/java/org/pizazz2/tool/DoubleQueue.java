@@ -23,7 +23,7 @@ import org.pizazz2.exception.ValidateException;
  * 代码参考DataX
  *
  * @author xlgp2171
- * @version 2.1.211014
+ * @version 2.1.211201
  */
 public class DoubleQueue<E> extends AbstractQueue<E> implements BlockingQueue<E>, Serializable, ICloseable {
     private static final long serialVersionUID = 4691370136164853873L;
@@ -172,7 +172,7 @@ public class DoubleQueue<E> extends AbstractQueue<E> implements BlockingQueue<E>
      */
     @Override
     public boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException {
-        long _nanoTime = unit.toNanos(timeout);
+        long nanoTime = unit.toNanos(timeout);
         // 获取锁 否则等待锁释放
         writeLock.lockInterruptibly();
         try {
@@ -186,11 +186,11 @@ public class DoubleQueue<E> extends AbstractQueue<E> implements BlockingQueue<E>
                     return true;
                 }
                 // 如果超时，则插入失败
-                if (_nanoTime <= 0) {
+                if (nanoTime <= 0) {
                     return false;
                 }
                 // 等待数据读取完成激活或等待超时
-                _nanoTime = notFull.awaitNanos(_nanoTime);
+                nanoTime = notFull.awaitNanos(nanoTime);
             }
         } finally {
             writeLock.unlock();
@@ -219,7 +219,7 @@ public class DoubleQueue<E> extends AbstractQueue<E> implements BlockingQueue<E>
      */
     @Override
     public E poll(long timeout, TimeUnit unit) throws InterruptedException {
-        long _nanoTime = unit.toNanos(timeout);
+        long nanoTime = unit.toNanos(timeout);
         // 获取锁 否则等待锁释放
         readLock.lockInterruptibly();
         try {
@@ -228,10 +228,10 @@ public class DoubleQueue<E> extends AbstractQueue<E> implements BlockingQueue<E>
                     return extract();
                 }
                 // 当等待超时时，返回null
-                if (_nanoTime <= 0) {
+                if (nanoTime <= 0) {
                     return null;
                 }
-                _nanoTime = transfer(_nanoTime);
+                nanoTime = transfer(nanoTime);
             }
         } finally {
             readLock.unlock();
