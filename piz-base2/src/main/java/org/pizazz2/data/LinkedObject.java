@@ -12,15 +12,12 @@ import java.util.LinkedList;
  * 链式对象
  *
  * @author xlgp2171
- * @version 2.0.210501
+ * @version 2.1.220702
  *
  * @param <T> 元数据
  */
 public class LinkedObject<T> implements IObject {
-    /**
-     * 文档ID
-     */
-    private final long id;
+    private String id;
     /**
      * 对象名称
      */
@@ -42,16 +39,16 @@ public class LinkedObject<T> implements IObject {
      */
     private T data;
 
-    public LinkedObject(long id, String name, String source, T data) throws ValidateException {
+    public LinkedObject(String id, String name, String source, T data) throws ValidateException {
         this(id, name, source);
         setData(data);
     }
 
-    public LinkedObject(long id, String name, String source) throws ValidateException {
+    public LinkedObject(String id, String name, String source) throws ValidateException {
         this(id, name, source, new LinkedList<>());
     }
 
-    public LinkedObject(long id, String name, String source, Collection<? extends LinkedObject<T>> children)
+    public LinkedObject(String id, String name, String source, Collection<? extends LinkedObject<T>> children)
             throws ValidateException {
         this.id = id;
         this.name = StringUtils.nullToEmpty(name);
@@ -61,12 +58,31 @@ public class LinkedObject<T> implements IObject {
 
     @Override
     public String getId() {
-        return StringUtils.of(id);
+        return id;
     }
 
     @Override
     public boolean isEmpty() {
-        return data != null && children.isEmpty();
+        return data != null && (children == null || children.isEmpty());
+    }
+
+    @Override
+    public void set(String key, Object target) {
+        throw new UnsupportedOperationException("linkedObject.set");
+    }
+
+    @Override
+    public void reset() {
+        setData(null);
+
+        if (children != null) {
+            children.clear();
+        }
+    }
+
+    @Override
+    public Object get(String key, Object defValue) {
+        throw new UnsupportedOperationException("linkedObject.get");
     }
 
     public boolean processed() {
@@ -109,8 +125,8 @@ public class LinkedObject<T> implements IObject {
 
     @Override
     public IObject copy() {
-        return new LinkedObject<T>(id, name, source, new ArrayList<>(children)).setData(data)
-                .setClassification(classification);
+        Collection<? extends LinkedObject<T>> tmp = children == null ? null : new ArrayList<>(children);
+        return new LinkedObject<T>(id, name, source, tmp).setData(data).setClassification(classification);
     }
 
     @Override
