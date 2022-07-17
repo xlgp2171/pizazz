@@ -12,7 +12,7 @@ import org.pizazz2.helper.TupleObjectHelper;
  * 解压缩基类
  *
  * @author xlgp2171
- * @version 2.1.211104
+ * @version 2.1.220714
  */
 public abstract class AbstractCompressParser extends AbstractParser {
 
@@ -24,6 +24,7 @@ public abstract class AbstractCompressParser extends AbstractParser {
 	public static class Config extends ParseConfig {
 		private final boolean includeDirectory;
 		private final String password;
+		private final boolean idNamedDirectory;
 
 		public Config(TupleObject config) throws IllegalException {
 			super(config);
@@ -31,6 +32,8 @@ public abstract class AbstractCompressParser extends AbstractParser {
 			this.includeDirectory = TupleObjectHelper.getBoolean(config, "includeDirectory", false);
 			// 解包密码
 			this.password = TupleObjectHelper.getString(config, "password", null);
+			// 使用ID命名目录
+			this.idNamedDirectory = TupleObjectHelper.getBoolean(config, "idNamedDirectory", Boolean.TRUE);
 		}
 
 		public boolean includeDirectory() {
@@ -39,6 +42,10 @@ public abstract class AbstractCompressParser extends AbstractParser {
 
 		public String password() {
 			return password;
+		}
+
+		public boolean idNamedDirectory() {
+			return idNamedDirectory;
 		}
 	}
 }

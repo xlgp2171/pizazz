@@ -56,7 +56,7 @@ public class TikaParser extends AbstractParser {
             discover(object, tmp);
             content = TikaHelper.extract(object.getData(), object.getMetadata(), config.charset(), handler);
         } else {
-            object.setStatus(ExtractObject.StatusEnum.UNKNOWN);
+            object.setStatus(ExtractObject.StatusEnum.UNSUPPORTED);
         }
         if (content != null) {
             object.setContent(ExtractHelper.tryCleanBlankLine(content, config.cleanLine()));

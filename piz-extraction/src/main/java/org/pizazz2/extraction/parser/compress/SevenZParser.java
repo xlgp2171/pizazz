@@ -23,8 +23,8 @@ import java.nio.file.Paths;
  * 无解析属性Metadata<br>
  * 可设置外部密码
  *
- * @author xlgp2
- * @version 2.1.211103
+ * @author xlgp2171
+ * @version 2.1.220714
  */
 public class SevenZParser extends AbstractCompressParser {
 
@@ -33,7 +33,7 @@ public class SevenZParser extends AbstractCompressParser {
 			ValidateException, IllegalException, DetectionException {
 		AbstractCompressParser.Config tmp = config.getTarget(AbstractCompressParser.Config.class);
 		try {
-			doUncompress(object, tmp.password(), tmp.includeDirectory());
+			doUncompress(object, tmp.password(), tmp.includeDirectory(), tmp.idNamedDirectory());
 		} catch (PasswordRequiredException e) {
 			object.setStatus(ExtractObject.StatusEnum.ENCRYPTION);
 		} catch (IOException e) {
@@ -41,14 +41,14 @@ public class SevenZParser extends AbstractCompressParser {
 		}
 	}
 
-	private void doUncompress(ExtractObject object, String password, boolean includeDirectory)
-			throws IOException, PasswordRequiredException {
+	private void doUncompress(ExtractObject object, String password, boolean includeDirectory,
+							  boolean idNamedDirectory) throws IOException, PasswordRequiredException {
 		char[] tmp = StringUtils.isTrimEmpty(password) ? null : password.toCharArray();
 
 		try (SeekableInMemoryByteChannel memory = new SeekableInMemoryByteChannel(object.getData());
 				SevenZFile file = new SevenZFile(memory, tmp)) {
 			SevenZArchiveEntry entry = file.getNextEntry();
-			Path parent = StringUtils.isTrimEmpty(object.getSource()) ? null : Paths.get(object.getSource());
+			Path parent = ExtractHelper.fillPath(object, idNamedDirectory);
 
 			while (entry != null) {
 				Path path = Paths.get(entry.getName());

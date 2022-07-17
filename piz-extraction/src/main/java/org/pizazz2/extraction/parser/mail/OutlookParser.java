@@ -195,7 +195,8 @@ public class OutlookParser extends AbstractParser {
      */
     private void fillRecipients(Metadata metadata, MAPIMessage message) {
         for (RecipientChunks item : message.getRecipientDetailsChunks()) {
-            StringChunk chunk = Optional.ofNullable(item.recipientDisplayNameChunk).orElse(item.recipientNameChunk);
+            StringChunk chunk = Optional.ofNullable(item.getRecipientDisplayNameChunk())
+                    .orElse(item.getRecipientNameChunk());
             String name = chunk != null ? chunk.getValue() : StringUtils.EMPTY;
             //
             List<PropertyValue> vals = item.getProperties().get(MAPIProperty.RECIPIENT_TYPE);
@@ -337,7 +338,7 @@ public class OutlookParser extends AbstractParser {
 
             try (TikaInputStream stream = TikaInputStream.get(new DocumentInputStream((DocumentEntry) ooxml))) {
                 ZipContainerDetector detector = new ZipContainerDetector();
-                MediaType type = null;
+                MediaType type;
                 try {
                     //if there's a stream error while detecting...
                     type = detector.detect(stream, new Metadata());

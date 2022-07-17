@@ -29,9 +29,10 @@ import org.pizazz2.extraction.support.ExtractHelper;
  * 无解析属性Metadata
  *
  * @author xlgp2171
- * @version 2.1.211103
+ * @version 2.1.220714
  */
 public class TarParser extends AbstractCompressParser {
+    public static final String[] TYPE = new String[] { "application/x-tar", "application/x-gtar" };
 
     @Override
     protected void doParse(ExtractObject object, IConfig config, IExtractListener listener) throws ParseException,
@@ -39,23 +40,28 @@ public class TarParser extends AbstractCompressParser {
         AbstractCompressParser.Config tmp = config.getTarget(AbstractCompressParser.Config.class);
         try {
             try {
-                doUncompress(object, tmp.charset(), tmp.includeDirectory());
+                doUncompress(object, tmp.charset(), tmp.includeDirectory(), tmp.idNamedDirectory());
             } catch (MalformedInputException e1) {
                 Charset charset = super.detect(object.getData(), config.detectLimit(), PizContext.LOCAL_ENCODING);
                 // 解压失败则用标准编码再解压
-                doUncompress(object, charset, tmp.includeDirectory());
+                doUncompress(object, charset, tmp.includeDirectory(), tmp.idNamedDirectory());
             }
         } catch (Exception e2) {
             super.throwException(object, config, e2);
         }
     }
 
-    protected void doUncompress(ExtractObject object, Charset charset, boolean includeDirectory) throws IOException,
-            DetectionException, ParseException {
+    protected void doUncompress(ExtractObject object, Charset charset, boolean includeDirectory,
+                                boolean idNamedDirectory) throws IOException, DetectionException, ParseException {
+        doBaseUncompress(object, charset, includeDirectory, idNamedDirectory);
+    }
+
+    protected void doBaseUncompress(ExtractObject object, Charset charset, boolean includeDirectory,
+                                boolean idNamedDirectory) throws IOException, DetectionException, ParseException {
         try (ByteArrayInputStream in = new ByteArrayInputStream(object.getData());
              TarArchiveInputStream stream = new TarArchiveInputStream(in, charset.name())) {
             TarArchiveEntry entry = stream.getNextTarEntry();
-            Path parent = StringUtils.isTrimEmpty(object.getSource()) ? null : Paths.get(object.getSource());
+            Path parent = ExtractHelper.fillPath(object, idNamedDirectory);
 
             while (entry != null) {
                 Path path = Paths.get(entry.getName());
@@ -80,8 +86,8 @@ public class TarParser extends AbstractCompressParser {
         }
     }
 
-    protected void doUncompressSub(ExtractObject object, InputStream in, Charset charset, boolean includeDirectory)
-            throws ParseException, DetectionException, IOException {
+    protected void doUncompressSub(ExtractObject object, InputStream in, Charset charset, boolean includeDirectory,
+                                   boolean idNamedDirectory) throws ParseException, DetectionException, IOException {
         byte[] data;
         try {
             data = IOUtils.toByteArray(in);
@@ -90,16 +96,25 @@ public class TarParser extends AbstractCompressParser {
         }
         MediaType type = super.detect(ExtractHelper.newTempObject().setData(data));
         // 若数据识别为"application/x-tar"
-        if (getType()[0].equals(StringUtils.of(type))) {
-            doUncompress(object.setData(data), charset,includeDirectory);
+        if (TYPE[0].equals(StringUtils.of(type))) {
+            doBaseUncompress(object.setData(data), charset, includeDirectory, idNamedDirectory);
         } else {
+            Path parent = ExtractHelper.fillPath(object, idNamedDirectory);
             // 当压缩文件为单独时，name使用文件名称代替
-            super.addAttachment(object, object.getName(), object.getSource()).setType(type).setData(data);
+            String name = getSubName(object, in);
+            super.addAttachment(object, name, ExtractHelper.pathResolve(parent, Paths.get(name)))
+                    .setType(type).setData(data);
         }
+    }
+
+    protected String getSubName(ExtractObject object, InputStream in) {
+        String name = object.getName();
+        int idx = name.lastIndexOf(".");
+        return idx != -1 ? name.substring(0, idx) : name;
     }
 
     @Override
     public String[] getType() {
-        return new String[] { "application/x-tar" };
+        return TYPE;
     }
 }

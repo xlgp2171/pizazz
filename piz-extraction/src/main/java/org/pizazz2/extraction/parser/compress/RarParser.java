@@ -41,7 +41,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * 无解析属性Metadata
  *
  * @author xlgp2171
- * @version 2.1.211103
+ * @version 2.1.220714
  */
 public class RarParser extends AbstractCompressParser {
 	@Override
@@ -121,7 +121,7 @@ public class RarParser extends AbstractCompressParser {
 			object.setStatus(ExtractObject.StatusEnum.ENCRYPTION);
 			return;
 		}
-		Path parent = StringUtils.isTrimEmpty(object.getSource()) ? null : Paths.get(object.getSource());
+		Path parent = ExtractHelper.fillPath(object, config.idNamedDirectory());
 
 		try (InputStream in = new ByteArrayInputStream(object.getData());
 			 Archive archive = new Archive(in, config.password())) {
@@ -169,7 +169,7 @@ public class RarParser extends AbstractCompressParser {
 		if (executeCommand(command, Optional.ofNullable(PizContext.LOCAL_ENCODING).orElse(config.charset()))) {
 			object.setStatus(ExtractObject.StatusEnum.ENCRYPTION);
 		} else {
-			loadAllFiles(object, itemDirectory, itemPath, config.includeDirectory());
+			loadAllFiles(object, itemDirectory, itemPath, config.includeDirectory(), config.idNamedDirectory());
 		}
 	}
 
@@ -201,10 +201,10 @@ public class RarParser extends AbstractCompressParser {
 		return encrypted.get();
 	}
 
-	private void loadAllFiles(ExtractObject object, Path itemDirectory, Path itemPath, boolean includeDirectory)
-			throws UtilityException {
-		Path[] paths = PathUtils.listPaths(itemDirectory, item -> !item.equals(itemDirectory), true);
-		Path parent = StringUtils.isTrimEmpty(object.getSource()) ? null : Paths.get(object.getSource());
+	private void loadAllFiles(ExtractObject object, Path itemDirectory, Path itemPath, boolean includeDirectory,
+							  boolean idNamedDirectory)	throws UtilityException {
+		Path[] paths = PathUtils.walkPaths(itemDirectory, item -> !item.equals(itemDirectory), true);
+		Path parent = ExtractHelper.fillPath(object, idNamedDirectory);
 
 		for (Path item : paths) {
 			if (PathUtils.isDirectory(item)) {

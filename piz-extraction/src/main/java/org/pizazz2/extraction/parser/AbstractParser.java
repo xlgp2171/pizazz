@@ -63,7 +63,7 @@ public abstract class AbstractParser implements IParser {
             throw e;
         } catch (Exception e) {
             listener.exception(object, e);
-            object.setStatus(ExtractObject.StatusEnum.UNKNOWN);
+            object.setStatus(ExtractObject.StatusEnum.UNSUPPORTED);
         } finally {
             // 归档操作
             object.archive(config.cleanData());
@@ -90,7 +90,7 @@ public abstract class AbstractParser implements IParser {
     }
 
     protected void throwException(ExtractObject object, IConfig config, Exception e) throws ParseException {
-        object.setStatus(ExtractObject.StatusEnum.UNKNOWN);
+        object.setStatus(ExtractObject.StatusEnum.UNSUPPORTED);
         String msg = "PARSE ERROR:" + e.getMessage() + ",id=" + object + ",type=" + object.getType() + ",length=" +
                 (object.getData() == null ? "NaN" : object.getData().length);
         object.setContent(msg);

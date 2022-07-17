@@ -30,7 +30,7 @@ import java.util.Enumeration;
  * 若要采用zip加密，推荐使用zip4j，但zip4j无法通过内存加载
  *
  * @author xlgp2171
- * @version 2.1.211103
+ * @version 2.1.220714
  */
 public class ZipParser extends AbstractCompressParser {
     @Override
@@ -42,11 +42,11 @@ public class ZipParser extends AbstractCompressParser {
 				object.setStatus(ExtractObject.StatusEnum.ENCRYPTION);
 			} else {
 				try {
-					doUncompress(object, tmp.charset(), tmp.includeDirectory());
+					doUncompress(object, tmp.charset(), tmp.includeDirectory(), tmp.idNamedDirectory());
 				} catch (MalformedInputException e1) {
 					Charset charset = super.detect(object.getData(), config.detectLimit(), PizContext.LOCAL_ENCODING);
 					// 解压失败则用标准编码再解压
-					doUncompress(object, charset, tmp.includeDirectory());
+					doUncompress(object, charset, tmp.includeDirectory(), tmp.idNamedDirectory());
 				}
 			}
 		} catch (Exception e2) {
@@ -71,12 +71,12 @@ public class ZipParser extends AbstractCompressParser {
         return false;
     }
 
-    protected void doUncompress(ExtractObject object, Charset charset, boolean includeDirectory)
-			throws IOException, UtilityException {
+    protected void doUncompress(ExtractObject object, Charset charset, boolean includeDirectory,
+                                boolean idNamedDirectory) throws IOException, UtilityException {
         try (SeekableInMemoryByteChannel memory = new SeekableInMemoryByteChannel(object.getData());
 			 ZipFile file = new ZipFile(memory, charset.name())) {
             Enumeration<ZipArchiveEntry> entries = file.getEntries();
-            Path parent = StringUtils.isTrimEmpty(object.getSource()) ? null : Paths.get(object.getSource());
+            Path parent = ExtractHelper.fillPath(object, idNamedDirectory);
 
             while (entries.hasMoreElements()) {
                 ZipArchiveEntry entry = entries.nextElement();
