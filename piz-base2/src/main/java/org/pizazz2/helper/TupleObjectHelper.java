@@ -9,7 +9,6 @@ import org.pizazz2.common.ref.IKryoConfig;
 import org.pizazz2.data.TupleObject;
 import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.ValidateException;
-import org.pizazz2.exception.UtilityException;
 
 /**
  * 通用对象工具
