@@ -66,7 +66,14 @@ public enum BasicCodeEnum implements IMessageCode {
 	/** 查找目标无法找到异常: TargetNotFoundException */
 	MSG_0027("MSG0027#"),
 	/** 格式转换异常: FormatException */
-	MSG_0028("MSG0028#");
+	MSG_0028("MSG0028#"),
+	/** 第三方组件连接异常: ConnectionException */
+	MSG_0029("MSG0029#"),
+	/** 方法调用异常: MethodInvokeException */
+	MSG_0030("MSG0030#"),
+	/** 状态异常: StateException */
+	MSG_0031("MSG0031#"),
+	;
 	
 
 	private final String code;

@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
  * 表达式常量
  *
  * @author xlgp2171
- * @version 2.1.200525
+ * @version 2.1.220707
  */
 public enum ExpressionEnum {
     /**
@@ -35,6 +35,10 @@ public enum ExpressionEnum {
      * 匹配首尾空白字符的正则表达式
      */
     B_E_SPACE("^\\s*|\\s*$"),
+    /**
+     * 匹配字符串内空白内容的正则表达式
+     */
+    BLANK("\\s*|\t|\r|\n"),
     /**
      * 匹配Email地址的正则表达式
      */
