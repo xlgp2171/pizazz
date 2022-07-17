@@ -32,7 +32,7 @@ piz-kafka:
       # 发送数据使用缓冲区大小(默认:1024*128,-1为使用OS设置)
       send.buffer.bytes: 131072
       # 自动提交周期(默认:5*1000,需要配置enable.auto.commit为true)
-      auto.commit.interval.ms： 3000
+      auto.commit.interval.ms: 3000
       # 消费端ID(默认:"")
       # client.id:
       # 无法满足配置fetch.min.bytes的情况下等待最大时间(默认:0.5*1000)
