@@ -5,13 +5,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.pizazz2.exception.ValidateException;
+import org.pizazz2.message.ExpressionEnum;
 
 /**
  * 字符串对象工具<br>
  * 部分参考org.apache.commons.lang3.StringUtils
+ * 部分参考com.baomidou.mybatisplus.core.toolkit.StringUtils
  * 
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.1.220707
  */
 public class StringUtils {
 
@@ -202,7 +204,70 @@ public class StringUtils {
 		return StringUtils.isTrimEmpty(target) ? EMPTY : Character.toTitleCase(target.charAt(0)) + target.substring(1);
 	}
 
+	/**
+	 * 字符串驼峰转下划线格式
+	 * @param target 需要转换的目标字符串
+	 * @return 转换完成的字符串
+	 */
+	public static String camelToUnderline(String target) {
+		if (StringUtils.isTrimEmpty(target)) {
+			return StringUtils.EMPTY;
+		}
+		int length = target.length();
+		StringBuilder sb = new StringBuilder(length);
+
+		for (int i = 0; i < length; i++) {
+			char c = target.charAt(i);
+
+			if (Character.isUpperCase(c) && i > 0) {
+				sb.append(CharUtils.UNDERLINE);
+			}
+			sb.append(Character.toLowerCase(c));
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * 字符串下划线转驼峰格式
+	 * @param target 需要转换的目标字符串
+	 * @return 转换完成的字符串
+	 */
+	public static String underlineToCamel(String target) {
+		if (StringUtils.isTrimEmpty(target)) {
+			return StringUtils.EMPTY;
+		}
+		String temp = target.toLowerCase();
+		int length = temp.length();
+		StringBuilder sb = new StringBuilder(length);
+
+		for (int i = 0; i < length; i++) {
+			char c = temp.charAt(i);
+
+			if (c == CharUtils.UNDERLINE) {
+				if (++i < length) {
+					sb.append(Character.toUpperCase(temp.charAt(i)));
+				}
+			} else {
+				sb.append(c);
+			}
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * 字符串去除空白内容： \n 回车 \t 水平制表符 \s 空格 \r 换行
+	 * @param target 目标字符串
+	 * @return 处理后的字符串
+	 */
+	public static String replaceBlank(String target) {
+		if (StringUtils.isEmpty(target)) {
+			return StringUtils.EMPTY;
+		}
+		Pattern pattern = ExpressionEnum.getPattern(ExpressionEnum.BLANK);
+		return pattern.matcher(target).replaceAll(StringUtils.EMPTY);
+	}
+
 	public static String of(Object target) {
-		return String.valueOf(target);
+		return target == null ? StringUtils.EMPTY : String.valueOf(target);
 	}
 }
