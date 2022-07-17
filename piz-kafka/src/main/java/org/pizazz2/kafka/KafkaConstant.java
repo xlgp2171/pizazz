@@ -15,9 +15,9 @@ public class KafkaConstant {
 	/**
 	 * kafka组件顶级配置KEY
 	 */
-	public static final String KEY_KAFKA = PizContext.NAMING_SHORT + "-kafka";
+	public static final String CONF_KAFKA = "transfer-kafka";
 
-	public static final String LOG_TAG = "[" + KafkaConstant.KEY_KAFKA + "]";
+	public static final String LOG_TAG = "[" + KafkaConstant.CONF_KAFKA + "]";
 	/**
 	 * kafka_client配置KEY<br>
 	 * 订阅端和发布端都拥有该配置KEY

@@ -38,7 +38,7 @@ public class SimpleMonitor<K, V> implements ICloseable {
         management = new Management<>(config);
         nodes = new ConcurrentSkipListSet<>(NodeEntity::compareTo);
         consumers = new ConcurrentSkipListSet<>(ConsumerEntity::compareTo);
-        scheduled = ThreadUtils.newDaemonScheduledThreadPool(2, KafkaConstant.KEY_KAFKA);
+        scheduled = ThreadUtils.newDaemonScheduledThreadPool(2, KafkaConstant.CONF_KAFKA);
     }
 
     public final void activate(Duration period, boolean realtime) {
@@ -123,9 +123,7 @@ public class SimpleMonitor<K, V> implements ICloseable {
     }
 
     private void addConsumerEntities(ConsumerEntity entity, ConcurrentSkipListSet<ConsumerEntity> consumerSet) {
-        if (!consumers.contains(entity)) {
-            consumers.add(entity);
-        }
+        consumers.add(entity);
 		consumerSet.add(entity);
     }
 

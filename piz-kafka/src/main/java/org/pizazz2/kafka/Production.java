@@ -1,21 +1,17 @@
 package org.pizazz2.kafka;
 
 import java.time.Duration;
-import java.util.Map;
 import java.util.concurrent.Future;
 
-import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
-import org.apache.kafka.common.TopicPartition;
 import org.pizazz2.data.TupleObject;
 import org.pizazz2.exception.*;
 import org.pizazz2.kafka.exception.KafkaException;
 import org.pizazz2.kafka.producer.ITransactionProcessor;
 import org.pizazz2.kafka.producer.SenderProcessor;
-import org.pizazz2.kafka.producer.TransactionProcessor;
 import org.pizazz2.kafka.core.AbstractClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +50,7 @@ public class Production<K, V> extends AbstractClient {
         producer = new KafkaProducer<>(transaction.optimizeKafkaConfig(getConvertor().kafkaConfig()));
         // 尝试初始化事务
         transaction.initTransactions(producer);
-        LOGGER.info(KafkaConstant.LOG_TAG + "production initialized,config=" + super.getConfig());
+        LOGGER.info(KafkaConstant.LOG_TAG + "production initialized,config=" + getConvertor().getTargetConfig());
     }
 
 //    public Production<K, V> beginTransaction() throws KafkaException {

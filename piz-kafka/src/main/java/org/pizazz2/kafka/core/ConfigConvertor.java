@@ -173,6 +173,10 @@ public class ConfigConvertor implements ICloseable {
 		return CollectionUtils.convert(tmp);
 	}
 
+	public TupleObject getTargetConfig() {
+		return config.clone();
+	}
+
 	@Override
 	public void destroy(Duration timeout) {
 		config.clear();

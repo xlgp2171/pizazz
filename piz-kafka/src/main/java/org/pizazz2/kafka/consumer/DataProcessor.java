@@ -67,6 +67,9 @@ public class DataProcessor<K, V> extends AbstractClassPlugin<TupleObject> implem
 
             @Override
             public void passing() throws Exception {
+                if (KafkaConstant.DEBUG_MODE) {
+                    logger.debug(KafkaConstant.LOG_TAG + "receive multi data: " + records.size());
+                }
                 // 消费数据
                 impl.execute(records);
                 // 处理偏移量
@@ -86,6 +89,9 @@ public class DataProcessor<K, V> extends AbstractClassPlugin<TupleObject> implem
 
             @Override
             public void passing() throws Exception {
+                if (KafkaConstant.DEBUG_MODE) {
+                    logger.debug(KafkaConstant.LOG_TAG + "receive single data");
+                }
                 // 消费数据
                 impl.execute(record);
                 // 处理偏移量

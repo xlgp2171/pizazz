@@ -18,11 +18,11 @@ public enum ConsumerIgnoreEnum {
     /**
      * 忽略consume异常
      */
-    CONSUME(false, true),
+    CONSUME(true, false),
     /**
      * 忽略offset异常
      */
-    OFFSET(true, false),
+    OFFSET(false, true),
     /**
      * 无任何忽略
      */

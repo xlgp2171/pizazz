@@ -71,11 +71,12 @@ public class Subscription<K, V> extends AbstractClient {
         // 创建Kafka消费类
         Map<String, Object> config = offset.optimizeKafkaConfig(getConvertor().kafkaConfig());
         consumer = new KafkaConsumer<>(processor.optimizeKafkaConfig(config));
-        LOGGER.info(KafkaConstant.LOG_TAG + "subscription initialized,config=" + getConfig());
+        LOGGER.info(KafkaConstant.LOG_TAG + "subscription initialized,config=" + getConvertor().getTargetConfig());
     }
 
     public void assign(Collection<TopicPartition> partitions, IDataRecord<K, V> impl)
             throws KafkaException {
+        validateExecutor(impl);
         consumer.assign(CollectionUtils.isEmpty(partitions) ? getConvertor().assignConfig() : partitions);
         LOGGER.info(KafkaConstant.LOG_TAG + "subscription:assign");
         consume(impl);
@@ -90,6 +91,7 @@ public class Subscription<K, V> extends AbstractClient {
         if (pattern == null) {
             pattern = getConvertor().topicPatternConfig();
         }
+        validateExecutor(impl);
         consumer.subscribe(pattern, offset.getRebalanceListener(consumer, listener));
         LOGGER.info(KafkaConstant.LOG_TAG + "subscription:subscribe,pattern=" + pattern);
         consume(impl);
@@ -101,6 +103,7 @@ public class Subscription<K, V> extends AbstractClient {
 
     public void subscribe(IDataRecord<K, V> impl, ConsumerRebalanceListener listener, String... topics)
             throws KafkaException {
+        validateExecutor(impl);
         Collection<String> tmp = ArrayUtils.isEmpty(topics) ? getConvertor().topicConfig() : Arrays.asList(topics);
         consumer.subscribe(tmp, offset.getRebalanceListener(consumer, listener));
         LOGGER.info(KafkaConstant.LOG_TAG + "subscription:subscribe,topics=" + tmp);
@@ -122,12 +125,15 @@ public class Subscription<K, V> extends AbstractClient {
         LOGGER.info(KafkaConstant.LOG_TAG + "subscription:unsubscribe");
     }
 
-    protected void consume(IDataRecord<K, V> impl) throws KafkaException, ValidateException {
-        ValidateUtils.notNull("consume", impl);
+    private void validateExecutor(IDataRecord<K, V> impl) throws KafkaException {
         // 限制实现类
         if (!(impl instanceof ISingleDataExecutor) && !(impl instanceof IMultiDataExecutor)) {
             throw new KafkaException(CodeEnum.KFK_0009, "data executor invalid");
         }
+    }
+
+    protected void consume(IDataRecord<K, V> impl) throws KafkaException, ValidateException {
+        ValidateUtils.notNull("consume", impl);
         // 强制数据一直接收
         loop.set(true);
         ConsumerRecords<K, V> records = null;
@@ -138,11 +144,12 @@ public class Subscription<K, V> extends AbstractClient {
                 records = consumer.poll(getConvertor().durationValue());
             } catch (Exception e) {
                 if (loop.get()) {
+                    LOGGER.error(KafkaConstant.LOG_TAG + loop.get() + " pool data:" + e.getMessage(), e);
+
                     if (getConvertor().consumerIgnoreValue().consumeThrowable()) {
                         loop.set(false);
                         throw new KafkaException(CodeEnum.KFK_0010, "poll data:" + getConvertor().durationValue(), e);
                     }
-                    LOGGER.error(KafkaConstant.LOG_TAG + loop.get() + " pool data:" + e.getMessage(), e);
                 }
             } finally {
                 lock.unlock();
@@ -170,7 +177,7 @@ public class Subscription<K, V> extends AbstractClient {
                                 processor.consume(consumer, item, (ISingleDataExecutor<K, V>) impl);
                             }
                         } else {
-                            Collection<ConsumerRecord<K, V>> result = new LinkedList<>();
+                            Collection<ConsumerRecord<K, V>> result = new ArrayList<>(records.count());
                             records.forEach(result::add);
                             processor.consume(consumer, result, (IMultiDataExecutor<K, V>) impl);
                         }
@@ -180,7 +187,11 @@ public class Subscription<K, V> extends AbstractClient {
             } catch (KafkaException e) {
                 processor.consumeComplete(consumer, impl, e);
                 LOGGER.error(KafkaConstant.LOG_TAG + "consume data:" + e.getMessage(), e);
-                throw e;
+
+                if (getConvertor().consumerIgnoreValue().consumeThrowable()) {
+                    loop.set(false);
+                    throw e;
+                }
             }
         }
     }
