@@ -17,41 +17,34 @@ import java.util.LinkedList;
  * 文档链接流转对象
  *
  * @author xlgp2171
- * @version 2.0.210827
+ * @version 2.1.220701
  */
 public class ExtractObject extends LinkedObject<byte[]> implements IData {
-    /**
-     * 文档属性
-     */
+    /** 文档属性 */
     private final Metadata metadata;
-
-    /**
-     * 文档状态
-     */
+    /** 文档状态 */
     private StatusEnum status;
-    /**
-     * 文档内容
-     */
+    /** 文档内容 */
     private String content;
 
-    public ExtractObject(long id, String name, String source) throws ValidateException {
+    public ExtractObject(String id, String name, String source) throws ValidateException {
         this(id, name, source, (Metadata) null);
     }
 
-    public ExtractObject(long id, String name, String source, byte[] data) throws ValidateException {
+    public ExtractObject(String id, String name, String source, byte[] data) throws ValidateException {
         this(id, name, source, null, data);
     }
 
-    public ExtractObject(long id, String name, String source, Metadata metadata, byte[] data) {
+    public ExtractObject(String id, String name, String source, Metadata metadata, byte[] data) {
         this(id, name, source, metadata);
         setData(data);
     }
 
-    public ExtractObject(long id, String name, String source, Metadata metadata) throws ValidateException {
+    public ExtractObject(String id, String name, String source, Metadata metadata) throws ValidateException {
         this(id, name, source, metadata, new LinkedList<>());
     }
 
-    public ExtractObject(long id, String name, String source, Metadata metadata, Collection<ExtractObject> attachment)
+    public ExtractObject(String id, String name, String source, Metadata metadata, Collection<ExtractObject> attachment)
             throws ValidateException {
         super(id, name, source, attachment);
         this.metadata = metadata == null ? new Metadata() : metadata;
@@ -115,7 +108,7 @@ public class ExtractObject extends LinkedObject<byte[]> implements IData {
             if (!getChildren().isEmpty()) {
                 status = StatusEnum.ATTACHMENT;
             } else if (isEmpty() && status != StatusEnum.ENCRYPTION) {
-                // 当内容和属性都为空又没有附件时，认为文档是空的
+                // 当内容和属性都为空又没有附件时，认为文档是无效的
                 status = StatusEnum.INVALID;
             } else {
                 status = StatusEnum.FINISHED;
@@ -209,42 +202,24 @@ public class ExtractObject extends LinkedObject<byte[]> implements IData {
     }
 
     public enum StatusEnum {
-        /**
-         * 初始的文档
-         */
+        /** 文档初始状态 */
         READY(0),
-        /**
-         * 处理完成的文档
-         */
+        /** 文档处理完成 */
         FINISHED(1),
-        /**
-         * 含有附件的文档
-         */
+        /** 文档包含附件 */
         ATTACHMENT(2),
-        /**
-         * 空值的文档
-         */
+        /** 文档内容为空 */
         EMPTY(3),
-        /**
-         * 加密的文档
-         */
+        /** 文档被加密 */
         ENCRYPTION(4),
-        /**
-         * 无效的文档
-         */
+        /** 文档无效 */
         INVALID(-1),
-        /**
-         * 附件不全的文档
-         */
+        /** 文档附件损坏 */
         BROKEN(-2),
-        /**
-         * 不支持的文档/损坏的文档
-         */
+        /** 文档无法解析 */
         UNSUPPORTED(-3),
-        /**
-         * 未知的文档
-         */
-        UNKNOWN(-4);
+        /** 文档被舍弃 */
+        REJECT(-4);
 
         private final int value;
 
