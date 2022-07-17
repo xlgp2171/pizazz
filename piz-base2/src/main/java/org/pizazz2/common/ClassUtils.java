@@ -1,5 +1,7 @@
 package org.pizazz2.common;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -20,7 +22,7 @@ import org.pizazz2.message.TypeEnum;
  * 参考org.apache.commons.beanutils.BeanUtilsBean
  *
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.1.211116
  */
 public class ClassUtils {
     /**
@@ -136,7 +138,8 @@ public class ClassUtils {
      * @throws UtilityException 类加载异常
      * @throws ValidateException classpath空异常
      */
-    public static Class<?> loadClass(String classpath, ClassLoader loader, boolean initialize) throws ValidateException, UtilityException {
+    public static Class<?> loadClass(String classpath, ClassLoader loader, boolean initialize)
+            throws ValidateException, UtilityException {
         ValidateUtils.notEmpty("loadClass", classpath);
 
         if (loader == null) {
@@ -256,6 +259,24 @@ public class ClassUtils {
         return tmp;
     }
 
+    /**
+     * 在目标类中是否包含查找接口
+     * @param target 目标类
+     * @param find 查找接口类
+     * @return 是否包含
+     * @throws ValidateException 验证异常
+     */
+    public static boolean hasInterface(Class<?> target, Class<?> find) throws ValidateException {
+        ValidateUtils.notNull("hasInterface", target, find);
+        HashSet<Class<?>> tmp = new HashSet<>();
+        try {
+            ClassUtils.getInterfaces(target, tmp);
+        } catch (ValidateException e) {
+            // 忽略空值异常
+        }
+        return tmp.contains(find);
+    }
+
     public static Class<?>[] getInterfaces(Class<?> clazz) {
         if (clazz == null) {
             return ArrayUtils.EMPTY_CLASS;
@@ -277,7 +298,7 @@ public class ClassUtils {
      * @throws ValidateException 验证空异常
      */
     public static void getInterfaces(Class<?> clazz, HashSet<Class<?>> cache) throws ValidateException {
-        ValidateUtils.notNull("getInterfaces", 0, cache);
+        ValidateUtils.notNull("getInterfaces", 1, cache);
 
         while (clazz != null) {
             Class<?>[] interfaces = clazz.getInterfaces();
@@ -307,10 +328,12 @@ public class ClassUtils {
         try {
             return type.cast(target.newInstance());
         } catch (ClassCastException e) {
-            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CLASS.CAST", target.getName(), type.getName());
+            String msg = LocaleHelper.toLocaleText(
+                    TypeEnum.BASIC, "ERR.CLASS.CAST", target.getName(), type.getName());
             throw new UtilityException(BasicCodeEnum.MSG_0004, msg, e);
         } catch (InstantiationException | IllegalAccessException e) {
-            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.CLASS.INIT", target.getName(), e.getMessage());
+            String msg = LocaleHelper.toLocaleText(
+                    TypeEnum.BASIC, "ERR.CLASS.INIT", target.getName(), e.getMessage());
             throw new UtilityException(BasicCodeEnum.MSG_0001, msg, e);
         }
     }
@@ -334,5 +357,21 @@ public class ClassUtils {
                 }
             }
         }
+    }
+
+    /**
+     * 装载动态代理
+     * @param classLoader 类加载器
+     * @param interfaceClass 接口类Class
+     * @param handler 代理接口
+     * @param <T> 接口类
+     * @return 接口实现的动态代理
+     * @throws ValidateException 验证异常
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T newProxyInstance(ClassLoader classLoader, Class<T> interfaceClass, InvocationHandler handler)
+            throws ValidateException {
+        ValidateUtils.notNull("newProxyInstance", classLoader, interfaceClass, handler);
+        return (T) Proxy.newProxyInstance(ClassUtils.getClassLoader(), new Class<?>[]{ interfaceClass }, handler);
     }
 }
