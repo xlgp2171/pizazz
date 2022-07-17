@@ -15,9 +15,9 @@ import org.pizazz2.message.TypeEnum;
 
 /**
  * 资源工具
- * 
+ *
  * @author xlgp2171
- * @version 2.1.211028
+ * @version 2.2.220417
  */
 public class ResourceUtils {
 
@@ -105,6 +105,13 @@ public class ResourceUtils {
 		return target.getProperty(key, defValue);
 	}
 
+	public static int getByte(Properties target, String key, byte defValue) {
+		if (target == null || !target.containsKey(key)) {
+			return defValue;
+		}
+		return NumberUtils.toByte(target.getProperty(key), defValue);
+	}
+
 	public static int getInt(Properties target, String key, int defValue) {
 		if (target == null || !target.containsKey(key)) {
 			return defValue;
@@ -112,11 +119,25 @@ public class ResourceUtils {
 		return NumberUtils.toInt(target.getProperty(key), defValue);
 	}
 
+	public static int getShort(Properties target, String key, short defValue) {
+		if (target == null || !target.containsKey(key)) {
+			return defValue;
+		}
+		return NumberUtils.toShort(target.getProperty(key), defValue);
+	}
+
 	public static long getLong(Properties target, String key, long defValue) {
 		if (target == null || !target.containsKey(key)) {
 			return defValue;
 		}
 		return NumberUtils.toLong(target.getProperty(key), defValue);
+	}
+
+	public static double getFloat(Properties target, String key, float defValue) {
+		if (target == null || !target.containsKey(key)) {
+			return defValue;
+		}
+		return NumberUtils.toFloat(target.getProperty(key), defValue);
 	}
 
 	public static double getDouble(Properties target, String key, double defValue) {
@@ -135,9 +156,17 @@ public class ResourceUtils {
 
 	public static String getString(Map<String, ?> target, String key, String defValue) {
 		if (target != null && target.containsKey(key)) {
-			return StringUtils.of(target.get(key));
+			Object tmp = target.get(key);
+			return tmp == null ? StringUtils.EMPTY : StringUtils.of(tmp);
 		}
 		return defValue;
+	}
+
+	public static int getByte(Map<String, ?> target, String key, byte defValue) {
+		if (target == null || !target.containsKey(key)) {
+			return defValue;
+		}
+		return NumberUtils.toByte(StringUtils.of(target.get(key)), defValue);
 	}
 
 	public static int getInt(Map<String, ?> target, String key, int defValue) {
@@ -147,11 +176,25 @@ public class ResourceUtils {
 		return NumberUtils.toInt(StringUtils.of(target.get(key)), defValue);
 	}
 
+	public static int getShort(Map<String, ?> target, String key, short defValue) {
+		if (target == null || !target.containsKey(key)) {
+			return defValue;
+		}
+		return NumberUtils.toShort(StringUtils.of(target.get(key)), defValue);
+	}
+
 	public static long getLong(Map<String, ?> target, String key, long defValue) {
 		if (target == null || !target.containsKey(key)) {
 			return defValue;
 		}
 		return NumberUtils.toLong(StringUtils.of(target.get(key)), defValue);
+	}
+
+	public static double getFloat(Map<String, ?> target, String key, float defValue) {
+		if (target == null || !target.containsKey(key)) {
+			return defValue;
+		}
+		return NumberUtils.toFloat(StringUtils.of(target.get(key)), defValue);
 	}
 
 	public static double getDouble(Map<String, ?> target, String key, double defValue) {
