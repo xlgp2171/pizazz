@@ -21,7 +21,7 @@ import java.util.ServiceLoader;
  *
  * @param <C> 配置文件类型
  * @author xlgp2171
- * @version 2.1.211103
+ * @version 2.1.211201
  */
 public abstract class AbstractClassPlugin<C extends IObject> {
     private final C configure;
@@ -64,13 +64,14 @@ public abstract class AbstractClassPlugin<C extends IObject> {
      *
      * @param plugin 插件类
      * @param clazz 需要转换的类型,需实现{@link IPlugin}接口
+     * @param <T> 实现{@link IPlugin}接口的类
      * @return 转换后的类型
      *
      * @throws UtilityException 类型转换失败
      * @throws ValidateException 若参数任意为null时
      * @throws IllegalException 类型转换异常
      */
-    public <T extends IPlugin> T cast(IPlugin plugin, Class<T> clazz)
+    public <T extends IPlugin<?>> T cast(IPlugin<?> plugin, Class<T> clazz)
             throws ValidateException, IllegalException, UtilityException {
         ValidateUtils.notNull("cast", plugin, clazz);
         return ClassUtils.cast(plugin, clazz);
@@ -81,30 +82,32 @@ public abstract class AbstractClassPlugin<C extends IObject> {
      * <li/> 首先尝试采用ServiceLoader加载
      *
      * @param key 在配置中的键值或者classpath路径
-     * @param clazz 接口实现的Class
+     * @param clazz 接口的Class
      * @param loader 采用的类加载器,null为默认加载器
      * @param initialize 是否加载后调用初始化方法
+     * @param <T> 实现{@link IPlugin}接口的类
      * @return 加载后的实现类, 可用cast方法转换类型
      *
      * @throws BaseException 插件类型转换异常，插件不存在或插件初始化异常
      * @throws ValidateException 参数验证异常
+     * @throws IllegalException 类型转换异常
      */
-    public IPlugin loadPlugin(String key, Class<? extends IPlugin> clazz, ClassLoader loader, boolean initialize)
-            throws BaseException, ValidateException {
+    public <T extends IPlugin<C>> T loadPlugin(String key, Class<T> clazz, ClassLoader loader, boolean initialize)
+            throws BaseException, ValidateException, IllegalException {
         ValidateUtils.notNull("loadPlugin", 0, clazz);
-        Iterator<? extends IPlugin> iterator = ServiceLoader.load(clazz,
+        Iterator<T> iterator = ServiceLoader.load(clazz,
                 loader == null ? ClassUtils.getClassLoader() : loader).iterator();
-        IPlugin tmp = null;
+        T tmp = null;
         try {
             if (iterator.hasNext()) {
                 tmp = iterator.next();
             }
         } catch (Throwable e) {
-            ToolException exception = new ToolException(BasicCodeEnum.MSG_0014, LocaleHelper.toLocaleText(TypeEnum.BASIC,
-                    "ERR.PLUGIN.LOAD", clazz.getName()), e);
+            ToolException exception = new ToolException(BasicCodeEnum.MSG_0014,
+                    LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.PLUGIN.LOAD", clazz.getName()), e);
 			log(exception.getMessage(), exception);
         }
-        return loadPlugin(key, tmp, loader, initialize);
+        return cast(loadPlugin(key, tmp, loader, initialize), clazz);
     }
 
     /**
@@ -119,7 +122,7 @@ public abstract class AbstractClassPlugin<C extends IObject> {
      * @throws BaseException 插件类型转换异常，插件不存在或插件初始化异常
      * @throws ValidateException 参数验证异常
      */
-    public IPlugin loadPlugin(String key, IPlugin defPlugin, ClassLoader loader, boolean initialize)
+    public IPlugin<C> loadPlugin(String key, IPlugin<C> defPlugin, ClassLoader loader, boolean initialize)
             throws BaseException, ValidateException {
         String classpath = StringUtils.of(configure.get(key, StringUtils.EMPTY));
         try {
@@ -130,8 +133,9 @@ public abstract class AbstractClassPlugin<C extends IObject> {
         }
     }
 
-    protected IPlugin load(String classpath, String defClass, IPlugin defPlugin, ClassLoader loader, boolean initialize,
-                           BaseException e) throws BaseException, IllegalException {
+    @SuppressWarnings("unchecked")
+    protected IPlugin<C> load(String classpath, String defClass, IPlugin<C> defPlugin, ClassLoader loader, boolean initialize,
+                              BaseException e) throws BaseException, IllegalException {
         if (StringUtils.isTrimEmpty(classpath)) {
             if (defPlugin != null) {
                 log(LocaleHelper.toLocaleText(TypeEnum.BASIC, "PLUGIN.LOAD", defPlugin.getId()), null);
@@ -146,24 +150,25 @@ public abstract class AbstractClassPlugin<C extends IObject> {
             }
             classpath = defClass;
         }
-        IPlugin tmp = ClassUtils.newClass(classpath, loader, IPlugin.class);
+        IPlugin<C> tmp = (IPlugin<C>) ClassUtils.newClass(classpath, loader, IPlugin.class);
         log(LocaleHelper.toLocaleText(TypeEnum.BASIC, "PLUGIN.LOAD", tmp.getId()), null);
         return switchPlugin(tmp, initialize);
     }
 
-    protected IPlugin switchPlugin(IPlugin instance, boolean initialize) throws BaseException {
+    protected IPlugin<C> switchPlugin(IPlugin<C> instance, boolean initialize) throws BaseException {
         PluginContext.getInstance().register(getClass(), instance);
         log(LocaleHelper.toLocaleText(TypeEnum.BASIC, "PLUGIN.REGISTER", instance.getId()), null);
         return initialize ? initialPlugin(instance) : instance;
     }
 
-    protected IPlugin initialPlugin(IPlugin instance) throws BaseException {
-        instance.initialize(configure.copy());
+    @SuppressWarnings("unchecked")
+    protected IPlugin<C> initialPlugin(IPlugin<C> instance) throws BaseException {
+        instance.initialize((C) configure.copy());
         log(LocaleHelper.toLocaleText(TypeEnum.BASIC, "PLUGIN.INIT", instance.getId()), null);
         return instance;
     }
 
-    public void unloadPlugin(IPlugin plugin, Duration timeout) {
+    public void unloadPlugin(IPlugin<?> plugin, Duration timeout) {
         if (plugin != null) {
             SystemUtils.destroy(plugin, timeout);
             PluginContext.getInstance().unregister(getClass(), plugin);

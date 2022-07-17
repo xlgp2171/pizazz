@@ -6,9 +6,9 @@ import org.pizazz2.exception.BaseException;
  * 动态插件接口
  *
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.1.211201
  */
-public interface IPlugin extends IObject, ICloseable {
+public interface IPlugin<C extends IObject> extends IObject, ICloseable {
 
     /**
      * 初始化
@@ -16,5 +16,5 @@ public interface IPlugin extends IObject, ICloseable {
      * @param config 初始化配置
      * @throws BaseException 抛出初始化异常
      */
-    void initialize(IObject config) throws BaseException;
+    void initialize(C config) throws BaseException;
 }
