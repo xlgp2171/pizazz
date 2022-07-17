@@ -11,15 +11,22 @@ import java.util.concurrent.*;
  * 线程工具
  *
  * @author xlgp2171
- * @version 2.0.211028
+ * @version 2.1.220707
  */
 public class ThreadUtils {
 
+    public static ThreadPoolExecutor newThreadPool(
+            int poolSize, BlockingQueue<Runnable> workQueue, PizThreadFactory factory,
+            RejectedExecutionHandler handler) throws ValidateException {
+        ValidateUtils.limit("newThreadPool", 1, poolSize, 0, Short.MAX_VALUE);
+        ValidateUtils.notNull("newThreadPool", 1, workQueue, factory, handler);
+        return new ThreadPoolExecutor(poolSize, poolSize, 0L, TimeUnit.MILLISECONDS, workQueue, factory,
+                handler);
+    }
+
     public static ThreadPoolExecutor newThreadPool(int poolSize, BlockingQueue<Runnable> workQueue,
                                                    PizThreadFactory factory) throws ValidateException {
-        ValidateUtils.limit("newThreadPool", 1, poolSize, 0, Short.MAX_VALUE);
-        ValidateUtils.notNull("newThreadPool", 1, workQueue, factory);
-        return new ThreadPoolExecutor(poolSize, poolSize, 0L, TimeUnit.MILLISECONDS, workQueue, factory);
+        return ThreadUtils.newThreadPool(poolSize, workQueue, factory, new ThreadPoolExecutor.AbortPolicy());
     }
 
     public static ScheduledThreadPoolExecutor newScheduledThreadPool(int poolSize, PizThreadFactory factory)
@@ -37,6 +44,12 @@ public class ThreadUtils {
         name = StringUtils.isTrimEmpty(name) ? SystemUtils.newUUIDSimple() : name;
         return ThreadUtils.newThreadPool(poolSize, new PizThreadFactory(PizContext.NAMING_SHORT + "-" + name,
                 true));
+    }
+
+    public static ThreadPoolExecutor newDaemonBlockingThreadPool(int poolSize, String name) throws ValidateException {
+        return ThreadUtils.newThreadPool(poolSize, new LinkedBlockingQueue<>(poolSize),
+                new PizThreadFactory(StringUtils.nullToEmpty(name), true),
+                new ThreadPoolExecutor.CallerRunsPolicy());
     }
 
     public static ScheduledThreadPoolExecutor newDaemonScheduledThreadPool(int poolSize, String name)
