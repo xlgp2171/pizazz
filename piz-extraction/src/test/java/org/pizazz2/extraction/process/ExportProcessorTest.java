@@ -18,7 +18,7 @@ public class ExportProcessorTest {
         Path path = Paths.get("E:\\Downloads\\yuanbo(94B86D8D355B)\\think-tank.rar" );
         byte[] data = PathUtils.toByteArray(path);
         Path temp = PathUtils.createTempDirectory(PizContext.NAMING_SHORT);
-        ExtractObject object = new ExtractObject(-1L, path.getFileName().toString(), StringUtils.EMPTY, data);
+        ExtractObject object = new ExtractObject("-1", path.getFileName().toString(), StringUtils.EMPTY, data);
         new ExtractProcessor().extract(object, null);
         new ExportProcessor(temp).exportAll(object);
     }
