@@ -20,7 +20,7 @@ import org.pizazz2.message.TypeEnum;
  * 时间日期工具
  * 
  * @author xlgp2171
- * @version 2.1.211020
+ * @version 2.2.220624
  */
 public class DateUtils {
 	/** 默认时间格式，格式化后如"2021-07-01 09:30:00" */
@@ -34,10 +34,18 @@ public class DateUtils {
 		return zoneId == null ? ZoneId.systemDefault() : zoneId;
 	}
 
+	public static Date toDate(LocalDateTime dateTime) throws ValidateException {
+		return DateUtils.toDate(dateTime, null);
+	}
+
 	public static Date toDate(LocalDateTime dateTime, ZoneId zoneId) throws ValidateException {
 		ValidateUtils.notNull("toDate", dateTime);
 		zoneId = DateUtils.nullToDefault(zoneId);
 		return Date.from(dateTime.atZone(zoneId).toInstant());
+	}
+
+	public static LocalDateTime toLocalDateTime(Date date) throws ValidateException {
+		return DateUtils.toLocalDateTime(date, null);
 	}
 
 	public static LocalDateTime toLocalDateTime(Date date, ZoneId zoneId) throws ValidateException {
@@ -49,6 +57,16 @@ public class DateUtils {
 	public static LocalDateTime toLocalDateTime(long timestamp, ZoneId zoneId) throws ValidateException {
 		zoneId = DateUtils.nullToDefault(zoneId);
 		return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), zoneId);
+	}
+
+	public static long toTimeMillis(LocalDateTime dateTime) throws ValidateException {
+		return DateUtils.toTimeMillis(dateTime, null);
+	}
+
+	public static long toTimeMillis(LocalDateTime dateTime, ZoneId zoneId) throws ValidateException {
+		ValidateUtils.notNull("toTimeMillis", dateTime);
+		zoneId = DateUtils.nullToDefault(zoneId);
+		return dateTime.atZone(zoneId).toInstant().toEpochMilli();
 	}
 
 	public static Date parse(String time, String pattern) throws ValidateException, IllegalException {
