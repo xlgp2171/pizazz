@@ -11,7 +11,7 @@ import java.net.InetAddress;
  * NetworkUtils测试
  *
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.1.211201
  */
 public class NetworkUtilsTest {
 
@@ -37,7 +37,7 @@ public class NetworkUtilsTest {
 
 	@Test
 	public void testGetIpAddressTypeByIP4() {
-		NetworkEnum.IpAddressType type = NetworkUtils.getIpAddressTypeByIP4("192.168.0.1");
+		NetworkEnum.IpAddressType type = NetworkUtils.getIpAddressTypeByIp4("192.168.0.1");
 		Assert.assertEquals(type, NetworkEnum.IpAddressType.C);
 	}
 }

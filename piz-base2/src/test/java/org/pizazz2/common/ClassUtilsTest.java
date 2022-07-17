@@ -2,6 +2,8 @@ package org.pizazz2.common;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -12,7 +14,7 @@ import org.pizazz2.exception.UtilityException;
  * ClassUtils测试
  *
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.0.211116
  */
 public class ClassUtilsTest {
 	static String CODE_TXT;
@@ -36,5 +38,11 @@ public class ClassUtilsTest {
 	public void testGetClassName() {
 		String result = ClassUtils.getClassName(CODE_TXT);
 		Assert.assertEquals(result, "DynamicObject");
+	}
+
+	@Test
+	public void testHasInterface() {
+		boolean result = ClassUtils.hasInterface(LinkedList.class, Queue.class);
+		Assert.assertTrue(result);
 	}
 }

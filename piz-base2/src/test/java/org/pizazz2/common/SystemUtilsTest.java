@@ -12,13 +12,13 @@ import java.time.Duration;
  * SystemUtils测试
  *
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.1.211201
  */
 public class SystemUtilsTest {
 
 	@Test
 	public void testDestroy() {
-		IPlugin plugin = new IPlugin() {
+		IPlugin<IObject> plugin = new IPlugin<IObject>() {
 			@Override
 			public void initialize(IObject config) throws BaseException {
 			}

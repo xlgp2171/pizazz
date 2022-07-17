@@ -88,7 +88,7 @@ public class ReflectUtilsTest {
 	@Test
 	public void testGetActualTypeArguments() {
 		// 实例化子类
-		LinkedObject<byte[]> object1 = new LinkedObject<byte[]>(-1L, StringUtils.EMPTY, StringUtils.EMPTY){};
+		LinkedObject<byte[]> object1 = new LinkedObject<byte[]>("1", StringUtils.EMPTY, StringUtils.EMPTY){};
 		Type type = ReflectUtils.getActualTypeArguments(object1.getClass())[0];
 		Class<byte[]> clazz = (Class<byte[]>) type;
 		Assert.assertEquals(type.getTypeName(), "byte[]");
