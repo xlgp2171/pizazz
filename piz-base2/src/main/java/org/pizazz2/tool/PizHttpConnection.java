@@ -33,13 +33,13 @@ import org.pizazz2.exception.UtilityException;
 import org.pizazz2.message.BasicCodeEnum;
 import org.pizazz2.message.TypeEnum;
 import org.pizazz2.tool.ref.IHttpConfig;
-import org.pizazz2.tool.ref.ResponseObject;
+import org.pizazz2.data.ResponseObject;
 
 /**
  * HTTP连接组件
  *
  * @author xlgp2171
- * @version 2.1.211103
+ * @version 2.1.211111
  */
 public class PizHttpConnection {
     public static final String PROTOCOL_HTTPS = "https";
@@ -63,7 +63,8 @@ public class PizHttpConnection {
         return connect("GET", TupleObjectHelper.emptyObject(), null);
     }
 
-    public HttpURLConnection connect(String method, TupleObject headers, byte[] data) throws ValidateException, ToolException {
+    public HttpURLConnection connect(String method, TupleObject headers, byte[] data)
+            throws ValidateException, ToolException {
         return connect(method, headers, data, null);
     }
 
@@ -79,7 +80,8 @@ public class PizHttpConnection {
      * @throws ValidateException 参数验证异常
      * @throws ToolException 连接异常
      */
-    public HttpURLConnection connect(String method, TupleObject headers, byte[] data, IHttpConfig config) throws ValidateException, ToolException {
+    public HttpURLConnection connect(String method, TupleObject headers, byte[] data, IHttpConfig config)
+            throws ValidateException, ToolException {
         HttpURLConnection connection = createHttpConnection(method, config);
 
         for (String item : headers.keySet()) {
@@ -109,17 +111,19 @@ public class PizHttpConnection {
         return connection;
     }
 
-    public static ResponseObject response(HttpURLConnection connection) throws ToolException {
+    public static ResponseObject<List<String>, byte[]> response(HttpURLConnection connection) throws ToolException {
         return PizHttpConnection.response(connection, HttpURLConnection.HTTP_OK);
     }
 
-    public static ResponseObject response(HttpURLConnection connection, int httpStatus) throws ValidateException, ToolException {
+    public static ResponseObject<List<String>, byte[]> response(HttpURLConnection connection, int httpStatus)
+            throws ValidateException, ToolException {
         ValidateUtils.notNull("response", connection);
         int code;
         try {
             code = connection.getResponseCode();
         } catch (IOException e) {
-            String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.HTTP.CONNECTION", connection.getURL(), e.getMessage());
+            String msg = LocaleHelper.toLocaleText(
+                    TypeEnum.BASIC, "ERR.HTTP.CONNECTION", connection.getURL(), e.getMessage());
             throw new ToolException(BasicCodeEnum.MSG_0016, msg, e);
         }
         if (code == httpStatus || httpStatus == NumberUtils.NEGATIVE_ONE.intValue()) {
@@ -138,10 +142,10 @@ public class PizHttpConnection {
             } finally {
                 PizHttpConnection.disconnect(connection);
             }
-            return new ResponseObject(code, data, properties);
+            return new ResponseObject<List<String>, byte[]>(code, properties).setResult(data);
         } else {
             PizHttpConnection.disconnect(connection);
-            return new ResponseObject(code, null, null);
+            return new ResponseObject<>(code);
         }
     }
 
