@@ -6,13 +6,20 @@ import org.pizazz2.exception.ValidateException;
  * 字符工具
  * 
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 2.1.220707
  */
 public class CharUtils {
 	public static final String MAGIC_UNICODE = "\\u";
+	public static final char UNDERLINE = '_';
 
 	public static final char[] HEX_DIGITS = "0123456789abcdef".toCharArray();
 
+	/**
+	 * 转换为unicode值
+	 *
+	 * @param ch 字符
+	 * @return unicode值
+	 */
 	public static String toUnicodeValue(char ch) {
 		return StringUtils.of(HEX_DIGITS[(ch >> 12) & 15]) + HEX_DIGITS[(ch >> 8) & 15] + HEX_DIGITS[(ch >> 4) & 15] +
 				HEX_DIGITS[(ch) & 15];
