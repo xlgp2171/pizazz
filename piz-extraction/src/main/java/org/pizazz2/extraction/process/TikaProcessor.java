@@ -94,7 +94,7 @@ public class TikaProcessor {
         ContentHandler newHandler(OutputStream output, Charset charset, boolean prettyPrint) throws IllegalException;
     }
 
-    public static enum HandlerEnum implements IHandler {
+    public enum HandlerEnum implements IHandler {
         /** 文本格式 */
         TEXT {
             @Override

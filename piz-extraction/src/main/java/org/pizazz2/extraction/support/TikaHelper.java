@@ -15,7 +15,14 @@ import org.pizazz2.extraction.process.TikaProcessor;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 
+/**
+ * Tika辅助工具
+ *
+ * @author xlgp2171
+ * @version 2.1.220715
+ */
 public class TikaHelper {
+    /** 默认的字符置信度匹配长度 */
     static final int CONFIDENCE = 35;
 
     public static MediaType detect(Path path, Metadata metadata)
@@ -85,9 +92,7 @@ public class TikaHelper {
     }
 
     private enum Singleton {
-        /**
-         * 单例
-         */
+        /** 单例 */
         INSTANCE;
 
         private final TikaProcessor executor;

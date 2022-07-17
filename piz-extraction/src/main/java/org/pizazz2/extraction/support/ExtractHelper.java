@@ -1,25 +1,51 @@
 package org.pizazz2.extraction.support;
 
 import org.apache.tika.metadata.Metadata;
+import org.pizazz2.PizContext;
+import org.pizazz2.common.NumberUtils;
 import org.pizazz2.common.StringUtils;
+import org.pizazz2.common.SystemUtils;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.extraction.data.ExtractObject;
 import org.pizazz2.tool.IdBuilder;
 import org.pizazz2.tool.IdFactory;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * 提取辅助工具
  *
  * @author xlgp2171
- * @version 2.0.210512
+ * @version 2.1.220714
  */
 public class ExtractHelper {
     static final String WINDOWS_PATH_SEPARATOR = "\\";
     static final String PATH_DIRECTORY = "/";
 
-    static final IdBuilder ID = IdFactory.newInstance(new Integer(32).shortValue());
+    static IdBuilder ID_BUILDER;
+
+    static {
+        String tmp = SystemUtils.getSystemProperty(PizContext.NAMING_SHORT + ".node.id", StringUtils.EMPTY);
+        // 默认节点为1
+        ID_BUILDER = IdFactory.newInstance(NumberUtils.toShort(tmp, NumberUtils.ONE.shortValue()));
+    }
+
+    public static Path fillPath(ExtractObject target, boolean idNamedDirectory) {
+        if (StringUtils.isTrimEmpty(target.getSource())) {
+            return null;
+        }
+        String path;
+
+        if (idNamedDirectory) {
+            path = target.getId();
+        } else {
+            path = target.getName();
+            int idx = path.lastIndexOf(".");
+            path = idx != -1 ? path.substring(0, idx) : path;
+        }
+        return Paths.get(target.getSource(), path);
+    }
 
     public static String pathResolve(Path parent, Path target) {
         Path tmp;
@@ -68,18 +94,17 @@ public class ExtractHelper {
         return StringUtils.nullToEmpty(content);
     }
 
-    public static long generateId() throws ValidateException {
-        return ID.generate();
+    public static String generateId() throws ValidateException {
+        return StringUtils.of(ID_BUILDER.generate());
     }
 
     public static ExtractObject newTempObject() {
-        return new ExtractObject(-1L, StringUtils.EMPTY, StringUtils.EMPTY);
+        return new ExtractObject("-1", StringUtils.EMPTY, StringUtils.EMPTY);
     }
 
     public static ExtractObject addAttachment(ExtractObject object, String name, String source, Metadata metadata) {
-        long id = ExtractHelper.generateId();
-        ExtractObject tmp = new ExtractObject(id,
-                StringUtils.isEmpty(name) ? StringUtils.of(id) : name, source, metadata);
+        String id = ExtractHelper.generateId();
+        ExtractObject tmp = new ExtractObject(id, StringUtils.isEmpty(name) ? id : name, source, metadata);
         object.addAttachment(tmp);
         return tmp;
     }

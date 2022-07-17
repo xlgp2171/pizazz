@@ -109,7 +109,7 @@ public class ExtractProcessor {
 
         if (detect(object) != null) {
             if (!defaultCheck.test(object.getType())) {
-                object.setStatus(ExtractObject.StatusEnum.UNSUPPORTED);
+                object.setStatus(ExtractObject.StatusEnum.REJECT);
                 listener.extracted(object);
                 return StringUtils.EMPTY;
             }
