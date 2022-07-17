@@ -17,12 +17,13 @@ import java.util.Set;
  * 网络工具
  * 
  * @author xlgp2171
- * @version 2.1.211028
+ * @version 2.1.211201
  */
 public class NetworkUtils {
-	public static String IP_SEPARATOR = "\\.";
+	public static final String IP_SEPARATOR = "\\.";
 	public static final String LOCAL_HOST = "localhost";
 	public static final String LOCAL_IP = "127.0.0.1";
+	public static final int MAX_SYSTEM_PORT = 1024;
 
 	public static InetAddress[] getAddressesByNetwork(NetworkEnum.Inet type) {
 		Enumeration<NetworkInterface> network;
@@ -213,7 +214,7 @@ public class NetworkUtils {
 	 * @return IP地址类型
 	 * @throws ValidateException 参数为空异常，IP地址不匹配异常
 	 */
-	public static NetworkEnum.IpAddressType getIpAddressTypeByIP4(String ip) throws ValidateException {
+	public static NetworkEnum.IpAddressType getIpAddressTypeByIp4(String ip) throws ValidateException {
 		ValidateUtils.notNull("getIpAddressTypeByIP4", ip);
 		ValidateUtils.verifyExpression(ExpressionEnum.IP_ADDRESS, ip);
 		String[] ipArray = ip.split(NetworkUtils.IP_SEPARATOR);
