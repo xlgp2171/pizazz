@@ -39,7 +39,7 @@ import com.argo.hwp.utils.HwpStreamReader;
  * @version 1.0.update
  */
 public final class HwpTextExtractorV3 {
-    private static final Logger log = LoggerFactory.getLogger(HwpTextExtractorV3.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HwpTextExtractorV3.class);
 
     /**
      * 1byte 문자들..
@@ -69,7 +69,6 @@ public final class HwpTextExtractorV3 {
 
     public static boolean extractText(File source, Writer writer) throws IOException {
         InputStream input = new FileInputStream(source);
-
         try {
             // 한글V3 시그니처 확인
             try {
@@ -83,12 +82,10 @@ public final class HwpTextExtractorV3 {
 					return false;
 				}
             } catch (IOException e) {
-                log.warn("파일정보 확인 중 오류. HWP 포맷이 아닌 것으로 간주함", e);
+                LOGGER.warn("文件信息确认中错误。视为非HWP格式", e);
                 return false;
             }
-
             extractText(input, writer);
-
             return true;
         } finally {
             try {
@@ -96,52 +93,44 @@ public final class HwpTextExtractorV3 {
                 // channel is closed as well.
                 input.close();
             } catch (IOException e) {
-                log.warn("exception while file.close", e);
+                LOGGER.warn("exception while file.close", e);
             }
         }
     }
 
     private static void extractText(InputStream inputStream, Writer writer) throws IOException {
         // 시그니처를 위해서 30바이트 읽은 상태
-
         HwpStreamReader input = new HwpStreamReader(inputStream);
-
         // 문서 정보 p.72
-
         // 암호 걸린 파일 확인
         input.ensureSkip(96);
         int t = input.uint16();
+
         if (t != 0) {
-			throw new IOException("암호화된 문서는 해석할 수 없습니다");
+			throw new IOException("加密过的文件是无法解析的");
 		}
         // 압축 확인
 		// 124
         input.ensureSkip(26);
         boolean compressed = input.uint8() != 0;
-//        log.debug("압축 확인 : {}", compressed);
-
         // 정보 블럭 길이
         input.ensureSkip(1);
         int blockSize = input.uint16();
-
         // 문서 요약 건너뛰기
         input.ensureSkip(1008);
         // 정보 블럭 건너뛰기
         input.ensureSkip(blockSize);
-
         // 압축 풀기
         if (compressed) {
-//            log.info("본문 압축 해제");
+            // log.info("본문 압축 해제");
             input = new HwpStreamReader(new InflaterInputStream(inputStream, new Inflater(true)));
         }
-
         // p.73 글꼴이름 건너뛰기
         for (int ii = 0; ii < 7; ii++) {
 			input.ensureSkip(input.uint16() * 40L);
 		}
         // p.74 스타일 건너뛰기
         input.ensureSkip((long) input.uint16() * (20 + 31 + 187));
-
         // <문단 리스트> ::= <문단>+ <빈문단>
         // int paraCount = 0;
         while (input.available()) {
@@ -159,9 +148,7 @@ public final class HwpTextExtractorV3 {
         int n_chars = input.uint16();
         int n_lines = input.uint16();
         short char_shape_included = input.uint8();
-
         StringBuilder buf = new StringBuilder();
-
         // p.77 기타 플래그부터..
         input.ensureSkip(1 + 4 + 1 + 31);
         // # 여기까지 43 bytes
@@ -173,10 +160,8 @@ public final class HwpTextExtractorV3 {
             // log.debug("빈문단");
             return false;
         }
-
         // # 줄 정보
         input.ensureSkip(n_lines * 14L);
-
         // # 글자 모양 정보 p.78
         if (char_shape_included != 0) {
             for (int ii = 0; ii < n_chars; ii++) {
@@ -186,16 +171,12 @@ public final class HwpTextExtractorV3 {
 				}
             }
         }
-
-        log.trace("n_chars = {}", n_chars);
-
         // # 글자들
         int n_chars_read = 0;
 
         while (n_chars_read < n_chars) {
 			// # 2바이트씩 읽는다.
             int c = input.uint16();
-            // log.debug("구분 : {}", Integer.toHexString(c));
             n_chars_read++;
 
             switch (c) {
@@ -224,13 +205,11 @@ public final class HwpTextExtractorV3 {
                 case 10:
                     n_chars_read += 3;
                     input.ensureSkip(6);
-
                     // # 테이블 식별 정보 84 바이트
                     input.ensureSkip(80);
                     int n_cells = input.uint16();
                     input.ensureSkip(2);
                     input.ensureSkip(27L * n_cells);
-
                     // # <셀 문단 리스트>+
                     for (int ii = 0; ii < n_cells; ii++) {
                         // # <셀 문단 리스트> ::= <셀 문단>+ <빈문단>
@@ -267,7 +246,6 @@ public final class HwpTextExtractorV3 {
                     n_chars_read += 3;
                     input.ensureSkip(6);
                     input.ensureSkip(10);
-
                     // # <문단 리스트> ::= <문단>+ <빈문단>
                     while (writeParaText(input, writer)) {
 						// do nothing
@@ -314,22 +292,20 @@ public final class HwpTextExtractorV3 {
 					// # hnc code range
                     if (c >= 0x0020 && c <= 0xffff) {
                         String s = Hnc2String.convert(c);
+
                         if (s == null) {
-                            log.warn("매핑 문자 없음 {}", Integer.toHexString(c));
+                            LOGGER.warn("无映射字符 {}", Integer.toHexString(c));
                             writer.write(unknown(c));
                         } else {
                             buf.append(s);
                             writer.write(s);
                         }
                     } else {
-                        log.error("특수 문자 ? : {}", Integer.toHexString(c));
+                        LOGGER.error("特殊字符 ? : {}", Integer.toHexString(c));
                         // throw new NotImplementedException();
                     }
             }
         }
-
-        log.trace(">>> {}", buf.toString());
-
         return true;
     }
 

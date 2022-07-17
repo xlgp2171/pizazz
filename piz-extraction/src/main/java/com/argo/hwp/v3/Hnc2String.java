@@ -60,11 +60,13 @@ class Hnc2String {
 
             for (; ; ) {
                 String line = reader.readLine();
+
                 if (line == null) {
                     break;
                 }
                 lineNumber++;
                 line = line.trim();
+
                 if (line.length() == 0) {
                     continue;
                 }
@@ -72,6 +74,7 @@ class Hnc2String {
                     continue;
                 }
                 Matcher matcher = p.matcher(line);
+
                 if (matcher.find()) {
                     int code = Integer.parseInt(matcher.group(1), 16);
                     int len;
@@ -83,7 +86,6 @@ class Hnc2String {
                         }
                         chars[len - 1] = (char) Integer.parseInt(hex, 16);
                     }
-
                     MAP[code] = new String(chars, 0, len - 1);
                 } else {
                     //					log.debug("[" + lineNumber + "]>>>" + line);
@@ -96,7 +98,6 @@ class Hnc2String {
 
     static String convert(int c) {
         assert c >= 0 && c < 0xFFFF;
-
         return MAP[c];
     }
 }

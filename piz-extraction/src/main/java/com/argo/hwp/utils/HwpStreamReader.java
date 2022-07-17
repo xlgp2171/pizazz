@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * @version 1.0.update
  */
 public class HwpStreamReader {
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final InputStream input;
     private final byte[] buf;
 
@@ -51,7 +51,6 @@ public class HwpStreamReader {
      * 읽을 데이터가 더 있는가?
      *
      * @return 是否还存在可读取字节
-     *
      * @throws IOException IO exception
      */
     public boolean available() throws IOException {
@@ -62,7 +61,6 @@ public class HwpStreamReader {
      * unsigned 1 byte
      *
      * @return the unsigned value of the byte as a 16 bit short
-     *
      * @throws IOException IO exception
      */
     public short uint8() throws IOException {
@@ -76,7 +74,6 @@ public class HwpStreamReader {
      * unsigned 2 byte
      *
      * @return the unsigned short (16-bit) value in an int
-     *
      * @throws IOException IO exception
      */
     public int uint16() throws IOException {
@@ -91,7 +88,6 @@ public class HwpStreamReader {
      *
      * @param i -
      * @return the unsigned short (16-bit) value in an int
-     *
      * @throws IOException IO exception
      */
     public int[] uint16(int i) throws IOException {
@@ -99,6 +95,7 @@ public class HwpStreamReader {
             throw new IllegalArgumentException();
         }
         int[] uints = new int[i];
+
         for (int ii = 0; ii < i; ii++) {
             if (ensure(2) == 0) {
                 throw new EOFException();
@@ -113,7 +110,6 @@ public class HwpStreamReader {
      * unsigned 4 byte
      *
      * @return the unsigned int (32-bit) value in a long
-     *
      * @throws IOException IO exception
      */
     public long uint32() throws IOException {
@@ -126,7 +122,6 @@ public class HwpStreamReader {
     /**
      * @param n the number of bytes to be skipped.
      * @return the actual number of bytes skipped.
-     *
      * @throws IOException IO exception
      */
     public long skip(long n) throws IOException {
@@ -141,8 +136,9 @@ public class HwpStreamReader {
      */
     public void ensureSkip(long n) throws IOException {
         long skipped = skip(n);
+
         if (n != skipped) {
-            log.error("Skip failed {} => {}", n, skipped);
+            logger.error("Skip failed {} => {}", n, skipped);
             throw new IOException();
         }
     }
@@ -153,18 +149,18 @@ public class HwpStreamReader {
      *
      * @param count 批次读取量
      * @return 读取总数
-     *
      * @throws IOException IO exception
      * @throws EOFException EOF exception
      */
     private int ensure(int count) throws IOException, EOFException {
         int total = 0;
+
         while (total < count) {
             // if (total > 0) {
             // log.warn("한번에 읽기 실패 {}/{}. 다시 읽기 시도함 {}", total, count, input);
             // }
-
             int read = input.read(buf, total, count - total);
+
             if (read <= 0) {
                 break;
             }
@@ -177,7 +173,6 @@ public class HwpStreamReader {
             // unexpected end
             throw new EOFException();
         }
-
         return total;
     }
 }
