@@ -77,25 +77,40 @@ public class IOUtils {
 
 	public static InputStream getResourceAsStream(String resource, Class<?> clazz, Thread current)
 			throws ValidateException, UtilityException {
+		return IOUtils.getResourceAsStream(resource, clazz, current, true);
+	}
+
+	public static InputStream getResourceAsStream(String resource, Class<?> clazz, Thread current, boolean pathFirst)
+			throws ValidateException, UtilityException {
 		ValidateUtils.notEmpty("getResourceAsStream", resource);
-		InputStream stream;
-		ClassLoader loader = ClassUtils.getClassLoader(clazz, current);
-
-		if (loader != null) {
-			stream = loader.getResourceAsStream(resource);
-
-			if (stream == null && clazz != null) {
-				stream = clazz.getResourceAsStream(resource);
-			}
-		} else {
-			stream = PizContext.class.getResourceAsStream(resource);
-
-			if (stream == null) {
-				stream = PizContext.CLASS_LOADER.getResourceAsStream(resource);
+		InputStream stream = null;
+		// 是否优先从path获取
+		if (pathFirst) {
+			try {
+				stream = IOUtils.getInputStream(Paths.get(resource));
+			} catch (UtilityException e) {
+				// 若无法获取可再尝试其它方式获取
 			}
 		}
 		if (stream == null) {
-			stream = IOUtils.getInputStream(Paths.get(resource));
+			ClassLoader loader = ClassUtils.getClassLoader(clazz, current);
+
+			if (loader != null) {
+				stream = loader.getResourceAsStream(resource);
+
+				if (stream == null && clazz != null) {
+					stream = clazz.getResourceAsStream(resource);
+				}
+			} else {
+				stream = PizContext.class.getResourceAsStream(resource);
+
+				if (stream == null) {
+					stream = PizContext.CLASS_LOADER.getResourceAsStream(resource);
+				}
+			}
+			if (stream == null) {
+				stream = IOUtils.getInputStream(Paths.get(resource));
+			}
 		}
 		return stream;
 	}
