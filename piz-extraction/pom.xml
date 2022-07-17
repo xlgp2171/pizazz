@@ -11,8 +11,8 @@
     <artifactId>piz-extraction</artifactId>
 
     <properties>
-        <tika.version>1.26</tika.version>
-        <slf4j.version>1.7.30</slf4j.version>
+        <tika.version>1.28.4</tika.version>
+        <slf4j.version>1.7.36</slf4j.version>
     </properties>
 
     <dependencies>

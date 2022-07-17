@@ -10,7 +10,7 @@
 		<module>piz-base2</module>
 		<module>piz-extraction</module>
         <module>piz-kafka</module>
-		<module>piz-incubation</module>
+<!--		<module>piz-incubation</module>-->
 	</modules>
 
 	<properties>
