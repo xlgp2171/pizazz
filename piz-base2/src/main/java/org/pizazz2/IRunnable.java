@@ -1,12 +1,14 @@
 package org.pizazz2;
 
 import org.pizazz2.exception.BaseException;
+import org.pizazz2.exception.BaseRuntimeException;
+import org.pizazz2.message.BasicCodeEnum;
 
 /**
  * 类运行接口
  * 
  * @author xlgp2171
- * @version 2.1.211028
+ * @version 2.1.220715
  */
 public interface IRunnable extends ICloseable, Runnable {
 	/**
@@ -18,7 +20,7 @@ public interface IRunnable extends ICloseable, Runnable {
 			activate();
 		} catch (Exception e) {
 			if (throwable()) {
-				throw new RuntimeException(e);
+				throw new BaseRuntimeException(BasicCodeEnum.MSG_0030, e);
 			} else {
 				throwException(e);
 			}

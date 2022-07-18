@@ -135,7 +135,7 @@ public abstract class AbstractClassPlugin<C extends IObject> {
 
     @SuppressWarnings("unchecked")
     protected IPlugin<C> load(String classpath, String defClass, IPlugin<C> defPlugin, ClassLoader loader, boolean initialize,
-                              BaseException e) throws BaseException, IllegalException {
+                              BaseException e) throws BaseException, ValidateException {
         if (StringUtils.isTrimEmpty(classpath)) {
             if (defPlugin != null) {
                 log(LocaleHelper.toLocaleText(TypeEnum.BASIC, "PLUGIN.LOAD", defPlugin.getId()), null);
