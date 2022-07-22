@@ -10,22 +10,36 @@ import java.util.Set;
  * 提取组件全局配置
  *
  * @author xlgp2171
- * @version 2.0.210501
+ * @version 2.1.220722
  */
 public class ExtractConfig {
 
     private Path baseDirectory;
-    /**
-     * BaseType的白名单
-     */
+    /** BaseType的白名单 */
     private final Set<String> typeWhiteList = new HashSet<>();
+    /** BaseType的黑名单 */
+    private final Set<String> typeBlackList = new HashSet<>();
 
     public ExtractConfig() {
         baseDirectory = PizContext.TEMP_DIRECTORY.resolve(PizContext.NAMING_SHORT + "_extraction_temp");
     }
 
+    public ExtractConfig setTypeWhiteList(Set<String> typeWhiteList) {
+        this.typeWhiteList.addAll(typeWhiteList);
+        return this;
+    }
+
     public Set<String> getTypeWhiteList() {
         return typeWhiteList;
+    }
+
+    public ExtractConfig setTypeBlackList(Set<String> typeBlackList) {
+        this.typeBlackList.addAll(typeBlackList);
+        return this;
+    }
+
+    public Set<String> getTypeBlackList() {
+        return typeBlackList;
     }
 
     public void setBaseDirectory(Path baseDirectory) {

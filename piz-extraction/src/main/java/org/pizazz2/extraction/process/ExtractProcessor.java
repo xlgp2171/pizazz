@@ -60,9 +60,15 @@ public class ExtractProcessor {
     public ExtractProcessor(ExtractConfig extractConfig, Predicate<MediaType> defaultCheck, BiFunction<TupleObject,
             MediaType, TupleObject> defaultModify, IExtractListener listener) throws ValidateException {
         this(extractConfig, defaultCheck == null ? type -> {
-            // 白名单为空时 通过验证
+            // 先验白名单再看黑名单
             if (extractConfig.getTypeWhiteList().isEmpty()) {
-                return true;
+                // 黑名单也为空时 通过验证
+                if (extractConfig.getTypeBlackList().isEmpty()) {
+                    return true;
+                } else {
+                    // 黑名单有类型时，不通过验证
+                    return !extractConfig.getTypeBlackList().contains(type.getBaseType().toString());
+                }
             } else {
                 // 白名单有类型时，通过验证
                 return extractConfig.getTypeWhiteList().contains(type.getBaseType().toString());
@@ -94,7 +100,6 @@ public class ExtractProcessor {
             // 调用后才作响应
             listener.detected(object);
         }
-
         return object.getType();
     }
 
@@ -108,23 +113,26 @@ public class ExtractProcessor {
         ValidateUtils.notNull("extract", object);
 
         if (detect(object) != null) {
-            if (!defaultCheck.test(object.getType())) {
-                object.setStatus(ExtractObject.StatusEnum.REJECT);
-                listener.extracted(object);
-                return StringUtils.EMPTY;
-            }
-            IParser parser = getParser(object.getType());
             // 可以根据配置和预测类型调整配置参数
             if (modify != null) {
                 config = modify.apply(config, object.getType());
             } else {
                 config = defaultModify.apply(config, object.getType());
             }
-            parser.parse(object, parser.toConfig(config), listener);
+            // 查找解析实现
+            IParser parser = getParser(object.getType());
+            // 判断是否进入解析流程
+            if (!defaultCheck.test(object.getType())) {
+                object.setStatus(ExtractObject.StatusEnum.REJECT);
+                // 归档操作
+                object.archive(parser.toConfig(config).cleanData());
+            } else {
+                parser.parse(object, parser.toConfig(config), listener);
+            }
         }
         // 任何情况都作响应
         listener.extracted(object);
-        return object.getContent();
+        return StringUtils.nullToEmpty(object.getContent());
     }
 
     public boolean hasParser(MediaType type) {
