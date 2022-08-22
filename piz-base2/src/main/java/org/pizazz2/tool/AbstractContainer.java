@@ -33,8 +33,6 @@ public abstract class AbstractContainer<T> implements IPlugin<TupleObject> {
     protected final IRunnable runnable;
     protected final IMessageOutput<T> output;
 
-
-
 	/**
 	 * 日志记录及异常抛出
 	 * @param msg 日志消息

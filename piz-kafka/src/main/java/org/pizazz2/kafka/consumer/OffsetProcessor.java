@@ -3,7 +3,6 @@ package org.pizazz2.kafka.consumer;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.kafka.clients.consumer.*;
@@ -125,7 +124,8 @@ public class OffsetProcessor implements IOffsetProcessor {
             // 若当前提交是否大于已提交offset，则写入缓存
             if (record.offset() > offsetCommitted.get(tp).offset()) {
                 setAndCommit(consumer, record, tp);
-            } else if (KafkaConstant.DEBUG_MODE) {
+            }
+            if (KafkaConstant.DEBUG_MODE) {
                 logger.debug(KafkaConstant.LOG_TAG + tp + " consumed:" + record.offset());
             }
         } else {
