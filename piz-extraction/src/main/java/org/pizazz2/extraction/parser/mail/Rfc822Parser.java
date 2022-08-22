@@ -104,6 +104,8 @@ public class Rfc822Parser extends AbstractParser {
             this.htmlFormat = "html".equals(TupleObjectHelper.getString(config, "textFormat", "text"));
             this.extractAll = TupleObjectHelper.getBoolean(config, "extractAll", false);
             this.mimeConfig = new MimeConfig.Builder()
+                    .setMaxHeaderLen(TupleObjectHelper
+                            .getInt(config, "maxHeaderLen", NumberUtils.NEGATIVE_ONE.intValue()))
                     .setMaxLineLen(TupleObjectHelper
                             .getInt(config, "maxLineLen", NumberUtils.NEGATIVE_ONE.intValue())).build();
         }
