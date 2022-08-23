@@ -17,7 +17,7 @@ import org.pizazz2.message.TypeEnum;
  * 资源工具
  *
  * @author xlgp2171
- * @version 2.2.220417
+ * @version 2.2.220823
  */
 public class ResourceUtils {
 
@@ -105,7 +105,7 @@ public class ResourceUtils {
 		return target.getProperty(key, defValue);
 	}
 
-	public static int getByte(Properties target, String key, byte defValue) {
+	public static byte getByte(Properties target, String key, byte defValue) {
 		if (target == null || !target.containsKey(key)) {
 			return defValue;
 		}
@@ -119,7 +119,7 @@ public class ResourceUtils {
 		return NumberUtils.toInt(target.getProperty(key), defValue);
 	}
 
-	public static int getShort(Properties target, String key, short defValue) {
+	public static short getShort(Properties target, String key, short defValue) {
 		if (target == null || !target.containsKey(key)) {
 			return defValue;
 		}
@@ -133,7 +133,7 @@ public class ResourceUtils {
 		return NumberUtils.toLong(target.getProperty(key), defValue);
 	}
 
-	public static double getFloat(Properties target, String key, float defValue) {
+	public static float getFloat(Properties target, String key, float defValue) {
 		if (target == null || !target.containsKey(key)) {
 			return defValue;
 		}
@@ -162,7 +162,7 @@ public class ResourceUtils {
 		return defValue;
 	}
 
-	public static int getByte(Map<String, ?> target, String key, byte defValue) {
+	public static byte getByte(Map<String, ?> target, String key, byte defValue) {
 		if (target == null || !target.containsKey(key)) {
 			return defValue;
 		}
@@ -176,7 +176,7 @@ public class ResourceUtils {
 		return NumberUtils.toInt(StringUtils.of(target.get(key)), defValue);
 	}
 
-	public static int getShort(Map<String, ?> target, String key, short defValue) {
+	public static short getShort(Map<String, ?> target, String key, short defValue) {
 		if (target == null || !target.containsKey(key)) {
 			return defValue;
 		}
@@ -190,7 +190,7 @@ public class ResourceUtils {
 		return NumberUtils.toLong(StringUtils.of(target.get(key)), defValue);
 	}
 
-	public static double getFloat(Map<String, ?> target, String key, float defValue) {
+	public static float getFloat(Map<String, ?> target, String key, float defValue) {
 		if (target == null || !target.containsKey(key)) {
 			return defValue;
 		}
