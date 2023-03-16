@@ -2,6 +2,8 @@ package org.pizazz2.tool;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.pizazz2.common.DateUtils;
+import org.pizazz2.tool.ref.IdObject;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -13,6 +15,15 @@ import java.util.concurrent.*;
  * @version 2.0.210201
  */
 public class IdFactoryTest {
+    @Test
+    public void testParse() {
+        IdObject object = IdFactory.parseObject(730114058750328832L);
+        System.out.println(object);
+        String format = DateUtils.format(object.getTimestamp(), DateUtils.DEFAULT_FORMAT);
+        System.out.println(format);
+    }
+
+
     @Test
     public void testGenerateAndParseObject() {
         short custom = 16;

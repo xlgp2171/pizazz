@@ -96,6 +96,27 @@ public class CollectionUtils {
 		return tmp.deleteCharAt(tmp.length() - 1).append("]").toString();
 	}
 
+	public static List<?> toList(Object target) {
+		if (!(target instanceof List)) {
+			return new LinkedList<>();
+		}
+		return (List<?>) target;
+	}
+
+	public static Set<?> toSet(Object target) {
+		if (!(target instanceof List)) {
+			return new HashSet<>();
+		}
+		return (Set<?>) target;
+	}
+
+	public static Collection<?> toCollection(Object target) {
+		if (!(target instanceof Collection)) {
+			return new LinkedList<>();
+		}
+		return (Collection<?>) target;
+	}
+
 	/**
 	 * 随机分布元素
 	 * @param target 目标集合

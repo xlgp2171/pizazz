@@ -20,8 +20,8 @@ public class StringUtilsTest {
 
 	@Test
 	public void testFormat() {
-		String result = StringUtils.format("{1}异常为{0}", "IOException", "TYPE");
-		Assert.assertEquals(result, "TYPE异常为IOException");
+		String result = StringUtils.format("'' {1} ''异常为{0}", "IOException", "TYPE");
+		Assert.assertEquals(result, "' TYPE '异常为IOException");
 	}
 
 	@Test

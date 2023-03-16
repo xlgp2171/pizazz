@@ -1,7 +1,9 @@
 package org.pizazz2.common;
 
+import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
 import org.pizazz2.ISerializable;
 import org.pizazz2.exception.IllegalException;
@@ -13,7 +15,7 @@ import org.pizazz2.message.TypeEnum;
  * 对象工具
  * 
  * @author xlgp2171
- * @version 2.1.21104
+ * @version 2.2.230315
  */
 public class ObjectUtils {
 
@@ -64,8 +66,17 @@ public class ObjectUtils {
 		return length;
 	}
 
-	public static boolean isNull(WeakReference<?> target) {
-		return target == null || target.get() == null;
+	public static boolean isNotNull(Object target) {
+		return !ObjectUtils.isNull(target);
+	}
+
+	public static boolean isNull(Object target) {
+		boolean tmp = Objects.isNull(target);
+
+		if (!tmp) {
+			return target instanceof Reference<?> && ((Reference<?>) target).get() == null;
+		}
+		return true;
 	}
 
 	public static boolean isArray(Object obj) {

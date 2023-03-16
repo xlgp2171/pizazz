@@ -13,7 +13,7 @@ import org.pizazz2.message.ExpressionEnum;
  * 部分参考com.baomidou.mybatisplus.core.toolkit.StringUtils
  * 
  * @author xlgp2171
- * @version 2.1.220707
+ * @version 2.2.230315
  */
 public class StringUtils {
 
@@ -22,6 +22,10 @@ public class StringUtils {
 
 	public static boolean isEmpty(CharSequence cs) {
 		return cs == null || cs.length() == 0;
+	}
+
+	public static boolean isNotEmpty(CharSequence cs) {
+		return !StringUtils.isEmpty(cs);
 	}
 
 	public static boolean isTrimEmpty(String str) {

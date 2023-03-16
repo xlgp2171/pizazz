@@ -5,12 +5,11 @@ import org.junit.Test;
 import org.pizazz2.common.IOUtils;
 import org.pizazz2.common.JSONUtils;
 import org.pizazz2.common.PathUtils;
-import org.pizazz2.common.ThreadUtils;
+import org.pizazz2.data.ResponseObject;
 import org.pizazz2.data.TupleObject;
 import org.pizazz2.exception.ToolException;
 import org.pizazz2.exception.UtilityException;
 import org.pizazz2.helper.TupleObjectHelper;
-import org.pizazz2.tool.ref.ResponseObject;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -28,7 +27,7 @@ import java.util.concurrent.Executors;
  * PizHttpConnection测试
  *
  * @author xlgp2171
- * @version 2.1.211029
+ * @version 2.1.211111
  */
 public class PizHttpConnectionTest {
 
@@ -63,9 +62,9 @@ public class PizHttpConnectionTest {
 		HttpURLConnection conn = connect(url);
 
 		if (conn != null) {
-			ResponseObject response = PizHttpConnection.response(conn);
+			ResponseObject<List<String>, byte[]> response = PizHttpConnection.response(conn);
 			Assert.assertEquals(response.getCode(), 200);
-			Assert.assertEquals(new String(response.getData()).substring(0, 9), "<!DOCTYPE");
+			Assert.assertEquals(new String(response.getResult()).substring(0, 9), "<!DOCTYPE");
 		}
 	}
 
@@ -82,9 +81,9 @@ public class PizHttpConnectionTest {
 		String requestString = JSONUtils.toJSON(request);
 		HttpURLConnection post = new PizHttpConnection(url)
 				.connect("POST", TupleObjectHelper.emptyObject(), requestString.getBytes());
-		ResponseObject response = PizHttpConnection.response(post, -1);
+		ResponseObject<List<String>, byte[]> response = PizHttpConnection.response(post, -1);
 		System.out.println(key + ": " + response.getCode());
-		System.out.println(key + ": " + new String(response.getData()));
+		System.out.println(key + ": " + new String(response.getResult()));
 	}
 
 	private TupleObject newRequestData(long id) throws UtilityException {
@@ -181,9 +180,9 @@ public class PizHttpConnectionTest {
 		String url = "http://127.0.0.1:5001/get_models";
 		HttpURLConnection post = new PizHttpConnection(url)
 				.connect("POST", TupleObjectHelper.emptyObject(), "".getBytes());
-		ResponseObject response = PizHttpConnection.response(post, -1);
+		ResponseObject<List<String>, byte[]> response = PizHttpConnection.response(post, -1);
 		System.out.println(response.getCode());
-		System.out.println(new String(response.getData()));
+		System.out.println(new String(response.getResult()));
 	}
 
 	@Test
@@ -191,8 +190,8 @@ public class PizHttpConnectionTest {
 		String url = "http://127.0.0.1:5001/ping";
 		HttpURLConnection post = new PizHttpConnection(url)
 				.connect("GET", TupleObjectHelper.emptyObject(), "".getBytes());
-		ResponseObject response = PizHttpConnection.response(post, -1);
+		ResponseObject<List<String>, byte[]> response = PizHttpConnection.response(post, -1);
 		System.out.println(response.getCode());
-		System.out.println(new String(response.getData()));
+		System.out.println(new String(response.getResult()));
 	}
 }

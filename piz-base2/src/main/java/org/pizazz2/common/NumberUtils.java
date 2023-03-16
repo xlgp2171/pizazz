@@ -9,7 +9,7 @@ import org.pizazz2.exception.ValidateException;
  * 数值工具
  *
  * @author xlgp2171
- * @version 2.0.210804
+ * @version 2.2.230315
  */
 public class NumberUtils {
     /** 0 */
@@ -33,65 +33,65 @@ public class NumberUtils {
         return !(max != null && length > max);
     }
 
-    public static int toInt(String target, int defValue) {
+    public static int toInt(Object target, int defValue) {
         return NumberUtils.toInt(target, 10, defValue);
     }
 
-    public static int toInt(String target, int radix, int defValue) {
+    public static int toInt(Object target, int radix, int defValue) {
         try {
-            return Integer.parseInt(target, radix);
+            return Integer.parseInt(StringUtils.of(target), radix);
         } catch (NumberFormatException e) {
             return defValue;
         }
     }
 
-    public static long toLong(String target, long defValue) {
+    public static long toLong(Object target, long defValue) {
         return NumberUtils.toLong(target, 10, defValue);
     }
 
-    public static long toLong(String target, int radix, long defValue) {
+    public static long toLong(Object target, int radix, long defValue) {
         try {
-            return Long.parseLong(target, radix);
+            return Long.parseLong(StringUtils.of(target), radix);
         } catch (NumberFormatException e) {
             return defValue;
         }
     }
 
-    public static short toShort(String target, short defValue) {
+    public static short toShort(Object target, short defValue) {
         return NumberUtils.toShort(target, 10, defValue);
     }
 
-    public static short toShort(String target, int radix, short defValue) {
+    public static short toShort(Object target, int radix, short defValue) {
         try {
-            return Short.parseShort(target, radix);
+            return Short.parseShort(StringUtils.of(target), radix);
         } catch (NumberFormatException e) {
             return defValue;
         }
     }
 
-    public static byte toByte(String target, byte defValue) {
+    public static byte toByte(Object target, byte defValue) {
         return NumberUtils.toByte(target, 10, defValue);
     }
 
-    public static byte toByte(String target, int radix, byte defValue) {
+    public static byte toByte(Object target, int radix, byte defValue) {
         try {
-            return Byte.parseByte(target, radix);
+            return Byte.parseByte(StringUtils.of(target), radix);
         } catch (NumberFormatException e) {
             return defValue;
         }
     }
 
-    public static double toDouble(String target, double defValue) {
+    public static double toDouble(Object target, double defValue) {
         try {
-            return Double.parseDouble(target);
+            return Double.parseDouble(StringUtils.of(target));
         } catch (NumberFormatException e) {
             return defValue;
         }
     }
 
-    public static float toFloat(String target, float defValue) {
+    public static float toFloat(Object target, float defValue) {
         try {
-            return Float.parseFloat(target);
+            return Float.parseFloat(StringUtils.of(target));
         } catch (NumberFormatException e) {
             return defValue;
         }
