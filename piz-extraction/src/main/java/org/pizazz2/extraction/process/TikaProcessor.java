@@ -63,8 +63,8 @@ public class TikaProcessor {
 
     public String extract(byte[] data, Metadata metadata, Charset charset, HandlerEnum format)
             throws ParseException, IllegalException {
-        // 默认初始化大小1MB
-        ByteArrayOutputStream tmp = new ByteArrayOutputStream(1024 * 1024);
+        // 默认初始化大小5MB
+        ByteArrayOutputStream tmp = new ByteArrayOutputStream(5 * 1024 * 1024);
         ContentHandler handler = format.newHandler(tmp, charset,false);
         extract(data, metadata, handler);
         return tmp.toString();

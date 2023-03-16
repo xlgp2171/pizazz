@@ -6,14 +6,14 @@
     <parent>
         <artifactId>pizazz</artifactId>
         <groupId>org.pizazz</groupId>
-        <version>2.1.0</version>
+        <version>2.2.0</version>
     </parent>
     <artifactId>piz-extraction</artifactId>
 
     <properties>
-        <tika.version>1.28.4</tika.version>
+        <tika.version>2.7.0</tika.version>
         <slf4j.version>1.7.36</slf4j.version>
-        <junrar.version>7.5.2</junrar.version>
+        <junrar.version>7.5.4</junrar.version>
     </properties>
 
     <dependencies>
@@ -42,7 +42,20 @@
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
-            <artifactId>tika-parsers</artifactId>
+<!--            <artifactId>tika-parsers</artifactId>-->
+            <artifactId>tika-parsers-standard-package</artifactId>
+            <version>${tika.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <!--            <artifactId>tika-parsers</artifactId>-->
+            <artifactId>tika-parsers-standard-package</artifactId>
+            <version>${tika.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <!--            <artifactId>tika-parsers</artifactId>-->
+            <artifactId>tika-parsers-standard-package</artifactId>
             <version>${tika.version}</version>
         </dependency>
 

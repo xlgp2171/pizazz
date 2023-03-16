@@ -1,6 +1,7 @@
 package org.pizazz2.extraction.data;
 
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.mime.MediaType;
 import org.pizazz2.common.ArrayUtils;
 import org.pizazz2.common.NumberUtils;
@@ -17,7 +18,7 @@ import java.util.LinkedList;
  * 文档链接流转对象
  *
  * @author xlgp2171
- * @version 2.1.220701
+ * @version 2.2.230310
  */
 public class ExtractObject extends LinkedObject<byte[]> implements IData {
     /** 文档属性 */
@@ -54,7 +55,7 @@ public class ExtractObject extends LinkedObject<byte[]> implements IData {
 
     private void initialMetadataName() {
         this.metadata.set(Metadata.TIKA_MIME_FILE, getName());
-        this.metadata.set(Metadata.RESOURCE_NAME_KEY, getName());
+        this.metadata.set(TikaCoreProperties.RESOURCE_NAME_KEY, getName());
     }
 
     @Override

@@ -7,16 +7,18 @@ import org.apache.poi.hsmf.datatypes.*;
 import org.apache.poi.hsmf.exceptions.ChunkNotFoundException;
 import org.apache.poi.poifs.filesystem.*;
 import org.apache.poi.util.CodePageUtil;
+import org.apache.tika.detect.Detector;
+import org.apache.tika.detect.zip.DefaultZipContainerDetector;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Message;
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.Property;
 import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.mime.MediaType;
 import org.apache.tika.parser.html.HtmlEncodingDetector;
-import org.apache.tika.parser.mbox.MboxParser;
+import org.apache.tika.parser.mailcommons.MailDateParser;
 import org.apache.tika.parser.microsoft.OfficeParser;
 import org.apache.tika.parser.microsoft.OutlookExtractor;
-import org.apache.tika.parser.pkg.ZipContainerDetector;
 import org.apache.tika.utils.ExceptionUtils;
 import org.pizazz2.common.*;
 import org.pizazz2.data.TupleObject;
@@ -52,7 +54,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * 解析属性Metadata包括：
  *
  * @author xlgp2171
- * @version 2.1.211103
+ * @version 2.2.230310
  */
 public class OutlookParser extends AbstractParser {
 
@@ -132,7 +134,7 @@ public class OutlookParser extends AbstractParser {
         fillRecipients(metadata, message);
         // 邮件发送时间
         fillSentDate(metadata, message, id);
-        // 邮件发送
+        // 邮件主题
         fillSubject(metadata, message, id);
     }
 
@@ -172,6 +174,13 @@ public class OutlookParser extends AbstractParser {
         return target == null ? StringUtils.EMPTY : target.toString();
     }
 
+    private void setFirstChunk(List<Chunk> chunks, Property property, Metadata metadata) {
+        if (chunks == null || chunks.size() < 1 || chunks.get(0) == null) {
+            return;
+        }
+        metadata.set(property, chunks.get(0).toString());
+    }
+
     /**
      * 填充邮件发送者
      *
@@ -179,12 +188,9 @@ public class OutlookParser extends AbstractParser {
      * @param message outlook实例
      */
     private void fillFromRecipient(Metadata metadata, MAPIMessage message) {
-        Chunks chunks = message.getMainChunks();
-
-        if (chunks != null) {
-            metadata.add(Metadata.MESSAGE_FROM_NAME, nullToEmpty(chunks.getDisplayFromChunk()));
-            metadata.add(Metadata.MESSAGE_FROM_EMAIL, nullToEmpty(chunks.getEmailFromChunk()));
-        }
+        Map<MAPIProperty, List<Chunk>> mainChunks = message.getMainChunks().getAll();
+        setFirstChunk(mainChunks.get(MAPIProperty.SENDER_NAME), Message.MESSAGE_FROM_NAME, metadata);
+        setFirstChunk(mainChunks.get(MAPIProperty.SENDER_EMAIL_ADDRESS), Message.MESSAGE_FROM_EMAIL, metadata);
     }
 
     /**
@@ -228,6 +234,15 @@ public class OutlookParser extends AbstractParser {
                     break;
             }
         }
+        try {
+            for (String recipientAddress : message.getRecipientEmailAddressList()) {
+                if (recipientAddress != null) {
+                    metadata.add(Metadata.MESSAGE_RECIPIENT_ADDRESS, recipientAddress);
+                }
+            }
+        } catch (ChunkNotFoundException he) {
+            // do nothing
+        }
     }
 
     /**
@@ -246,7 +261,7 @@ public class OutlookParser extends AbstractParser {
             LOGGER.warn("MAIL DATE NOT FOUND,id=" + id);
         }
         if (calendar != null) {
-            dateString = DateUtils.format(calendar.getTime(), "yyyy-MM-dd HH:mm:ss");
+            dateString = DateUtils.format(calendar.getTime(), DateUtils.DEFAULT_FORMAT);
         } else {
             Map<String, String[]> headers = null;
             try {
@@ -258,13 +273,13 @@ public class OutlookParser extends AbstractParser {
                 for (Map.Entry<String, String[]> header : headers.entrySet()) {
                     String headerKey = header.getKey();
 
-                    if (headerKey.toLowerCase().startsWith("date:")) {
+                    if (headerKey.toLowerCase(Locale.ROOT).startsWith("date:")) {
                         String date = headerKey.substring(headerKey.indexOf(':') + 1).trim();
                         // See if we can parse it as a normal mail date
                         try {
-                            Date d = MboxParser.parseDate(date);
-                            dateString = DateUtils.format(d, "yyyy-MM-dd HH:mm:ss");
-                        } catch (java.text.ParseException e) {
+                            Date d = MailDateParser.parseDateLenient(date);
+                            dateString = DateUtils.format(d, DateUtils.DEFAULT_FORMAT);
+                        } catch (Exception e) {
                             LOGGER.warn("UNSUPPORTED MAIL DATE FORMAT:" + date + ",id=" + id);
                             dateString = date;
                         }
@@ -287,9 +302,8 @@ public class OutlookParser extends AbstractParser {
      */
     private void fillSubject(Metadata metadata, MAPIMessage message, String id) {
         try {
-            if (!StringUtils.isEmpty(message.getSubject())) {
-                metadata.add(TikaCoreProperties.TITLE, message.getSubject());
-            }
+            metadata.add(TikaCoreProperties.TITLE, StringUtils.nullToEmpty(message.getSubject()));
+            metadata.set(TikaCoreProperties.SUBJECT, StringUtils.nullToEmpty(message.getConversationTopic()));
         } catch (ChunkNotFoundException e) {
             LOGGER.warn("MAIL SUBJECT NOT FOUND,id=" + id);
         }
@@ -332,23 +346,28 @@ public class OutlookParser extends AbstractParser {
                                            IExtractListener listener) throws IOException, DetectionException,
             ParseException, ValidateException, IllegalException {
         // Is it an embedded OLE2 document, or an embedded OOXML document?
-        if (dir.hasEntry("Package")) {
-            // It's OOXML (has a ZipFile):
-            Entry ooxml = dir.getEntry("Package");
+        //first try for ooxml
+        Entry ooxml = dir.hasEntry("Package") ? dir.getEntry("Package") :
+                (dir.hasEntry("package") ? dir.getEntry("package") : null);
 
-            try (TikaInputStream stream = TikaInputStream.get(new DocumentInputStream((DocumentEntry) ooxml))) {
-                ZipContainerDetector detector = new ZipContainerDetector();
+        if (ooxml != null) {
+            // It's OOXML (has a ZipFile):
+            Metadata metadata = new Metadata();
+            metadata.set(Metadata.CONTENT_LENGTH, Integer.toString(((DocumentEntry)ooxml).getSize()));
+
+            try (TikaInputStream in = TikaInputStream
+                    .get(new DocumentInputStream((DocumentEntry) ooxml))) {
+                Detector detector = new DefaultZipContainerDetector();
                 MediaType type;
                 try {
-                    //if there's a stream error while detecting...
-                    type = detector.detect(stream, new Metadata());
+                    type = detector.detect(in, metadata);
                 } catch (Exception e) {
                     String msg = ExceptionUtils.getFilteredStackTrace(e);
                     throw new DetectionException(CodeEnum.ETT_04, msg, e);
                 }
                 byte[] data;
                 try {
-                    data = IOUtils.toByteArray(stream);
+                    data = IOUtils.toByteArray(in);
                 } catch (UtilityException e) {
                     LOGGER.warn(e.getMessage() + ",name=" + dir.getName() + ",id=" + parent.getId());
                     data = ArrayUtils.EMPTY_BYTE;
@@ -372,9 +391,10 @@ public class OutlookParser extends AbstractParser {
         // It's regular OLE2:
         // What kind of document is it?
         Metadata metadata = new Metadata();
-        metadata.set(Metadata.EMBEDDED_RELATIONSHIP_ID, dir.getName());
+        metadata.set(TikaCoreProperties.EMBEDDED_RELATIONSHIP_ID, dir.getName());
+
         if (dir.getStorageClsid() != null) {
-            metadata.set(Metadata.EMBEDDED_STORAGE_CLASS_ID, dir.getStorageClsid().toString());
+            metadata.set(TikaCoreProperties.EMBEDDED_STORAGE_CLASS_ID, dir.getStorageClsid().toString());
         }
         OfficeParser.POIFSDocumentType type = OfficeParser.POIFSDocumentType.detectType(dir);
         String rName = dir.getName();
@@ -406,12 +426,13 @@ public class OutlookParser extends AbstractParser {
                 DocumentEntry contentsEntry;
                 try {
                     contentsEntry = (DocumentEntry) dir.getEntry("CONTENTS");
-                } catch (FileNotFoundException ioe) {
+                } catch (FileNotFoundException e) {
                     contentsEntry = (DocumentEntry) dir.getEntry("Contents");
                 }
-                DocumentInputStream inp = new DocumentInputStream(contentsEntry);
-                contents = new byte[contentsEntry.getSize()];
-                inp.readFully(contents);
+                try (DocumentInputStream inp = new DocumentInputStream(contentsEntry)) {
+                    contents = new byte[contentsEntry.getSize()];
+                    inp.readFully(contents);
+                }
             } catch (Exception e) {
                 String msg = ExceptionUtils.getFilteredStackTrace(e);
                 throw new ParseException(CodeEnum.ETT_06, msg, e);

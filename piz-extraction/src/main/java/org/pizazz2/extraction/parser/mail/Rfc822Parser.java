@@ -17,7 +17,8 @@ import org.apache.tika.metadata.Message;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.mime.MediaType;
-import org.apache.tika.parser.mail.MailUtil;
+import org.apache.tika.parser.mailcommons.MailDateParser;
+import org.apache.tika.parser.mailcommons.MailUtil;
 import org.pizazz2.PizContext;
 import org.pizazz2.common.*;
 import org.pizazz2.data.TupleObject;
@@ -32,7 +33,6 @@ import org.pizazz2.extraction.exception.DetectionException;
 import org.pizazz2.extraction.exception.ParseException;
 import org.pizazz2.extraction.parser.AbstractParser;
 import org.pizazz2.extraction.support.ExtractHelper;
-import org.pizazz2.extraction.support.ParseHelper;
 import org.pizazz2.helper.TupleObjectHelper;
 
 import java.io.ByteArrayInputStream;
@@ -51,7 +51,7 @@ import java.util.function.BiConsumer;
  * 解析属性Metadata包括：
  *
  * @author xlgp2171
- * @version 2.1.211201
+ * @version 2.2.230310
  */
 public class Rfc822Parser extends AbstractParser {
     static final String KEY_MULTIPART_ALTERNATIVE = "multipart/alternative";
@@ -64,6 +64,7 @@ public class Rfc822Parser extends AbstractParser {
     public static final String KEY_CC = "Cc";
     public static final String KEY_BCC = "Bcc";
     public static final String KEY_DATE = "Date";
+    public static final String KEY_CONTENT_TYPE = "Content-Type";
 
     @Override
     public IConfig toConfig(TupleObject config) {
@@ -78,6 +79,7 @@ public class Rfc822Parser extends AbstractParser {
                 new DefaultBodyDescriptorBuilder());
         parser.setContentHandler(new Handler(object, tmp));
         parser.setContentDecoding(true);
+        parser.setNoRecurse();
 
         try (InputStream in = new ByteArrayInputStream(object.getData())) {
             parser.parse(in);
@@ -185,7 +187,8 @@ public class Rfc822Parser extends AbstractParser {
                 MailboxList mailboxList = fromField.getMailboxList();
 
                 if (fromField.isValidField() && !CollectionUtils.isEmpty(mailboxList)) {
-                    for (Mailbox item : mailboxList) {
+                    for (Address item : mailboxList) {
+                        // 和源文件不一致，未使用MailUtil.setPersonAndEmail方法
                         fillDisplayString(item, (name, address) -> {
                             metadata.add(Metadata.MESSAGE_FROM_NAME, StringUtils.nullToEmpty(name));
                             metadata.add(Metadata.MESSAGE_FROM_EMAIL, StringUtils.nullToEmpty(address));
@@ -197,6 +200,7 @@ public class Rfc822Parser extends AbstractParser {
                 }
             } else if (KEY_SUBJECT.equalsIgnoreCase(fieldName)) {
                 metadata.set(TikaCoreProperties.TITLE, ((UnstructuredField) parsedField).getValue());
+                metadata.set(TikaCoreProperties.SUBJECT, ((UnstructuredField) parsedField).getValue());
             } else if (KEY_TO.equalsIgnoreCase(fieldName)) {
                 processAddressList(parsedField, KEY_TO + ":", (name, address) -> {
                     metadata.add(Metadata.MESSAGE_TO_NAME, StringUtils.nullToEmpty(name));
@@ -213,15 +217,27 @@ public class Rfc822Parser extends AbstractParser {
                     metadata.add(Metadata.MESSAGE_BCC_EMAIL, StringUtils.nullToEmpty(address));
                 });
             } else if (KEY_DATE.equalsIgnoreCase(fieldName)) {
-                DateTimeField dateField = (DateTimeField) parsedField;
-                Date date = dateField.getDate();
-
-                if (date == null) {
-                    date = ParseHelper.tryOtherDateFormats(field.getBody());
+                String dateBody = parsedField.getBody();
+                Date date = null;
+                try {
+                    date = MailDateParser.parseDateLenient(dateBody);
+                } catch (Exception e) {
+                    LOGGER.warn("DATE VALIDATE:" + e.getMessage() + ",date=" + dateBody);
                 }
                 if (date != null) {
                     metadata.set(TikaCoreProperties.CREATED, DateUtils.format(date, DateUtils.DEFAULT_FORMAT));
                 }
+            } else if (KEY_CONTENT_TYPE.equalsIgnoreCase(fieldName)) {
+                final MediaType contentType = MediaType.parse(parsedField.getBody());
+
+                if (contentType.getType().equalsIgnoreCase("multipart")) {
+                    metadata.set(Message.MULTIPART_SUBTYPE, contentType.getSubtype());
+                    metadata.set(Message.MULTIPART_BOUNDARY, contentType.getParameters().get("boundary"));
+                } else {
+                    metadata.add(Metadata.MESSAGE_RAW_HEADER_PREFIX + parsedField.getName(), field.getBody());
+                }
+            } else {
+                // metadata.add(Metadata.MESSAGE_RAW_HEADER_PREFIX + parsedField.getName(), field.getBody());
             }
         }
 
@@ -269,6 +285,11 @@ public class Rfc822Parser extends AbstractParser {
             Metadata subMetadata = new Metadata();
             subMetadata.set(Metadata.CONTENT_TYPE, body.getMimeType());
             subMetadata.set(Metadata.CONTENT_ENCODING, body.getCharset());
+            // TIKA-2455: flag the containing type.
+            if (parts.size() > 0) {
+                subMetadata.set(Message.MULTIPART_SUBTYPE, parts.peek().getSubType());
+                subMetadata.set(Message.MULTIPART_BOUNDARY, parts.peek().getBoundary());
+            }
             byte[] data;
             try {
                 data = IOUtils.toByteArray(is);
@@ -371,9 +392,11 @@ public class Rfc822Parser extends AbstractParser {
         }
 
         private void fillDisplayString(Address address, BiConsumer<String, String> consumer) {
+            String name = StringUtils.EMPTY;
+
             if (address instanceof Mailbox) {
                 Mailbox mailbox = (Mailbox) address;
-                String name = mailbox.getName();
+                name = mailbox.getName();
 
                 if (!StringUtils.isEmpty(name)) {
                     name = DecoderUtil.decodeEncodedWords(name, DecodeMonitor.SILENT);
@@ -385,6 +408,8 @@ public class Rfc822Parser extends AbstractParser {
                 for (Mailbox item : group.getMailboxes()) {
                     fillDisplayString(item, consumer);
                 }
+            } else {
+                consumer.accept(name, address.toString());
             }
         }
 
@@ -471,6 +496,11 @@ public class Rfc822Parser extends AbstractParser {
 
         public Part(BodyDescriptor descriptor) {
             this.descriptor = descriptor;
+        }
+
+        @Override
+        public String toString() {
+            return "Part{" + "bodyDescriptor=" + descriptor + ", children=" + children + '}';
         }
     }
 
