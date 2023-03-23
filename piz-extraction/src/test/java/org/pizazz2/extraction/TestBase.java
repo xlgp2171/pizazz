@@ -27,7 +27,7 @@ public class TestBase {
             System.out.println(multiSpace(level) + "META: " +
                     (text.length() > 40 ? text.substring(0, 40) + " ..." : text));
             text = object.getContent();
-            System.out.println(multiSpace(level) + "TEXT:" +
+            System.out.println(multiSpace(level) + "TEXT: " +
                     (text == null ? "None" : (text.length() > 40 ? text.substring(0, 40) + " ..." : text)));
         }
         if (object.hasAttachment()) {

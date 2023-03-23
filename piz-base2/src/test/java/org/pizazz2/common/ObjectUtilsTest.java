@@ -7,9 +7,15 @@ import org.junit.Test;
  * ObjectUtils测试
  *
  * @author xlgp2171
- * @version 2.0.210525
+ * @version 2.2.230323
  */
 public class ObjectUtilsTest {
+
+	@Test
+	public void testConvertPrimitive() {
+		long result = ObjectUtils.convertPrimitive("23", Long.class);
+		Assert.assertEquals(result, 23);
+	}
 
 	@Test
 	public void testGetObjectsLength() {

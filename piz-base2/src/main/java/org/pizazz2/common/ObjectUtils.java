@@ -1,7 +1,6 @@
 package org.pizazz2.common;
 
 import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.util.Objects;
 
@@ -15,9 +14,43 @@ import org.pizazz2.message.TypeEnum;
  * 对象工具
  * 
  * @author xlgp2171
- * @version 2.2.230315
+ * @version 2.2.230323
  */
 public class ObjectUtils {
+
+	@SuppressWarnings("unchecked")
+	public static <T>T convertPrimitive(Object target, Class<T> clazz) throws IllegalException {
+		Object result = null;
+		String tmp = StringUtils.of(target);
+		try {
+			// 包装类型和基本类型通用
+			if (clazz == Integer.class) {
+				result = Integer.parseInt(tmp);
+			} else if (clazz == Byte.class) {
+				result = Byte.parseByte(tmp);
+			} else if (clazz == Short.class) {
+				result = Short.parseShort(tmp);
+			} else if (clazz == Double.class) {
+				result = Double.parseDouble(tmp);
+			} else if (clazz == Float.class) {
+				result = Float.parseFloat(tmp);
+			} else if (clazz == Long.class) {
+				result = Long.parseLong(tmp);
+			}
+		} catch(NumberFormatException e) {
+			throw new IllegalException(BasicCodeEnum.MSG_0005, e.getMessage(), e);
+		}
+		if (result == null) {
+			if (clazz == Boolean.class) {
+				result = BooleanUtils.toBoolean(tmp);
+			} else if (clazz == String.class) {
+				result = tmp;
+			} else {
+				result = ClassUtils.cast(target, clazz);
+			}
+		}
+		return (T) result;
+	}
 
 	public static long getObjectsLength(Object... data) throws IllegalException {
 		long length = 0;

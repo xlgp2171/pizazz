@@ -1,7 +1,9 @@
 package org.pizazz2.common;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
+import cn.hutool.core.convert.Convert;
 import org.pizazz2.exception.UtilityException;
 import org.pizazz2.exception.ValidateException;
 
@@ -9,7 +11,7 @@ import org.pizazz2.exception.ValidateException;
  * 集合工具
  * 
  * @author xlgp2171
- * @version 2.0.210914
+ * @version 2.2.230323
  */
 public class CollectionUtils {
 
@@ -67,7 +69,7 @@ public class CollectionUtils {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static List<String> convert(List<Object> target) {
+	public static List<String> convert(List<?> target) {
 		if (CollectionUtils.isEmpty(target)) {
 			return CollectionUtils.emptyList();
 		}
@@ -98,9 +100,68 @@ public class CollectionUtils {
 
 	public static List<?> toList(Object target) {
 		if (!(target instanceof List)) {
-			return new LinkedList<>();
+			return new ArrayList<>(Collections.singletonList(target));
 		}
 		return (List<?>) target;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> List<T> toList(Object target, Class<T> clazz)  {
+		ValidateUtils.notNull("target", clazz);
+
+		if (ObjectUtils.isNull(target)) {
+			return CollectionUtils.emptyList();
+		}
+		Class<?> targetClass = target.getClass();
+		Collection<Object> tmp;
+		// 按集合和数组方式组织数据
+		if (targetClass.isArray()) {
+			tmp = CollectionUtils.arrayToCollection(target);
+		} else if (targetClass.isAssignableFrom(Collection.class)) {
+			tmp = new ArrayList<>(((Collection<Object>) target));
+		} else {
+			// 若不是集合或者数组
+			tmp = new ArrayList<>(Collections.singletonList(target));
+		}
+		return tmp.stream().map(item -> ObjectUtils.convertPrimitive(item, clazz)).collect(Collectors.toList());
+	}
+
+	static Collection<Object> arrayToCollection(Object target) {
+		List<Object> result = new ArrayList<>();
+		Class<?> clazz = target.getClass();
+
+		if (clazz == int[].class) {
+			for (Object item : (int[]) target) {
+				result.add(item);
+			}
+		} else if (clazz == byte[].class) {
+			for (Object item : (byte[]) target) {
+				result.add(item);
+			}
+		} else if (clazz == short[].class) {
+			for (Object item : (short[]) target) {
+				result.add(item);
+			}
+		} else if (clazz == double[].class) {
+			for (Object item : (double[]) target) {
+				result.add(item);
+			}
+		} else if (clazz == float[].class) {
+			for (Object item : (float[]) target) {
+				result.add(item);
+			}
+		} else if (clazz == long[].class) {
+			for (Object item : (long[]) target) {
+				result.add(item);
+			}
+		} else if (clazz == boolean[].class) {
+			for (Object item : (boolean[]) target) {
+				result.add(item);
+			}
+		} else {
+			result.addAll(Arrays.asList((Object[]) target));
+		}
+		return result;
 	}
 
 	public static Set<?> toSet(Object target) {
