@@ -72,9 +72,9 @@ public final class PizContext {
 	static {
 		LOCAL_OS = SystemUtils.getOSType(SystemUtils.getSystemProperty("os.name", StringUtils.EMPTY).toLowerCase());
 		// 默认英文环境
-		String tmp = SystemUtils.getSystemProperty(PizContext.NAMING_SHORT + ".locale", "en_US");
+		String tmp = SystemUtils.getSystemProperty(PizContext.NAMING_SHORT + ".locale", "en-US");
 		Locale tmpL = Locale.forLanguageTag(tmp);
-		LOCAL_LOCALE = StringUtils.isTrimEmpty(tmpL.toString()) ? Locale.forLanguageTag("zh_CN") : tmpL;
+		LOCAL_LOCALE = StringUtils.isTrimEmpty(tmpL.toString()) ? Locale.forLanguageTag("zh-CN") : tmpL;
 		Path tmpPath;
 		try {
 			tmpPath = Paths.get("").toRealPath();
