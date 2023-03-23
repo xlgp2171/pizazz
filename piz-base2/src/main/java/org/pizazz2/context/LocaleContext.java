@@ -51,7 +51,7 @@ public final class LocaleContext implements ICloseable {
             Map<Locale, Properties> tmp = tree.get(type);
 
             if (tmp != null && !tmp.containsKey(locale)) {
-                synchronized (tmp) {
+                synchronized (tree) {
                     if (!tmp.containsKey(locale)) {
                         load(tmp, type, locale);
                     }
@@ -101,7 +101,7 @@ public final class LocaleContext implements ICloseable {
         tree.clear();
     }
 
-    private static enum Singleton {
+    private enum Singleton {
         /**
          * 单例
          */
@@ -109,7 +109,7 @@ public final class LocaleContext implements ICloseable {
 
         private final LocaleContext context;
 
-        private Singleton() {
+        Singleton() {
             context = new LocaleContext();
         }
 

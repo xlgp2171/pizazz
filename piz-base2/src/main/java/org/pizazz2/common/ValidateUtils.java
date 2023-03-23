@@ -18,7 +18,7 @@ import java.util.function.Supplier;
  * 验证工具
  *
  * @author xlgp2171
- * @version 2.2.230315
+ * @version 2.2.230323
  */
 public class ValidateUtils {
     static void throwException(IMessageCode code, Supplier<String> message) {
@@ -27,8 +27,8 @@ public class ValidateUtils {
     // ----------
 
     public static void verifyExpression(ExpressionEnum expression, String target) throws ValidateException {
-        String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.EXPRESSION.MATCHES", target, expression.name());
-        ValidateUtils.verifyExpression(BasicCodeEnum.MSG_0026, expression, target, () -> msg);
+        ValidateUtils.verifyExpression(BasicCodeEnum.MSG_0026, expression, target, () ->
+                LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.EXPRESSION.MATCHES", target, expression.name()));
     }
 
     public static void verifyExpression(IMessageCode code, ExpressionEnum expression, String target,
@@ -56,8 +56,8 @@ public class ValidateUtils {
     }
 
     public static void notEmpty(String method, IObject target, int seq) {
-        String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, seq);
-        ValidateUtils.notEmpty(BasicCodeEnum.MSG_0001, target, () -> msg);
+        ValidateUtils.notEmpty(BasicCodeEnum.MSG_0001, target, () ->
+                LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, seq));
     }
     // ----------
 
@@ -77,8 +77,8 @@ public class ValidateUtils {
     }
 
     public static void notEmpty(String method, Collection<?> target, int seq) throws ValidateException {
-        String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, seq);
-        ValidateUtils.notEmpty(BasicCodeEnum.MSG_0001, target, () -> msg);
+        ValidateUtils.notEmpty(BasicCodeEnum.MSG_0001, target, () ->
+                LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, seq));
     }
     // ----------
 
@@ -91,8 +91,8 @@ public class ValidateUtils {
     }
 
     public static void notEmpty(String method, Map<?, ?> target, int seq) {
-        String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, seq);
-        ValidateUtils.notEmpty(BasicCodeEnum.MSG_0001, target, () -> msg);
+        ValidateUtils.notEmpty(BasicCodeEnum.MSG_0001, target, () ->
+                LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, seq));
     }
 
     public static void notEmpty(IMessageCode code, Map<?, ?> target, Supplier<String> message) throws ValidateException {
@@ -111,8 +111,8 @@ public class ValidateUtils {
     }
 
     public static void notEmpty(String method, byte[] target, int seq) throws ValidateException {
-        String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, seq);
-        ValidateUtils.notEmpty(BasicCodeEnum.MSG_0001, target, () -> msg);
+        ValidateUtils.notEmpty(BasicCodeEnum.MSG_0001, target, () ->
+                LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, seq));
     }
 
     public static void notEmpty(IMessageCode code, byte[] target, Supplier<String> message) throws ValidateException {
@@ -131,8 +131,8 @@ public class ValidateUtils {
     }
 
     public static void notEmpty(String method, Object[] target, int seq) throws ValidateException {
-        String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, seq);
-        ValidateUtils.notEmpty(BasicCodeEnum.MSG_0001, target, () -> msg);
+        ValidateUtils.notEmpty(BasicCodeEnum.MSG_0001, target, () ->
+                LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, seq));
     }
 
     public static void notEmpty(IMessageCode code, Object[] target, Supplier<String> message) throws ValidateException {
@@ -151,8 +151,8 @@ public class ValidateUtils {
     }
 
     public static void notEmpty(String method, String target, int seq) throws ValidateException {
-        String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, seq);
-        ValidateUtils.notEmpty(BasicCodeEnum.MSG_0001, target, () -> msg);
+        ValidateUtils.notEmpty(BasicCodeEnum.MSG_0001, target, () ->
+                LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, seq));
     }
 
     public static void notEmpty(IMessageCode code, String target, Supplier<String> message) throws ValidateException {
@@ -179,10 +179,11 @@ public class ValidateUtils {
         if (ArrayUtils.isEmpty(arguments)) {
             msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method,
                     NumberUtils.ONE.intValue());
-        }
-        for (int i = 0; i < arguments.length; i++) {
-            if (arguments[i] == null) {
-                msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, i + 1);
+        } else {
+            for (int i = 0; i < arguments.length; i++) {
+                if (arguments[i] == null) {
+                    msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", method, i + 1);
+                }
             }
         }
         if (msg != null) {
@@ -196,8 +197,8 @@ public class ValidateUtils {
     }
 
     public static void isTrue(String method, boolean target) throws ValidateException {
-        String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.BOOLEAN", method, "true");
-        ValidateUtils.isTrue(BasicCodeEnum.MSG_0005, target, () -> msg);
+        ValidateUtils.isTrue(BasicCodeEnum.MSG_0005, target, () ->
+                LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.BOOLEAN", method, "true"));
     }
 
     public static void isTrue(IMessageCode code, boolean target, Supplier<String> message) throws ValidateException {
@@ -212,8 +213,8 @@ public class ValidateUtils {
     }
 
     public static void isFalse(String method, boolean target) throws ValidateException {
-        String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.BOOLEAN", method, "false");
-        ValidateUtils.isFalse(BasicCodeEnum.MSG_0005, target, () -> msg);
+        ValidateUtils.isFalse(BasicCodeEnum.MSG_0005, target, () ->
+                LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.BOOLEAN", method, "false"));
     }
 
     public static void isFalse(IMessageCode code, boolean target, Supplier<String> message) throws ValidateException {
@@ -285,8 +286,8 @@ public class ValidateUtils {
     }
 
     public static void equals(String method, long left, long right) throws ValidateException {
-        String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.EQUALS", method, "value");
-        ValidateUtils.equals(BasicCodeEnum.MSG_0005, left, right, () -> msg);
+        ValidateUtils.equals(BasicCodeEnum.MSG_0005, left, right, () ->
+                LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.EQUALS", method, "value"));
     }
 
     public static void equals(IMessageCode code, long left, long right, Supplier<String> message)
@@ -303,8 +304,8 @@ public class ValidateUtils {
     }
 
     public static void sameLength(String method, int index, String target, int length) throws ValidateException {
-        String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.LENGTH", method, index, length);
-        ValidateUtils.sameLength(BasicCodeEnum.MSG_0005, index, target, length, () -> msg);
+        ValidateUtils.sameLength(BasicCodeEnum.MSG_0005, index, target, length, () ->
+                LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.LENGTH", method, index, length));
     }
 
     public static void sameLength(IMessageCode code, int index, String target, int length, Supplier<String> message)
@@ -321,8 +322,8 @@ public class ValidateUtils {
     }
 
     public static void sameLength(String method, int index, byte[] target, int length) throws ValidateException {
-        String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.LENGTH", method, index, length);
-        ValidateUtils.sameLength(BasicCodeEnum.MSG_0005, index, target, length, () -> msg);
+        ValidateUtils.sameLength(BasicCodeEnum.MSG_0005, index, target, length, () ->
+                LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.LENGTH", method, index, length));
     }
 
     public static void sameLength(IMessageCode code, int index, byte[] target, int length, Supplier<String> message)
@@ -339,8 +340,8 @@ public class ValidateUtils {
     }
 
     public static void sameLength(String method, int index, Object[] target, int length) throws ValidateException {
-        String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.LENGTH", method, index, length);
-        ValidateUtils.sameLength(BasicCodeEnum.MSG_0005, index, target, length, () -> msg);
+        ValidateUtils.sameLength(BasicCodeEnum.MSG_0005, index, target, length, () ->
+                LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.LENGTH", method, index, length));
     }
 
     public static void sameLength(IMessageCode code, int index, Object[] target, int length, Supplier<String> message)
@@ -357,8 +358,8 @@ public class ValidateUtils {
     }
 
     public static void limit(String method, int index, Number target, Number min, Number max) throws ValidateException {
-        String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.LENGTH", method, index, StringUtils.EMPTY);
-        ValidateUtils.limit(BasicCodeEnum.MSG_0005, index, target, min, max, () -> msg);
+        ValidateUtils.limit(BasicCodeEnum.MSG_0005, index, target, min, max, () ->
+                LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.LENGTH", method, index, StringUtils.EMPTY));
     }
 
     public static void limit(IMessageCode code, int index, Number target, Number min, Number max,
@@ -390,8 +391,8 @@ public class ValidateUtils {
      * @throws ValidateException 目标不为合成类
      */
     public static void isSyntheticClass(String method, Object target) throws ValidateException {
-        String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.MUST", method, "Synthetic Class");
-        ValidateUtils.isSyntheticClass(BasicCodeEnum.MSG_0005, target, () -> msg);
+        ValidateUtils.isSyntheticClass(BasicCodeEnum.MSG_0005, target, () ->
+                LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.MUST", method, "Synthetic Class"));
     }
 
     public static void isSyntheticClass(IMessageCode code, Object target, Supplier<String> message)
