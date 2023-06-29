@@ -17,7 +17,7 @@ import java.nio.file.Paths;
  * 提取辅助工具
  *
  * @author xlgp2171
- * @version 2.1.220714
+ * @version 2.2.230630
  */
 public class ExtractHelper {
     static final String WINDOWS_PATH_SEPARATOR = "\\";
@@ -32,7 +32,7 @@ public class ExtractHelper {
     }
 
     public static Path fillPath(ExtractObject target, boolean idNamedDirectory) {
-        if (StringUtils.isTrimEmpty(target.getSource())) {
+        if (target.getSource() == null) {
             return null;
         }
         String path;
