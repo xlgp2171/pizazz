@@ -51,10 +51,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * outlook(application/vnd.ms-outlook)解析<br>
- * 解析属性Metadata包括：
+ * 解析属性
  *
  * @author xlgp2171
- * @version 2.2.230310
+ * @version 2.2.230705
  */
 public class OutlookParser extends AbstractParser {
 
@@ -438,10 +438,10 @@ public class OutlookParser extends AbstractParser {
                 throw new ParseException(CodeEnum.ETT_06, msg, e);
             }
             data = contents;
-            rName = rName + type.getExtension();
+            rName = rName + '.' + type.getExtension();
         } else {
             contentType = StringUtils.of(type.getType().getBaseType());
-            rName = rName + '.' + type.getExtension();
+            rName = System.currentTimeMillis() + '.' + type.getExtension();
         }
         if (data == null) {
             ExtractObject current = new ExtractObject(ExtractHelper.generateId(), rName, source)
@@ -453,6 +453,7 @@ public class OutlookParser extends AbstractParser {
             } finally {
                 current.archive(config.cleanData());
             }
+            listener.extracted(current);
             // 增加附件文件(已解析)
             parent.addAttachment(current);
         } else {
