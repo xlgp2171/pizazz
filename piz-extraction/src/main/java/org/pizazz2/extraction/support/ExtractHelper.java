@@ -17,11 +17,11 @@ import java.nio.file.Paths;
  * 提取辅助工具
  *
  * @author xlgp2171
- * @version 2.2.230630
+ * @version 2.2.230707
  */
 public class ExtractHelper {
-    static final String WINDOWS_PATH_SEPARATOR = "\\";
-    static final String PATH_DIRECTORY = "/";
+    public static final String WINDOWS_PATH_SEPARATOR = "\\";
+    public static final String PATH_DIRECTORY = "/";
 
     static IdBuilder ID_BUILDER;
 
