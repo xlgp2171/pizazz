@@ -41,7 +41,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * 无解析属性Metadata
  *
  * @author xlgp2171
- * @version 2.1.220714
+ * @version 2.2.230707
  */
 public class RarParser extends AbstractCompressParser {
 	@Override
@@ -126,7 +126,11 @@ public class RarParser extends AbstractCompressParser {
 		try (InputStream in = new ByteArrayInputStream(object.getData());
 			 Archive archive = new Archive(in, config.password())) {
 			for (FileHeader item : archive) {
-				Path path = Paths.get(item.getFileName());
+				// rar路径获取会出现dir\file_name，当linux下解析会将文件名称连通dir一起
+				String pathString = item.getFileName()
+						.replaceAll(ExtractHelper.WINDOWS_PATH_SEPARATOR + ExtractHelper.WINDOWS_PATH_SEPARATOR,
+								ExtractHelper.PATH_DIRECTORY);
+				Path path = Paths.get(pathString);
 
 				if (item.isDirectory()) {
 					if (config.includeDirectory()) {
@@ -141,8 +145,13 @@ public class RarParser extends AbstractCompressParser {
 						archive.extractFile(item, out);
 						data = out.toByteArray();
 					}
-					super.addAttachment(object, path.getFileName().toString(), ExtractHelper.pathResolve(parent, path))
-							.setData(data);
+					String name = path.getFileName().toString();
+					String source = ExtractHelper.pathResolve(parent, path);
+
+					if (LOGGER.isDebugEnabled()) {
+						LOGGER.debug("[EXTRACTION](RAR-4)ATTACHMENT: name=" + name + ",source=" + source);
+					}
+					super.addAttachment(object, name, source).setData(data);
 				}
 			}
 		}
@@ -222,8 +231,13 @@ public class RarParser extends AbstractCompressParser {
 					object.setStatus(ExtractObject.StatusEnum.BROKEN);
 					continue;
 				}
-				super.addAttachment(object, item.getFileName().toString(), ExtractHelper.pathResolve(parent,
-						itemDirectory.relativize(item))).setData(data);
+				String name = item.getFileName().toString();
+				String source = ExtractHelper.pathResolve(parent, itemDirectory.relativize(item));
+
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("[EXTRACTION](RAR-5)ATTACHMENT: name=" + name + ",source=" + source);
+				}
+				super.addAttachment(object, name, source).setData(data);
 			}
 		}
 		try {
