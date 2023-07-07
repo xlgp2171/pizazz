@@ -30,7 +30,7 @@ import java.util.Enumeration;
  * 若要采用zip加密，推荐使用zip4j，但zip4j无法通过内存加载
  *
  * @author xlgp2171
- * @version 2.1.220714
+ * @version 2.2.230707
  */
 public class ZipParser extends AbstractCompressParser {
     @Override
@@ -90,8 +90,13 @@ public class ZipParser extends AbstractCompressParser {
                                 .toString()).setStatus(ExtractObject.StatusEnum.EMPTY);
                     }
                 } else {
-                    super.addAttachment(object, path.getFileName().toString(), ExtractHelper.pathResolve(parent, path))
-                            .setData(IOUtils.toByteArray(file.getInputStream(entry)));
+                    String name = path.getFileName().toString();
+                    String source = ExtractHelper.pathResolve(parent, path);
+
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("[EXTRACTION](ZIP)ATTACHMENT: name=" + name + ",source=" + source);
+                    }
+                    super.addAttachment(object, name, source).setData(IOUtils.toByteArray(file.getInputStream(entry)));
                 }
             }
         }

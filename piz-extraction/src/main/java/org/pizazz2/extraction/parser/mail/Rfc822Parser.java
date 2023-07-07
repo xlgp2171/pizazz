@@ -51,7 +51,7 @@ import java.util.function.BiConsumer;
  * 解析属性Metadata包括：
  *
  * @author xlgp2171
- * @version 2.2.230310
+ * @version 2.2.230707
  */
 public class Rfc822Parser extends AbstractParser {
     static final String KEY_MULTIPART_ALTERNATIVE = "multipart/alternative";
@@ -309,6 +309,10 @@ public class Rfc822Parser extends AbstractParser {
                     }
                     Path tmp = StringUtils.isTrimEmpty(object.getSource()) ? null : Paths.get(object.getSource());
                     String source = tmp != null ? tmp.resolve(object.getId()).toString() : StringUtils.EMPTY;
+
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("[EXTRACTION](EML)ATTACHMENT: name=" + fileName + ",source=" + source);
+                    }
                     ExtractHelper.addAttachment(object, fileName, source, new Metadata()).setData(data);
                     // 附件录入到此结束
                     return;

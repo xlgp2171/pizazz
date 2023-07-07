@@ -29,7 +29,7 @@ import org.pizazz2.extraction.support.ExtractHelper;
  * 无解析属性Metadata
  *
  * @author xlgp2171
- * @version 2.1.220714
+ * @version 2.2.230707
  */
 public class TarParser extends AbstractCompressParser {
     public static final String[] TYPE = new String[] { "application/x-tar", "application/x-gtar" };
@@ -77,8 +77,13 @@ public class TarParser extends AbstractCompressParser {
                     byte[] data = new byte[length];
 
                     if (stream.read(data) > 0) {
-                        super.addAttachment(object, path.getFileName().toString(), ExtractHelper.pathResolve(
-                                parent, path)).setData(data);
+                        String name = path.getFileName().toString();
+                        String source = ExtractHelper.pathResolve(parent, path);
+
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("[EXTRACTION](TAR)ATTACHMENT: name=" + name + ",source=" + source);
+                        }
+                        super.addAttachment(object, name, source).setData(data);
                     }
                 }
                 entry = stream.getNextTarEntry();
@@ -102,8 +107,12 @@ public class TarParser extends AbstractCompressParser {
             Path parent = ExtractHelper.fillPath(object, idNamedDirectory);
             // 当压缩文件为单独时，name使用文件名称代替
             String name = getSubName(object, in);
-            super.addAttachment(object, name, ExtractHelper.pathResolve(parent, Paths.get(name)))
-                    .setType(type).setData(data);
+            String source = ExtractHelper.pathResolve(parent, Paths.get(name));
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("[EXTRACTION](TAR-SUB)ATTACHMENT: name=" + name + ",source=" + source);
+            }
+            super.addAttachment(object, name, source).setType(type).setData(data);
         }
     }
 

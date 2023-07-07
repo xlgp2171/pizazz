@@ -54,7 +54,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * 解析属性
  *
  * @author xlgp2171
- * @version 2.2.230705
+ * @version 2.2.230707
  */
 public class OutlookParser extends AbstractParser {
 
@@ -154,6 +154,9 @@ public class OutlookParser extends AbstractParser {
                 // 修正文件名称编码
                 if (!StringUtils.isEmpty(fileName)) {
                     fileName = ParseHelper.convert(fileName, parent.getMetadata().get(Metadata.CONTENT_ENCODING));
+                }
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("[EXTRACTION](MSG)ATTACHMENT: name=" + fileName + ",source=" + source);
                 }
                 // 增加附件文件(未解析)
                 super.addAttachment(parent, fileName, source).setData(item.getAttachData().getValue());
@@ -372,6 +375,9 @@ public class OutlookParser extends AbstractParser {
                     LOGGER.warn(e.getMessage() + ",name=" + dir.getName() + ",id=" + parent.getId());
                     data = ArrayUtils.EMPTY_BYTE;
                 }
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("[EXTRACTION](MSG)ATTACHMENT: name=" + dir.getName() + ",source=" + source);
+                }
                 // 增加附件文件(未解析)
                 ExtractObject tmp = super.addAttachment(parent, dir.getName(), source);
                 tmp.setType(type).setData(data);
@@ -444,7 +450,7 @@ public class OutlookParser extends AbstractParser {
             rName = System.currentTimeMillis() + '.' + type.getExtension();
         }
         if (data == null) {
-            ExtractObject current = new ExtractObject(ExtractHelper.generateId(), rName, source)
+            ExtractObject current = new ExtractObject(ExtractHelper.generateId(), rName, source, ArrayUtils.EMPTY_BYTE)
                     .setTypeString(getType()[0]);
             listener.detected(current);
             try {
@@ -454,9 +460,16 @@ public class OutlookParser extends AbstractParser {
                 current.archive(config.cleanData());
             }
             listener.extracted(current);
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("[EXTRACTION](MSG-SUB-RESOLVED)ATTACHMENT: name=" + rName + ",source=" + source);
+            }
             // 增加附件文件(已解析)
             parent.addAttachment(current);
         } else {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("[EXTRACTION](MSG-SUB)ATTACHMENT: name=" + rName + ",source=" + source);
+            }
             // 增加附件文件(未解析)
             ExtractObject tmp = super.addAttachment(parent, rName, source);
             tmp.setTypeString(contentType).setData(data);
