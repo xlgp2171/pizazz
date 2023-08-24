@@ -44,4 +44,29 @@ public class XMLUtilsTest {
         Element element = XMLUtils.withElement(nodes.item(0));
         Assert.assertEquals(element.getTextContent(), "23.4");
     }
+
+    @Test
+    public void testSampleXml() throws UtilityException {
+        Document doc = XMLUtils.getDocument("sample.xml");
+        Element root = XMLUtils.getRootElement(doc);
+
+        if (root != null) {
+            NodeList recordNode = XMLUtils.selectNodes("//record", doc);
+            System.out.println(recordNode.getLength());
+            List<Element> recordElements = XMLUtils.getChildElements(recordNode);
+
+            for (Element record : recordElements) {
+                NodeList fieldNode = record.getChildNodes();
+                List<Element> fieldElements = XMLUtils.getChildElements(fieldNode);
+
+                for (Element field : fieldElements) {
+                    String name = field.getAttribute("name");
+
+                    if (name.equals("srcip") || name.equals("dstip")) {
+                        System.out.println(field.getAttribute("value"));
+                    }
+                }
+            }
+        }
+    }
 }

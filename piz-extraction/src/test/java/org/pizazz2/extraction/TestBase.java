@@ -19,16 +19,20 @@ public class TestBase {
     }
 
     protected void println(ExtractObject object, boolean output, int level) {
+        println(object, output, level, 40);
+    }
+
+    protected void println(ExtractObject object, boolean output, int level, int length) {
         System.out.println(multiSpace(level) + "[" + object.getStatus().name() + " / " + object.getType() + "]: " +
                 object + "(" + object.getSource() + ")");
 
         if (output) {
             String text = object.getMetadata().toString();
             System.out.println(multiSpace(level) + "META: " +
-                    (text.length() > 40 ? text.substring(0, 40) + " ..." : text));
+                    (text.length() > length ? text.substring(0, length) + " ..." : text));
             text = object.getContent();
             System.out.println(multiSpace(level) + "TEXT: " +
-                    (text == null ? "None" : (text.length() > 40 ? text.substring(0, 40) + " ..." : text)));
+                    (text == null ? "None" : (text.length() > length ? text.substring(0, length) + " ..." : text)));
         }
         if (object.hasAttachment()) {
             for (ExtractObject item : object.getAttachment()) {

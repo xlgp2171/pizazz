@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 public class DataflowProcessorTest {
 
     static DataflowProcessor<ContentObject> PROCESSOR;
+    static final int PROCESS_TIME = 1000;
     static final boolean SYNC = false;
     static final int ACTIONS = 4;
     static final long SIZE = 8;
@@ -38,6 +39,11 @@ public class DataflowProcessorTest {
             String datetime = DateUtils.format(LocalDateTime.now(), "yyyy-MM-dd HH:mm:ss.SSS", null);
             String tmp = dataList.stream().map(ContentObject::getName).collect(Collectors.joining(","));
             System.out.println(datetime + ",size=" + tmp);
+            try {
+                Thread.sleep(PROCESS_TIME);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }, LISTENER).setActions(ACTIONS).setSize(SIZE).setInterval(INTERVAL).setSync(SYNC).setThreads(THREADS).build();
     }
 
@@ -46,7 +52,8 @@ public class DataflowProcessorTest {
         for (int i = 0; i < 9; i++) {
             PROCESSOR.add(new ContentObject("A" + i, ArrayUtils.EMPTY_BYTE));
         }
-        Thread.sleep(1000);
+        System.out.println("finish");
+        Thread.sleep(10000);
     }
 
     @Test
@@ -64,6 +71,15 @@ public class DataflowProcessorTest {
             Thread.sleep(700);
         }
         Thread.sleep(1000);
+    }
+
+    @Test
+    public void testBigData() throws InterruptedException {
+        for (int i = 0; i < 100; i++) {
+            PROCESSOR.add(new ContentObject("D" + i, "XXX".getBytes()));
+        }
+        System.out.println("FINISHED");
+        Thread.sleep(10000);
     }
 
     @AfterClass

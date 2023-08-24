@@ -51,6 +51,14 @@ public class CryptoFactoryTest {
     public void testMD5() {
         String result = new CryptoFactory.MD5Coder(MSG.getBytes(StandardCharsets.UTF_8)).toString();
         Assert.assertEquals(result, "apmpF3CXu7zZOGPDWEIrDw==");
+
+        long a = System.currentTimeMillis();
+
+        for (int i = 0; i < 2 * 50; i ++) {
+            new CryptoFactory.MD5Coder(MSG.getBytes(StandardCharsets.UTF_8)).toString();
+        }
+        long b = System.currentTimeMillis();
+        System.out.println(b - a);
     }
 
     @Test
