@@ -4,15 +4,15 @@
 	<parent>
 		<groupId>org.pizazz</groupId>
 		<artifactId>pizazz</artifactId>
-		<version>2.2.0</version>
+		<version>2.2.2</version>
 	</parent>
 	<artifactId>piz-base2</artifactId>
 	<packaging>jar</packaging>
 
 	<properties>
 		<fastjson.version>1.2.83</fastjson.version>
-		<snakeyaml.version>2.0</snakeyaml.version>
-		<kryo.version>5.4.0</kryo.version>
+		<snakeyaml.version>1.33</snakeyaml.version>
+		<kryo.version>5.5.0</kryo.version>
 	</properties>
 
 	<dependencies>
@@ -30,8 +30,12 @@
 			<groupId>com.esotericsoftware</groupId>
 			<artifactId>kryo</artifactId>
 			<version>${kryo.version}</version>
-			<!-- 需要时再引入，作用于类org.pizazz2.common.SerializationUtils -->
 			<scope>provided</scope>
 		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>cn.hutool</groupId>-->
+<!--			<artifactId>hutool-core</artifactId>-->
+<!--			<version>5.8.1</version>-->
+<!--		</dependency>-->
 	</dependencies>
 </project>
