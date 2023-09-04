@@ -11,7 +11,7 @@
     <artifactId>piz-extraction</artifactId>
 
     <properties>
-        <tika.version>2.8.0</tika.version>
+        <tika.version>2.7.0</tika.version>
         <slf4j.version>1.7.36</slf4j.version>
         <junrar.version>7.5.5</junrar.version>
     </properties>
@@ -43,18 +43,6 @@
         <dependency>
             <groupId>org.apache.tika</groupId>
 <!--            <artifactId>tika-parsers</artifactId>-->
-            <artifactId>tika-parsers-standard-package</artifactId>
-            <version>${tika.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <!--            <artifactId>tika-parsers</artifactId>-->
-            <artifactId>tika-parsers-standard-package</artifactId>
-            <version>${tika.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <!--            <artifactId>tika-parsers</artifactId>-->
             <artifactId>tika-parsers-standard-package</artifactId>
             <version>${tika.version}</version>
         </dependency>
