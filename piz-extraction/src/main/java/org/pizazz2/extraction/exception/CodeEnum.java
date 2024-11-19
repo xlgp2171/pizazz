@@ -6,7 +6,7 @@ import org.pizazz2.message.ref.IMessageCode;
  * 错误码
  *
  * @author xlgp2171
- * @version 2.0.210501
+ * @version 2.2.240627
  */
 public enum CodeEnum implements IMessageCode {
     /** 读取IO异常 */
@@ -20,7 +20,9 @@ public enum CodeEnum implements IMessageCode {
     /** Tika解析异常 */
     ETT_05("ETT05#"),
     /** 邮件附件解析异常 */
-    ETT_06("ETT06#");
+    ETT_06("ETT06#"),
+    /** 加密无法抽取异常 */
+    ETT_07("ETT07#");
 
     private final String code;
 

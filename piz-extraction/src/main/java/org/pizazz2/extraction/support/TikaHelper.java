@@ -9,6 +9,7 @@ import org.pizazz2.common.PathUtils;
 import org.pizazz2.exception.UtilityException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.extraction.exception.DetectionException;
+import org.pizazz2.extraction.exception.EncryptionException;
 import org.pizazz2.extraction.exception.ParseException;
 import org.pizazz2.extraction.process.TikaProcessor;
 
@@ -54,40 +55,40 @@ public class TikaHelper {
     }
 
     public static String extractToText(Path path, Metadata metadata, Charset charset)
-            throws UtilityException, ParseException, ValidateException {
+            throws UtilityException, ParseException, EncryptionException, ValidateException {
         byte[] tmp = PathUtils.toByteArray(path);
         return TikaHelper.extractToText(tmp, metadata, charset);
     }
 
     public static String extractToText(byte[] data, Metadata metadata, Charset charset)
-            throws ParseException, ValidateException {
+            throws ParseException, EncryptionException, ValidateException {
         return Singleton.INSTANCE.get().extract(data, metadata, charset, TikaProcessor.HandlerEnum.TEXT);
     }
 
     public static String extractToHtml(Path path, Metadata metadata, Charset charset)
-            throws UtilityException, ParseException, ValidateException {
+            throws UtilityException, ParseException, EncryptionException, ValidateException {
         byte[] tmp = PathUtils.toByteArray(path);
         return TikaHelper.extractToHtml(tmp, metadata, charset);
     }
 
     public static String extractToHtml(byte[] data, Metadata metadata, Charset charset)
-            throws ParseException, ValidateException {
+            throws ParseException, EncryptionException, ValidateException {
         return Singleton.INSTANCE.get().extract(data, metadata, charset, TikaProcessor.HandlerEnum.HTML);
     }
 
     public static String extractToXml(Path path, Metadata metadata, Charset charset)
-            throws UtilityException, ParseException, ValidateException {
+            throws UtilityException, ParseException, EncryptionException, ValidateException {
         byte[] tmp = PathUtils.toByteArray(path);
         return TikaHelper.extractToXml(tmp, metadata, charset);
     }
 
     public static String extractToXml(byte[] data, Metadata metadata, Charset charset)
-            throws ParseException, ValidateException {
+            throws ParseException, EncryptionException, ValidateException {
         return Singleton.INSTANCE.get().extract(data, metadata, charset, TikaProcessor.HandlerEnum.XML);
     }
 
     public static String extract(byte[] data, Metadata metadata, Charset charset, TikaProcessor.HandlerEnum handler)
-            throws ParseException {
+            throws ParseException, EncryptionException, ValidateException {
         return Singleton.INSTANCE.get().extract(data, metadata, charset, handler);
     }
 

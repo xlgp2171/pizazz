@@ -1,6 +1,7 @@
 package org.pizazz2.extraction.process;
 
 import org.apache.tika.config.TikaConfig;
+import org.apache.tika.exception.EncryptedDocumentException;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
@@ -16,6 +17,7 @@ import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.extraction.exception.DetectionException;
 import org.pizazz2.extraction.exception.CodeEnum;
+import org.pizazz2.extraction.exception.EncryptionException;
 import org.pizazz2.extraction.exception.ParseException;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -33,7 +35,7 @@ import java.nio.charset.Charset;
  * 可参考使用ForkParser
  *
  * @author xlgp2171
- * @version 2.1.211104
+ * @version 2.2.240627
  */
 public class TikaProcessor {
     private final TikaConfig config;
@@ -62,19 +64,22 @@ public class TikaProcessor {
     }
 
     public String extract(byte[] data, Metadata metadata, Charset charset, HandlerEnum format)
-            throws ParseException, IllegalException {
+            throws ParseException, EncryptionException, ValidateException {
         // 默认初始化大小5MB
-        ByteArrayOutputStream tmp = new ByteArrayOutputStream(5 * 1024 * 1024);
+        ByteArrayOutputStream tmp = new ByteArrayOutputStream(10 * 1024 * 1024);
         ContentHandler handler = format.newHandler(tmp, charset,false);
         extract(data, metadata, handler);
         return tmp.toString();
     }
 
 
-    private void extract(byte[] data, Metadata metadata, ContentHandler handler) throws ParseException {
+    private void extract(byte[] data, Metadata metadata, ContentHandler handler)
+            throws ParseException, EncryptionException {
         try (TikaInputStream stream = TikaInputStream.get(data, metadata)) {
             //             ContentHandler handler = new BodyContentHandler(-1);
             parser.parse(stream, handler, metadata, context);
+        } catch (EncryptedDocumentException e) {
+            throw new EncryptionException(CodeEnum.ETT_07, "ENCRYPTED:" + e.getMessage(), e);
         } catch (IOException | SAXException | TikaException e) {
             throw new ParseException(CodeEnum.ETT_05, "EXTRACT:" + e.getMessage(), e);
         }

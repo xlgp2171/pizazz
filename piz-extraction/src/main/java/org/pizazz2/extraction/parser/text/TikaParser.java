@@ -6,6 +6,7 @@ import org.pizazz2.common.StringUtils;
 import org.pizazz2.data.TupleObject;
 import org.pizazz2.exception.IllegalException;
 import org.pizazz2.exception.ValidateException;
+import org.pizazz2.extraction.exception.EncryptionException;
 import org.pizazz2.extraction.process.IExtractListener;
 import org.pizazz2.extraction.config.IConfig;
 import org.pizazz2.extraction.config.ParseConfig;
@@ -29,7 +30,7 @@ import java.util.Set;
  * 解析属性Metadata由数据类型决定
  *
  * @author xlgp2171
- * @version 2.1.211103
+ * @version 2.2.240627
  */
 public class TikaParser extends AbstractParser {
     static final MediaType TYPE_DEFAULT = MediaType.parse("text/plain");
@@ -54,7 +55,12 @@ public class TikaParser extends AbstractParser {
 
         if (handler != null) {
             discover(object, tmp);
-            content = TikaHelper.extract(object.getData(), object.getMetadata(), config.charset(), handler);
+            try {
+                content = TikaHelper.extract(object.getData(), object.getMetadata(), config.charset(), handler);
+            } catch (EncryptionException e) {
+                // 若加密则状态修改为加密
+                object.setStatus(ExtractObject.StatusEnum.ENCRYPTION);
+            }
         } else {
             object.setStatus(ExtractObject.StatusEnum.UNSUPPORTED);
         }

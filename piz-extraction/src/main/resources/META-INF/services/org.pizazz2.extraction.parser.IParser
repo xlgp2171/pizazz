@@ -8,3 +8,4 @@ org.pizazz2.extraction.parser.compress.GzipParser
 org.pizazz2.extraction.parser.compress.RarParser
 org.pizazz2.extraction.parser.text.HwpV3Parser
 org.pizazz2.extraction.parser.text.TikaParser
+org.pizazz2.extraction.parser.audio.FlacParser
