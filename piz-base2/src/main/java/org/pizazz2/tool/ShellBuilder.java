@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * SHELL运行组件
  * 
  * @author xlgp2171
- * @version 2.1.210720
+ * @version 2.2.241119
  */
 public class ShellBuilder implements ICloseable {
 
@@ -36,15 +36,29 @@ public class ShellBuilder implements ICloseable {
 	private Duration timeout = Duration.ZERO;
 
 	public ShellBuilder(IShellFactory factory, String[] command) throws ValidateException {
+		this(factory, command, true);
+	}
+
+	public ShellBuilder(IShellFactory factory, String[] command, boolean commandHead) throws ValidateException {
 		ValidateUtils.notNull("ShellBuilder", factory);
 		this.factory = factory;
 		builder = new ProcessBuilder();
-		command(command);
+		command(command, commandHead);
 	}
 
+	@Deprecated
 	public void command(String[] command) {
+		this.command(command, true);
+	}
+
+	/**
+	 * 输入命令
+	 * @param command 命令
+	 * @param commandHead 是否有命令头（如windows会自动填上["cmd", "-c"]）
+	 */
+	public void command(String[] command, boolean commandHead) {
 		if (!ArrayUtils.isEmpty(command)) {
-			builder.command(ArrayUtils.merge(PizContext.LOCAL_OS.getEnvironment(), command));
+			builder.command(commandHead ? ArrayUtils.merge(PizContext.LOCAL_OS.getEnvironment(), command) : command);
 		}
 	}
 
