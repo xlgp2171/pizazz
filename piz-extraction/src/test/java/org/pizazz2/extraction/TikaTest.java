@@ -11,24 +11,55 @@ import org.apache.tika.parser.CompositeParser;
 import org.apache.tika.parser.Parser;
 import org.junit.Test;
 import org.pizazz2.common.IOUtils;
+import org.pizazz2.common.PathUtils;
 import org.pizazz2.exception.UtilityException;
+import org.pizazz2.extraction.exception.DetectionException;
+import org.pizazz2.extraction.exception.EncryptionException;
 import org.pizazz2.extraction.exception.ParseException;
 import org.pizazz2.extraction.support.TikaHelper;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
 public class TikaTest {
     static final String NAME = "sample.zip";
+    static final Path RESOURCE_PATH = Paths.get("src\\test\\resources");
 
     @Test
-    public void testExtractByTika() throws ParseException, UtilityException {
+    public void testExtractByTika() throws ParseException, EncryptionException, UtilityException {
         byte[] data = IOUtils.toByteArray(IOUtils.getResourceAsStream(NAME));
         Metadata metadata = new Metadata();
         String content = TikaHelper.extractToText(data, metadata, StandardCharsets.UTF_8);
         System.out.println("META: " + metadata);
         System.out.println("TEXT: " + content);
+    }
+
+    @Test
+    public void testMediaType() {
+        MediaType type = MediaType.parse("audio/pcm");
+        System.out.println(type.getBaseType().toString());
+    }
+
+    @Test
+    public void testDetectAll() throws UtilityException, DetectionException {
+        Path[] paths = PathUtils.listPaths(RESOURCE_PATH, null, false);
+
+        for (Path item : paths) {
+            Metadata metadata = new Metadata();
+            MediaType detect = TikaHelper.detect(item, metadata);
+            System.out.println(detect.toString() + " : " + item.getFileName());
+        }
+    }
+
+    @Test
+    public void testDetect() throws UtilityException, DetectionException {
+        Path path = Paths.get("E:\\Music\\古典音乐1\\VOL29_拉威尔_色彩绚丽的名曲\\29_拉威爾_色彩絢麗的名曲_01_波麗露.mp3");
+        Metadata metadata = new Metadata();
+        MediaType detect = TikaHelper.detect(path, metadata);
+        System.out.println(detect.toString() + " : " + path.getFileName());
     }
 
     @Test

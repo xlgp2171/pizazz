@@ -8,6 +8,7 @@ import org.gagravarr.flac.FlacFile;
 import org.gagravarr.flac.FlacInfo;
 import org.gagravarr.flac.FlacOggFile;
 import org.gagravarr.ogg.OggStreamIdentifier;
+import org.pizazz2.common.StringUtils;
 import org.pizazz2.exception.ValidateException;
 import org.pizazz2.extraction.config.IConfig;
 import org.pizazz2.extraction.data.ExtractObject;
@@ -41,7 +42,7 @@ public class FlacParser extends AbstractParser {
 		// Open the FLAC file
 		try (FlacFile flac = FlacFile.open(new ByteArrayInputStream(object.getData()))) {
 			FlacInfo info = flac.getInfo();
-			metadata.set("channel", "2");
+			metadata.set("channels", StringUtils.of(info.getNumChannels()));
 			metadata.set(XMPDM.AUDIO_SAMPLE_RATE, info.getSampleRate());
 			metadata.set(XMPDM.DURATION, info.getNumberOfSamples() * 1.0 / info.getSampleRate());
 

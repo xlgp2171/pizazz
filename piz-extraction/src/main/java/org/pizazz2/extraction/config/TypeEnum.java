@@ -8,7 +8,7 @@ import java.util.*;
  * 类型枚举
  *
  * @author xlgp2171
- * @version 2.3.241028
+ * @version 2.3.241230
  */
 public enum TypeEnum {
     /** 文档 */
@@ -24,9 +24,9 @@ public enum TypeEnum {
     /** 电子邮件 */
     EMAIL(new MapObject("application/vnd.ms-outlook", "msg").append("message/rfc822", "eml")),
     /** 音频 */
-    AUDIO(new MapObject("audio/vnd.wave", "wav").append("audio/vorbis", "ogg").append("audio/ogg", "oga")
-            .append("audio/mpeg", "mp3").append("audio/x-flac", "flac").append("audio/x-aac", "aac")
-            .append("audio/amr", "amr").append("audio/mp4", "m4a")),
+    AUDIO(new MapObject("audio/vnd.wave", "wav").append("audio/vorbis", "ogg").append("audio/mpeg", "mp3")
+            .append("audio/x-flac", "flac").append("audio/x-aac", "aac").append("audio/amr", "amr")
+            .append("audio/mp4", "m4a")),
     /** 视频 */
     VIDEO(new MapObject("video/x-msvideo", "avi").append("video/x-ms-wmv", "wmv").append("video/x-flv", "flv")
             .append(" video/webm", "webm").append("video/mpeg", "mpg").append("video/mp4", "mp4")
@@ -38,10 +38,10 @@ public enum TypeEnum {
             .append("image/svg+xml", "svg").append("image/tiff", "tiff").append("image/webp", "webp")),
     /** 压缩文件 */
     COMPRESS(new MapObject("application/x-rar-compressed; version=4", "rar")
-            .append("application/x-rar-compressed; version=5", "rar").append("application/x-bzip2", "bz2")
-            .append("application/gzip", "gz").append("application/x-7z-compressed", "7z")
-            .append("application/x-tar", "tar").append("application/x-gtar", "tar").append("application/zip", "zip")
-            .append("image/webp", "webp"));
+            .append("application/x-rar-compressed; version=5", "rar").append("application/x-rar-compressed", "rar")
+            .append("application/x-bzip2", "bz2").append("application/gzip", "gz")
+            .append("application/x-7z-compressed", "7z").append("application/x-tar", "tar")
+            .append("application/x-gtar", "tar").append("application/zip", "zip").append("image/webp", "webp"));
 
     private final MapObject type;
 
@@ -49,12 +49,16 @@ public enum TypeEnum {
         this.type = type;
     }
 
-    public Map<String, String> getType() {
+    Map<String, String> getType() {
         return type.get();
     }
 
+    public Set<String> getExtractTypes() {
+        return getType().keySet();
+    }
+
     public String getSuffix(String key) {
-        return contains(key) ? type.get().get(key) : "";
+        return contains(key) ? getType().get(key).split("/")[0] : "";
     }
 
     public boolean contains(String key) {
@@ -63,6 +67,15 @@ public enum TypeEnum {
 
     public void append(String key, String value) {
         type.append(key, value);
+    }
+
+    public static TypeEnum fromType(String typeString) {
+        for (TypeEnum item : values()) {
+            if (item.contains(typeString)) {
+                return item;
+            }
+        }
+        throw new IllegalArgumentException(typeString);
     }
 
     static class MapObject {

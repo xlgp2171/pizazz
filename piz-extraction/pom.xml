@@ -13,7 +13,6 @@
     <properties>
         <tika.version>2.9.2</tika.version>
         <slf4j.version>1.7.36</slf4j.version>
-        <junrar.version>7.5.4</junrar.version>
     </properties>
 
     <dependencies>
@@ -46,11 +45,10 @@
             <artifactId>tika-parsers-standard-package</artifactId>
             <version>${tika.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>com.github.junrar</groupId>
-            <artifactId>junrar</artifactId>
-            <version>${junrar.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.github.pjfanning</groupId>-->
+<!--            <artifactId>excel-streaming-reader</artifactId>-->
+<!--            <version>4.3.1</version>-->
+<!--        </dependency>-->
     </dependencies>
 </project>

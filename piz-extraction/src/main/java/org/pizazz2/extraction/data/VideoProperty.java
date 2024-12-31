@@ -1,28 +1,35 @@
 package org.pizazz2.extraction.data;
 
-public class VideoProperty extends AbstractProperty{
-    private String duration;
-    /** 分辨率 */
-    private String resolution;
+public class VideoProperty extends FileProperty {
+    private float duration = -1F;
+
+    private int width = -1;
+    private int height = -1;
     public VideoProperty(long length, String type, String suffix) {
         super(length, type, suffix);
     }
 
-    public String getDuration() {
+    public float getDuration() {
         return duration;
     }
 
-    public VideoProperty setDuration(String duration) {
+    public void setDuration(float duration) {
         this.duration = duration;
-        return this;
     }
 
-    public String getResolution() {
-        return resolution;
+    public int getWidth() {
+        return width;
     }
 
-    public VideoProperty setResolution(String resolution) {
-        this.resolution = resolution;
-        return this;
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 }

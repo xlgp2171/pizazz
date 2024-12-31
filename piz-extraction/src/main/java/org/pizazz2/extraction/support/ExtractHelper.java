@@ -17,7 +17,7 @@ import java.nio.file.Paths;
  * 提取辅助工具
  *
  * @author xlgp2171
- * @version 2.2.230707
+ * @version 2.2.241231
  */
 public class ExtractHelper {
     public static final String WINDOWS_PATH_SEPARATOR = "\\";
@@ -107,5 +107,16 @@ public class ExtractHelper {
         ExtractObject tmp = new ExtractObject(id, StringUtils.isEmpty(name) ? id : name, source, metadata);
         object.addAttachment(tmp);
         return tmp;
+    }
+
+    /**
+     * 修改抽取对象内容
+     * @param object 抽取对象
+     * @param content 内容
+     */
+    public static void updateContent(ExtractObject object, String content) {
+        if (object != null) {
+            object.forceUpdateContent(content);
+        }
     }
 }

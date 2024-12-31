@@ -1,8 +1,8 @@
 package org.pizazz2.extraction.data;
 
-public class AudioProperty extends AbstractProperty {
+public class AudioProperty extends FileProperty {
     /** 持续时长 */
-    private float duration;
+    private float duration = -1F;
     /**  */
     private int bits;
     /** 通道 */

@@ -156,6 +156,18 @@ public class ExtractObject extends LinkedObject<byte[]> implements IData {
         return this;
     }
 
+    public ExtractObject forceUpdateContent(String content) {
+        synchronized (this) {
+            // 当前状态
+            ExtractObject.StatusEnum status = getStatus();
+            // 需要该状态才能成功设置类型
+            setStatus(ExtractObject.StatusEnum.READY);
+            setContent(content);
+            setStatus(status);
+        }
+        return this;
+    }
+
     public ExtractObject setStatus(StatusEnum status) {
         if (status != null) {
             this.status = status;

@@ -1,11 +1,12 @@
 package org.pizazz2.extraction.data;
 
-public class AbstractProperty {
+
+public class FileProperty {
     private final long length;
     private final String type;
     private final String suffix;
 
-    public AbstractProperty(long length, String type, String suffix) {
+    public FileProperty(long length, String type, String suffix) {
         this.length = length;
         this.type = type;
         this.suffix = suffix;
@@ -21,14 +22,5 @@ public class AbstractProperty {
 
     public String getSuffix() {
         return suffix;
-    }
-
-    @Override
-    public String toString() {
-        return "AbstractProperty{" +
-                "length=" + length +
-                ", type='" + type + '\'' +
-                ", suffix='" + suffix + '\'' +
-                '}';
     }
 }
