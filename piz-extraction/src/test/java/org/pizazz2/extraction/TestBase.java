@@ -5,10 +5,12 @@ import org.pizazz2.extraction.data.ExtractObject;
 import org.pizazz2.extraction.exception.DetectionException;
 import org.pizazz2.extraction.exception.ParseException;
 
+/**
+ * 测试基类
+ */
 public class TestBase {
-
-    protected void extract(TextExtraction executor, ExtractObject object, TupleObject config) throws DetectionException,
-            ParseException {
+    protected void extract(TextExtraction executor, ExtractObject object, TupleObject config)
+            throws DetectionException, ParseException {
         executor.extract(object, config);
 
         if (object.hasAttachment()) {
@@ -19,22 +21,28 @@ public class TestBase {
     }
 
     protected void println(ExtractObject object, boolean output, int level) {
-        println(object, output, level, 40);
+        println(object, output, level, 64);
     }
 
     protected void println(ExtractObject object, boolean output, int level, int length) {
-        System.out.println(multiSpace(level) + "[" + object.getStatus().name() + " / " + object.getType() + "]: " +
-                object + "(" + object.getSource() + ")");
+        System.out.println(multiSpace(level) + "[" + object.getStatus().name() + " (" + object.getType() + ")]:\t" +
+                object + " (" + object.getSource() + ")");
 
         if (output) {
             String text = object.getMetadata().toString();
-            System.out.println(multiSpace(level) + "META: " +
+            System.out.println(multiSpace(level) + "META:\t" +
                     (text.length() > length ? text.substring(0, length) + " ..." : text));
             text = object.getContent();
-            System.out.println(multiSpace(level) + "TEXT: " +
-                    (text == null ? "None" : (text.length() > length ? text.substring(0, length) + " ..." : text)));
+
+            if (text != null) {
+                text = text.replaceAll("\n", " ");
+                System.out.println(multiSpace(level) + "TEXT:\t" +
+                        (text.length() > length ? text.substring(0, length) + " ..." : text));
+            }
         }
         if (object.hasAttachment()) {
+            System.out.println(multiSpace(level) + "ATTA:\t");
+
             for (ExtractObject item : object.getAttachment()) {
                 println(item, output, level + 1);
             }
