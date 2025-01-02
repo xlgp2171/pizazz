@@ -161,7 +161,7 @@ public class ExtractObject extends LinkedObject<byte[]> implements IData {
             // 当前状态
             ExtractObject.StatusEnum status = getStatus();
             // 需要该状态才能成功设置类型
-            setStatus(ExtractObject.StatusEnum.READY);
+            reset();
             setContent(content);
             setStatus(status);
         }

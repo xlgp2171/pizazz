@@ -15,12 +15,11 @@ import java.util.Arrays;
  * @version 2.3.241231
  */
 public class TypeHelper {
-    @SuppressWarnings({"unchecked"})
-    public static <T>T toProperty(Metadata metadata, Class<T> clazz) {
+    public static <T>T toProperty(Metadata metadata, Class<T> clazz) throws ClassCastException {
         String type = metadata.get(Metadata.CONTENT_TYPE);
         String typeReal = type.split(";")[0];
         long length = NumberUtils.toLong(metadata.get(Metadata.CONTENT_LENGTH), -1L);
-        FileProperty property = null;
+        FileProperty property;
 
         if (TypeEnum.DOCUMENT.contains(typeReal)) {
             property = TypeHelper.toDocumentProperty(metadata, length, type);
@@ -38,13 +37,21 @@ public class TypeHelper {
             String[] names = metadata.get(TikaCoreProperties.RESOURCE_NAME_KEY).split("\\.");
             property = new FileProperty(length, type, names[names.length - 1]);
         }
-        return (T) property;
+        return clazz.cast(property);
+    }
+
+    public static TypeEnum findType(ExtractObject object) throws IllegalArgumentException {
+        return TypeEnum.fromType(object.getTypeString());
     }
 
     public static DocumentProperty toDocumentProperty(Metadata metadata, long length, String type) {
         String typeReal = type.split(";")[0];
         DocumentProperty property = new DocumentProperty(length, type, TypeEnum.DOCUMENT.getSuffix(typeReal));
 
+        if ("application/x-hwp".equals(type)) {
+            // FIXME 该类型暂时无法解析
+            return property;
+        }
         if ("text/plain".equals(typeReal) || "text/html".equals(typeReal) || "text/x-vcard".equals(typeReal) ||
                 "application/xhtml+xml".equals(typeReal) || "text/x-web-markdown".equals(typeReal)) {
             property.setEncoding(metadata.get(Metadata.CONTENT_ENCODING));
@@ -54,7 +61,8 @@ public class TypeHelper {
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document".equals(typeReal) ||
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet".equals(typeReal) ||
                 "application/vnd.openxmlformats-officedocument.presentationml.presentation".equals(typeReal) ||
-                "application/vnd.ms-excel".equals(typeReal) || "application/vnd.ms-powerpoint".equals(typeReal)) {
+                "application/vnd.ms-excel".equals(typeReal) || "application/vnd.ms-powerpoint".equals(typeReal) ||
+                "application/x-hwp-v5".equals(type)) {
             Integer page = metadata.getInt(Office.PAGE_COUNT);
             property.setPage(page != null ? page : -1);
             property.setCreator(metadata.get(DublinCore.CREATOR));

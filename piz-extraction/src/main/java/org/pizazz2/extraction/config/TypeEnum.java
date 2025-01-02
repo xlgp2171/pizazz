@@ -20,7 +20,8 @@ public enum TypeEnum {
             .append("application/vnd.openxmlformats-officedocument.presentationml.presentation", "pptx")
             .append("application/xml", "xml").append("text/csv", "csv").append("application/pdf", "pdf")
             .append("text/plain", "txt").append("text/html", "html").append("application/xhtml+xml", "xhtml")
-            .append("text/x-web-markdown", "md").append("text/x-vcard", "vcf")),
+            .append("text/x-web-markdown", "md").append("text/x-vcard", "vcf").append("application/x-hwp", "hwp")
+            .append("application/x-hwp", "hwp").append("application/x-hwp-v5", "hwp")),
     /** 电子邮件 */
     EMAIL(new MapObject("application/vnd.ms-outlook", "msg").append("message/rfc822", "eml")),
     /** 音频 */
@@ -69,7 +70,7 @@ public enum TypeEnum {
         type.append(key, value);
     }
 
-    public static TypeEnum fromType(String typeString) {
+    public static TypeEnum fromType(String typeString) throws IllegalArgumentException {
         for (TypeEnum item : values()) {
             if (item.contains(typeString)) {
                 return item;
