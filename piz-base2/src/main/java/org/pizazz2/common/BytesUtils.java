@@ -13,7 +13,7 @@ import org.pizazz2.message.TypeEnum;
  * 字节工具
  *
  * @author xlgp2171
- * @version 2.1.211104
+ * @version 3.0.250102
  */
 public class BytesUtils {
 
@@ -42,7 +42,8 @@ public class BytesUtils {
     }
 
     public static byte[] toBytes(boolean target) {
-        return ByteBuffer.allocate(Byte.BYTES).put(target ? NumberUtils.ONE.byteValue() : NumberUtils.ZERO.byteValue()).array();
+        return ByteBuffer.allocate(Byte.BYTES).put(
+                target ? NumberUtils.ONE.byteValue() : NumberUtils.ZERO.byteValue()).array();
     }
 
     public static long toLong(byte[] target) throws ValidateException {
@@ -102,7 +103,7 @@ public class BytesUtils {
         } else if (target instanceof Boolean) {
             buffer.put(((boolean) target) ? NumberUtils.ONE.byteValue() : NumberUtils.ZERO.byteValue());
         } else if (target instanceof ISerializable) {
-            buffer.put(((ISerializable) target).serialize());
+            buffer.put(((ISerializable<?>) target).serialize());
         } else {
             String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.SUPPORT",
                     "addObject", target.getClass().getName());
@@ -122,7 +123,7 @@ public class BytesUtils {
                 String msg = LocaleHelper.toLocaleText(TypeEnum.BASIC, "ERR.ARGS.NULL", "buffer", i);
                 throw new ValidateException(BasicCodeEnum.MSG_0001, msg);
             }
-            length += ObjectUtils.getObjectLength(data[i]);
+            length += (int) ObjectUtils.getObjectLength(data[i]);
         }
         ByteBuffer tmp = ByteBuffer.allocate(length);
 

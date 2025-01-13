@@ -9,12 +9,12 @@ import java.time.Duration;
  *
  * @param <T> 根据输出内容注册泛型
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 3.0.250102
  */
 @FunctionalInterface
 public interface IMessageOutput<T> extends ICloseable {
-    static final IMessageOutput<String> EMPTY_STRING = message -> message = null;
-    static final IMessageOutput<String> EMPTY_STRING_ENABLED = new IMessageOutput<String>() {
+    IMessageOutput<String> EMPTY_STRING = message -> {};
+    IMessageOutput<String> EMPTY_STRING_ENABLED = new IMessageOutput<>() {
         @Override
         public boolean isEnabled() {
             return true;

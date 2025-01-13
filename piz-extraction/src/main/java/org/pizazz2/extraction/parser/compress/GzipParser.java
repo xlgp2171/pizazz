@@ -39,9 +39,8 @@ public class GzipParser extends TarParser {
 	protected String getSubName(ExtractObject object, InputStream in) {
 		String name = null;
 
-		if (in instanceof GzipCompressorInputStream) {
-			GzipCompressorInputStream gin = (GzipCompressorInputStream) in;
-			name = gin.getMetaData().getFilename();
+		if (in instanceof GzipCompressorInputStream gin) {
+			name = gin.getMetaData().getFileName();
 		}
 		if (StringUtils.isEmpty(name)) {
 			name = super.getSubName(object, in);

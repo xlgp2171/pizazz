@@ -1,7 +1,7 @@
 package org.pizazz2.kafka.consumer;
 
 import org.pizazz2.common.StringUtils;
-import org.pizazz2.common.YAMLUtils;
+import org.pizazz2.common.YamlUtils;
 import org.pizazz2.data.TupleObject;
 import org.pizazz2.exception.UtilityException;
 import org.pizazz2.exception.ValidateException;
@@ -34,7 +34,7 @@ public enum ConsumerTemplateEnum {
 
     public void fill(TupleObject clientC, TupleObject configC) throws ValidateException, UtilityException {
         if (this != ConsumerTemplateEnum.NONE) {
-            TupleObject tmp = YAMLUtils.fromYAML(name().toLowerCase() + ".yml");
+            TupleObject tmp = YamlUtils.fromYAML(name().toLowerCase() + ".yml");
             clientC.putAll(TupleObjectHelper.merge(TupleObjectHelper.getTupleObject(tmp, KafkaConstant.KEY_CLIENT), clientC));
             configC.putAll(TupleObjectHelper.merge(TupleObjectHelper.getTupleObject(tmp, KafkaConstant.KEY_CONFIG), configC));
         }

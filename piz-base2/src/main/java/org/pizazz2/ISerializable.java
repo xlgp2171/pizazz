@@ -10,9 +10,9 @@ import org.pizazz2.exception.ValidateException;
  * 序列化接口
  *
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 3.0.250102
  */
-public interface ISerializable extends Serializable {
+public interface ISerializable<T extends Serializable> extends Serializable {
     /**
      * 对象序列化
      * @return 数据二进制流
@@ -25,7 +25,7 @@ public interface ISerializable extends Serializable {
      * @param data 数据二进制流
      * @throws ValidateException 反序列化异常
      */
-    void deserialize(byte[] data) throws ValidateException;
+    T deserialize(byte[] data) throws ValidateException;
 
     /**
      * 获取编码格式

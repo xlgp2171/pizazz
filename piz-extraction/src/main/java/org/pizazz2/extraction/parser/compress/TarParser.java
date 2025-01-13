@@ -29,7 +29,7 @@ import org.pizazz2.extraction.support.ExtractHelper;
  * 无解析属性Metadata
  *
  * @author xlgp2171
- * @version 2.2.230707
+ * @version 3.0.250110
  */
 public class TarParser extends AbstractCompressParser {
     public static final String[] TYPE = new String[] { "application/x-tar", "application/x-gtar" };
@@ -60,7 +60,7 @@ public class TarParser extends AbstractCompressParser {
                                 boolean idNamedDirectory) throws IOException, DetectionException, ParseException {
         try (ByteArrayInputStream in = new ByteArrayInputStream(object.getData());
              TarArchiveInputStream stream = new TarArchiveInputStream(in, charset.name())) {
-            TarArchiveEntry entry = stream.getNextTarEntry();
+            TarArchiveEntry entry = stream.getNextEntry();
             Path parent = ExtractHelper.fillPath(object, idNamedDirectory);
 
             while (entry != null) {
@@ -73,7 +73,7 @@ public class TarParser extends AbstractCompressParser {
                                 .toString()).setStatus(ExtractObject.StatusEnum.EMPTY);
                     }
                 } else {
-                    int length = new Long(entry.getSize()).intValue();
+                    int length = Long.valueOf(entry.getSize()).intValue();
                     byte[] data = new byte[length];
 
                     if (stream.read(data) > 0) {
@@ -86,7 +86,7 @@ public class TarParser extends AbstractCompressParser {
                         super.addAttachment(object, name, source).setData(data);
                     }
                 }
-                entry = stream.getNextTarEntry();
+                entry = stream.getNextEntry();
             }
         }
     }

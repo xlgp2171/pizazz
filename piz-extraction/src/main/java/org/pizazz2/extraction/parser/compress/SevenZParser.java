@@ -24,7 +24,7 @@ import java.nio.file.Paths;
  * 可设置外部密码
  *
  * @author xlgp2171
- * @version 2.2.230707
+ * @version 3.0.250110
  */
 public class SevenZParser extends AbstractCompressParser {
 
@@ -46,7 +46,7 @@ public class SevenZParser extends AbstractCompressParser {
 		char[] tmp = StringUtils.isTrimEmpty(password) ? null : password.toCharArray();
 
 		try (SeekableInMemoryByteChannel memory = new SeekableInMemoryByteChannel(object.getData());
-				SevenZFile file = new SevenZFile(memory, tmp)) {
+				SevenZFile file = SevenZFile.builder().setSeekableByteChannel(memory).setPassword(tmp).get()) {
 			SevenZArchiveEntry entry = file.getNextEntry();
 			Path parent = ExtractHelper.fillPath(object, idNamedDirectory);
 
@@ -61,7 +61,7 @@ public class SevenZParser extends AbstractCompressParser {
 								.toString()).setStatus(ExtractObject.StatusEnum.EMPTY);
 					}
 				} else {
-					int length = new Long(entry.getSize()).intValue();
+					int length = Long.valueOf(entry.getSize()).intValue();
 					byte[] data = new byte[length];
 					file.read(data, 0, length);
 					String name = path.getFileName().toString();

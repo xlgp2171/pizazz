@@ -1,6 +1,5 @@
 package org.pizazz2.tool;
 
-import org.pizazz2.ICloseable;
 import org.pizazz2.IMessageOutput;
 import org.pizazz2.PizContext;
 import org.pizazz2.common.ArrayUtils;
@@ -23,9 +22,9 @@ import java.util.concurrent.atomic.AtomicReference;
  * SHELL运行组件
  * 
  * @author xlgp2171
- * @version 2.2.241119
+ * @version 3.0.250110
  */
-public class ShellBuilder implements ICloseable {
+public class ShellBuilder {
 
 	private final IdBuilder idBuilder = IdFactory.newInstance();
 	private final AtomicLong id = new AtomicLong(-1L);
@@ -146,8 +145,7 @@ public class ShellBuilder implements ICloseable {
 		});
 	}
 
-	@Override
-	public void destroy(Duration timeout) {
+	public void close() {
 		turn(id.get(), null, true);
 		id.lazySet(-1L);
 	}

@@ -30,7 +30,7 @@ import java.util.Enumeration;
  * 若要采用zip加密，推荐使用zip4j，但zip4j无法通过内存加载
  *
  * @author xlgp2171
- * @version 2.2.230707
+ * @version 3.0.250110
  */
 public class ZipParser extends AbstractCompressParser {
     @Override
@@ -56,7 +56,7 @@ public class ZipParser extends AbstractCompressParser {
 
     private boolean encrypted(byte[] data) throws IOException {
         try (SeekableInMemoryByteChannel memory = new SeekableInMemoryByteChannel(data);
-			 ZipFile file = new ZipFile(memory)) {
+			 ZipFile file = ZipFile.builder().setSeekableByteChannel(memory).get()) {
             Enumeration<ZipArchiveEntry> entries = file.getEntries();
 
             while (entries.hasMoreElements()) {
@@ -74,7 +74,7 @@ public class ZipParser extends AbstractCompressParser {
     protected void doUncompress(ExtractObject object, Charset charset, boolean includeDirectory,
                                 boolean idNamedDirectory) throws IOException, UtilityException {
         try (SeekableInMemoryByteChannel memory = new SeekableInMemoryByteChannel(object.getData());
-			 ZipFile file = new ZipFile(memory, charset.name())) {
+			 ZipFile file = ZipFile.builder().setSeekableByteChannel(memory).setCharset(charset).get()) {
             Enumeration<ZipArchiveEntry> entries = file.getEntries();
             Path parent = ExtractHelper.fillPath(object, idNamedDirectory);
 

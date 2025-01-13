@@ -56,12 +56,10 @@ public class ObjectUtils {
 		long length = 0;
 		data = ArrayUtils.nullToEmpty(data);
 
-		if (data.length > 0) {
-			for (Object item : data) {
-				length += ObjectUtils.getObjectLength(item);
-			}
-		}
-		return length;
+        for (Object item : data) {
+            length += ObjectUtils.getObjectLength(item);
+        }
+        return length;
 	}
 
 	public static long getObjectLength(Object target) throws IllegalException {

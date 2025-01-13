@@ -6,13 +6,13 @@
     <parent>
         <artifactId>pizazz</artifactId>
         <groupId>org.pizazz</groupId>
-        <version>2.2.4</version>
+        <version>3.0.0</version>
     </parent>
     <artifactId>piz-extraction</artifactId>
 
     <properties>
-        <tika.version>2.9.2</tika.version>
-        <slf4j.version>1.7.36</slf4j.version>
+        <tika.version>3.0.0</tika.version>
+        <slf4j.version>2.0.16</slf4j.version>
     </properties>
 
     <dependencies>
@@ -41,7 +41,6 @@
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
-<!--            <artifactId>tika-parsers</artifactId>-->
             <artifactId>tika-parsers-standard-package</artifactId>
             <version>${tika.version}</version>
         </dependency>

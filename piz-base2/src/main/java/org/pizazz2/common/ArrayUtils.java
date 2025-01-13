@@ -159,7 +159,7 @@ public class ArrayUtils {
         return Stream.of(target).collect(Collectors.toSet());
     }
 
-    public static int getMinimumLength(String[] target) {
+    public static int getElementMinimumLength(String[] target) {
         if (ArrayUtils.isEmpty(target)) {
             return NumberUtils.NEGATIVE_ONE.intValue();
         }

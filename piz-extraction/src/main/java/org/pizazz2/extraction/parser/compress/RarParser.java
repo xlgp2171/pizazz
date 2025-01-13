@@ -41,7 +41,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * 无解析属性Metadata
  *
  * @author xlgp2171
- * @version 2.2.230707
+ * @version 3.0.250110
  */
 public class RarParser extends AbstractCompressParser {
 	@Override
@@ -175,7 +175,7 @@ public class RarParser extends AbstractCompressParser {
 		String command = config.rarPath().toString() + " x -p" + config.password() + " -y " + itemPath + " " +
                 itemDirectory;
 
-		if (executeCommand(command, Optional.ofNullable(PizContext.LOCAL_ENCODING).orElse(config.charset()))) {
+		if (executeCommand(command, Optional.of(PizContext.LOCAL_ENCODING).orElse(config.charset()))) {
 			object.setStatus(ExtractObject.StatusEnum.ENCRYPTION);
 		} else {
 			loadAllFiles(object, itemDirectory, itemPath, config.includeDirectory(), config.idNamedDirectory());

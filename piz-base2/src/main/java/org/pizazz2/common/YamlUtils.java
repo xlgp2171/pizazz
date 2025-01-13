@@ -20,9 +20,9 @@ import org.yaml.snakeyaml.error.YAMLException;
  * 使用snakeyaml组件
  * 
  * @author xlgp2171
- * @version 2.0.210201
+ * @version 3.0.250102
  */
-public class YAMLUtils {
+public class YamlUtils {
 
 	public static <T> T fromYAML(InputStream target, Class<T> type) throws ValidateException, UtilityException {
 		ValidateUtils.notNull("fromYAML", target, type);
@@ -37,7 +37,7 @@ public class YAMLUtils {
 	public static TupleObject fromYAML(InputStream target) throws ValidateException, UtilityException {
 		ValidateUtils.notNull("fromYAML", target);
 		try {
-			return YAMLUtils.fromYAML(target, TupleObject.class);
+			return YamlUtils.fromYAML(target, TupleObject.class);
 		} finally {
 			SystemUtils.close(target);
 		}
@@ -52,7 +52,7 @@ public class YAMLUtils {
 	 */
 	public static TupleObject fromYAML(String resource) throws ValidateException, UtilityException {
 		try (InputStream tmp = IOUtils.getResourceAsStream(resource, PizContext.class, null)) {
-			return YAMLUtils.fromYAML(tmp, TupleObject.class);
+			return YamlUtils.fromYAML(tmp, TupleObject.class);
 		} catch (IOException e) {
 			return TupleObjectHelper.emptyObject();
 		}
@@ -77,7 +77,7 @@ public class YAMLUtils {
 	 */
 	public static void toYAML(Path path, TupleObject data) throws ValidateException, UtilityException {
 		ValidateUtils.notNull("fromYAML", path, data);
-		String tmp = YAMLUtils.toYAMLString(path, data);
+		String tmp = YamlUtils.toYAMLString(path, data);
 		PathUtils.copyToPath(tmp.getBytes(PizContext.LOCAL_ENCODING), path);
 	}
 }

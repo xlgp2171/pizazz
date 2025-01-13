@@ -100,7 +100,7 @@ public final class ShellFactory implements IShellFactory, ICloseable {
         @Override
         public List<String> get() {
             final List<String> tmp = new LinkedList<>();
-            IOUtils.readLine(in, charset, new IMessageOutput<String>() {
+            IOUtils.readLine(in, charset, new IMessageOutput<>() {
                 @Override
                 public void write(String message) {
                     if (call.isEnabled()) {

@@ -10,7 +10,6 @@ import org.pizazz2.common.NumberUtils;
 import org.pizazz2.data.TupleObject;
 import org.pizazz2.exception.BaseException;
 import org.pizazz2.exception.BaseRuntimeException;
-import org.pizazz2.exception.ValidateException;
 import org.pizazz2.kafka.exception.CodeEnum;
 import org.pizazz2.kafka.exception.KafkaException;
 import org.pizazz2.kafka.core.AbstractClient;
@@ -27,7 +26,7 @@ import java.util.concurrent.ExecutionException;
  * @param <V> 消息Value
  *
  * @author xlgp2171
- * @version 2.1.220626
+ * @version 3.0.250110
  */
 public class Management<K, V> extends AbstractClient {
     private AdminClient admin;
@@ -56,7 +55,7 @@ public class Management<K, V> extends AbstractClient {
     }
 
     public Map<String, KafkaFuture<TopicDescription>> describeTopics(Collection<String> topics) {
-        return admin.describeTopics(topics).values();
+        return admin.describeTopics(topics).topicNameValues();
     }
 
     public Map<String, KafkaFuture<ConsumerGroupDescription>> describedGroups(Collection<String> groupIds) {
@@ -84,13 +83,13 @@ public class Management<K, V> extends AbstractClient {
     }
 
     public KafkaFuture<Void> createTopic(String topic, int partition, int replicationFactor) {
-        NewTopic tmp = new NewTopic(topic, partition, new Integer(replicationFactor).shortValue());
+        NewTopic tmp = new NewTopic(topic, partition, Integer.valueOf(replicationFactor).shortValue());
         Map<String, KafkaFuture<Void>> result = admin.createTopics(Collections.singletonList(tmp)).values();
         return result.getOrDefault(topic, null);
     }
 
     public KafkaFuture<Void> deleteTopic(String topic) {
-        Map<String, KafkaFuture<Void>> result = admin.deleteTopics(Collections.singletonList(topic)).values();
+        Map<String, KafkaFuture<Void>> result = admin.deleteTopics(Collections.singletonList(topic)).topicNameValues();
         return result.getOrDefault(topic, null);
     }
 

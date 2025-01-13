@@ -1,15 +1,12 @@
 package org.pizazz2.extraction.parser.compress;
 
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.pizazz2.common.StringUtils;
 import org.pizazz2.extraction.data.ExtractObject;
 import org.pizazz2.extraction.exception.DetectionException;
 import org.pizazz2.extraction.exception.ParseException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.Charset;
 
 /**
